@@ -1,7 +1,7 @@
 'use client';
 
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Import useEffect
 import { format } from 'date-fns';
 import {
   Table,
@@ -40,7 +40,13 @@ const statusColors: Record<Appointment['status'], string> = {
 
 export const AdminAppointmentManager: FC<AdminAppointmentManagerProps> = ({ initialAppointments }) => {
   const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
+  const [isClient, setIsClient] = useState(false); // State to track client-side mount
   const { toast } = useToast();
+
+  // Set isClient to true only after the component mounts
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Sort appointments by date, upcoming first
   const sortedAppointments = [...appointments].sort((a, b) => a.date.getTime() - b.date.getTime());
@@ -84,8 +90,9 @@ export const AdminAppointmentManager: FC<AdminAppointmentManagerProps> = ({ init
           {sortedAppointments.map((appointment) => (
             <TableRow key={appointment.id}>
               <TableCell>
-                <div>{format(appointment.date, 'PPP')}</div>
-                <div className="text-sm text-muted-foreground">{format(appointment.date, 'p')}</div>
+                {/* Only format the time on the client side after mount */}
+                <div>{isClient ? format(appointment.date, 'PPP') : ''}</div>
+                <div className="text-sm text-muted-foreground">{isClient ? format(appointment.date, 'p') : '...'}</div>
               </TableCell>
               <TableCell>
                 <div className="font-medium">{appointment.clientName}</div>
