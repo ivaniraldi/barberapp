@@ -44,13 +44,12 @@ export const ServiceList: FC<ServiceListProps> = ({ services }) => {
             animate={isSingleService ? undefined : "visible"}
             // Pass index for stagger delay
             custom={index}
-            // Remove transition prop here as it's defined in variants
-            // transition={isSingleService ? undefined : { delay: index * 0.05 }}
         >
           {/* Use Card styling implicitly via parent or keep transparent */}
-          <div className={isSingleService ? "p-0" : "p-0"}> {/* Adjusted padding */}
+          <div className="p-0"> {/* Adjusted padding */}
               <div className="flex items-start sm:items-center justify-between mb-2 flex-col sm:flex-row gap-2 sm:gap-0">
                 <h3 className="text-lg font-semibold flex items-center text-primary">
+                  {/* Icon only shown if it's part of a list, not a single display */}
                   {!isSingleService && <Scissors className="mr-2 h-5 w-5 text-primary shrink-0" />}
                    {service.name}
                 </h3>

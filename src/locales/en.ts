@@ -29,8 +29,8 @@ export default {
     title: 'Our Services',
     subtitle: 'Find the perfect grooming service for you.',
     no_services: 'No services currently available. Please check back later.',
-    category_other: 'Other', // Default category name
-    // Added category translations (keys should be lowercase and use underscores)
+    // Added specific category translations with 'category_' prefix
+    category_other: 'Other Services',
     category_haircuts: 'Haircuts',
     category_beard_care: 'Beard Care',
     category_shaves: 'Shaves',
@@ -41,8 +41,8 @@ export default {
   cuts_page: {
       title: 'Style Gallery',
       subtitle: 'Explore the cuts and styles we offer.',
-      all_cuts: 'All Cuts', // Default category if needed, or for filter
-      // Add categories as needed, mirroring service categories if desired
+      all_cuts: 'All Cuts', // Filter option
+      // Keys for filters, matching service categories if applicable
       haircuts: 'Haircuts',
       beard_care: 'Beard Care',
       shaves: 'Shaves',

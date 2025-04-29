@@ -29,8 +29,8 @@ export default {
     title: 'Nuestros Servicios',
     subtitle: 'Encuentra el servicio de aseo perfecto para ti.',
     no_services: 'No hay servicios disponibles actualmente. Por favor, vuelve más tarde.',
-    category_other: 'Otros',
-    // Added category translations (keys should be lowercase and use underscores)
+    // Added specific category translations with 'category_' prefix
+    category_other: 'Otros Servicios',
     category_haircuts: 'Cortes de Pelo',
     category_beard_care: 'Cuidado de Barba',
     category_shaves: 'Afeitados',
