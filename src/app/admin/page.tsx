@@ -9,11 +9,11 @@ import { Button } from "@/components/ui/button"; // Import Button
 import Link from "next/link"; // Import Link
 
 
-// Mock Appointments Data - Replace with actual data fetching later
+// Mock Appointments Data - Use ISO strings for consistency across server/client
 const mockAppointments = [
-    { id: 'a1', clientName: 'John Doe', clientPhone: '+15551234', clientEmail: 'john@example.com', serviceName: 'Classic Haircut', date: new Date(2024, 6, 25, 10, 0), status: 'Confirmed' },
-    { id: 'a2', clientName: 'Jane Smith', clientPhone: '+15555678', clientEmail: 'jane@example.com', serviceName: 'Beard Trim', date: new Date(2024, 6, 25, 11, 30), status: 'Pending' },
-    { id: 'a3', clientName: 'Bob Johnson', clientPhone: '+15559012', clientEmail: 'bob@example.com', serviceName: 'Hot Towel Shave', date: new Date(2024, 6, 26, 14, 0), status: 'Completed' },
+    { id: 'a1', clientName: 'John Doe', clientPhone: '+15551234', clientEmail: 'john@example.com', serviceName: 'Classic Haircut', date: '2024-07-25T10:00:00Z', status: 'Confirmed' }, // Use ISO 8601 format (UTC)
+    { id: 'a2', clientName: 'Jane Smith', clientPhone: '+15555678', clientEmail: 'jane@example.com', serviceName: 'Beard Trim', date: '2024-07-25T11:30:00Z', status: 'Pending' },
+    { id: 'a3', clientName: 'Bob Johnson', clientPhone: '+15559012', clientEmail: 'bob@example.com', serviceName: 'Hot Towel Shave', date: '2024-07-26T14:00:00Z', status: 'Completed' },
 ];
 
 

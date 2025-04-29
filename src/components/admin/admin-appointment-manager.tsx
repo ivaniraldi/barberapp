@@ -2,7 +2,7 @@
 'use client';
 
 import type { FC } from 'react';
-import { useState } from 'react'; // Removed useEffect
+import { useState, useEffect } from 'react'; // Import useEffect
 import { format } from 'date-fns';
 import {
   Table,
@@ -13,7 +13,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-// Removed Button as Select is used for actions now
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, CheckCircle, XCircle, Clock, User, Phone, Mail, Scissors } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -24,7 +23,7 @@ interface Appointment {
   clientPhone: string;
   clientEmail: string;
   serviceName: string;
-  date: Date; // Keep as Date object
+  date: Date | string; // Allow string for initial props, parse inside
   status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
 }
 
@@ -39,14 +38,38 @@ const statusColors: Record<Appointment['status'], string> = {
     Completed: 'bg-blue-900/50 border-blue-700 text-blue-300', // Dark theme adjustment
 };
 
+// Helper function to safely create a Date object
+const safeParseDate = (dateInput: Date | string): Date | null => {
+  try {
+    const date = new Date(dateInput);
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      return null; // Invalid date
+    }
+    return date;
+  } catch (error) {
+    console.error("Error parsing date:", error);
+    return null;
+  }
+};
+
 export const AdminAppointmentManager: FC<AdminAppointmentManagerProps> = ({ initialAppointments }) => {
   const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
-  // Removed isClient state
+  const [isClient, setIsClient] = useState(false); // State to track client-side mount
   const { toast } = useToast();
 
+  useEffect(() => {
+    setIsClient(true); // Set to true after component mounts
+  }, []);
+
   // Sort appointments by date, upcoming first
-  // Ensure date comparison works correctly
-  const sortedAppointments = [...appointments].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  // Ensure date comparison works correctly by parsing dates safely
+  const sortedAppointments = [...appointments].sort((a, b) => {
+    const dateA = safeParseDate(a.date);
+    const dateB = safeParseDate(b.date);
+    if (!dateA || !dateB) return 0; // Handle invalid dates if necessary
+    return dateA.getTime() - dateB.getTime();
+   });
 
    const updateAppointmentStatus = async (appointmentId: string, newStatus: Appointment['status']) => {
        // Simulate API call
@@ -85,13 +108,23 @@ export const AdminAppointmentManager: FC<AdminAppointmentManagerProps> = ({ init
                <TableCell colSpan={5} className="text-center text-muted-foreground py-6">No appointments found.</TableCell>
              </TableRow>
            )}
-          {sortedAppointments.map((appointment) => (
+          {sortedAppointments.map((appointment) => {
+            const appointmentDate = safeParseDate(appointment.date);
+            return (
             <TableRow key={appointment.id} className="hover:bg-muted/50">
               <TableCell>
                  {/* Format date directly. Ensure the Date object is valid. */}
-                 {/* If initialAppointments pass dates as strings, parse them first */}
-                <div>{format(new Date(appointment.date), 'PPP')}</div>
-                <div className="text-sm text-muted-foreground">{format(new Date(appointment.date), 'p')}</div>
+                 {appointmentDate ? (
+                    <>
+                      <div>{format(appointmentDate, 'PPP')}</div>
+                      {/* Only render time formatting on the client */}
+                      <div className="text-sm text-muted-foreground h-4"> {/* Added fixed height to prevent layout shift */}
+                        {isClient ? format(appointmentDate, 'p') : ''}
+                      </div>
+                    </>
+                 ) : (
+                    <div className="text-destructive">Invalid Date</div>
+                 )}
               </TableCell>
               <TableCell>
                 <div className="font-medium text-primary">{appointment.clientName}</div>
@@ -132,7 +165,7 @@ export const AdminAppointmentManager: FC<AdminAppointmentManagerProps> = ({ init
                   </Select>
               </TableCell>
             </TableRow>
-          ))}
+          )})}
         </TableBody>
       </Table>
     </div>
