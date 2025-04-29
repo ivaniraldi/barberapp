@@ -3,7 +3,8 @@ import { GalleryGrid } from '@/components/gallery-grid';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { getServices, type Service } from '@/lib/services'; // Re-use services for categories maybe
-import { getI18n } from '@/locales/server';
+import { getI18n } from '@/locales/server'; // Import server-side i18n
+import { setStaticParamsLocale } from 'next-international/server'; // Correct import for setStaticParamsLocale
 import { MotionDiv } from '@/components/motion-provider';
 import { Images } from 'lucide-react'; // Icon for gallery
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'; // Use Tabs for filtering
@@ -62,7 +63,10 @@ const categoryTranslationKeys: Record<string, string> = {
     // Add more mappings if needed
 };
 
-export default async function CutsPage() {
+export default async function CutsPage({ params }: { params: { locale: string } }) {
+  // Set locale for static generation (important for build)
+  setStaticParamsLocale(params.locale);
+
   const t = await getI18n();
   const categories = getUniqueCategories(cutImages);
 

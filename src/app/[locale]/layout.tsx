@@ -8,8 +8,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Navbar } from '@/components/navbar';
 import { I18nProviderClient } from '@/locales/client'; // Import client provider
 import type { ReactNode } from 'react';
-import { MotionProvider } from '@/components/motion-provider'; // Import MotionProvider
+import { MotionProvider } from '@/components/motion-provider';
 import { getStaticParams } from '@/locales/server'; // Import getStaticParams for locale generation
+import { setStaticParamsLocale } from 'next-international/server'; // Import setStaticParamsLocale
 
 interface LocaleLayoutProps {
   children: ReactNode;
@@ -31,7 +32,7 @@ export default function LocaleLayout({ children, params: { locale } }: LocaleLay
     // Removed Geist font variables from html tag
     // Ensure no extra whitespace or comments directly inside the html tag
     <html lang={validLocale} className={`dark`}>
-      <body className="antialiased bg-gradient-to-br from-background via-background/95 to-secondary/10 text-foreground min-h-screen flex flex-col">
+       <body className="antialiased bg-gradient-to-br from-background via-background/95 to-secondary/10 text-foreground min-h-screen flex flex-col">
         {/* Wrap content with I18nProviderClient */}
         <I18nProviderClient locale={validLocale}> {/* Pass validated locale */}
            {/* Wrap with MotionProvider */}
@@ -56,5 +57,10 @@ export default function LocaleLayout({ children, params: { locale } }: LocaleLay
 // unless you want to pre-render specific locale pages during build.
 // Next.js dynamic routing will handle non-pre-rendered locales.
  export function generateStaticParams() {
-   return getStaticParams(); // Use the function exported from locales/server
+   const params = getStaticParams(); // Get locale objects like [{ locale: 'en' }, ...]
+   // Set the locale for each param object during static generation
+   params.forEach(({ locale }) => {
+     setStaticParamsLocale(locale);
+   });
+   return params;
  }

@@ -86,36 +86,36 @@ export function Navbar() {
                const isActive = pathname === baseHref || (item.href === '/' && pathname === `/${currentLocale}`);
 
                return (
-                <MotionButton
-                  key={item.href}
-                  asChild
-                  variant="ghost" // Use ghost for less emphasis, rely on underline/color
-                  className={cn(
-                    'transition-colors text-sm font-medium relative group px-3 py-2 rounded-md', // Added rounded-md for better hover effect
-                    isActive
-                    ? 'text-accent' // Use accent color for active link
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50' // Subtle hover
-                  )}
-                  initial="hidden"
-                  animate="visible"
-                  variants={navItemVariants}
-                  transition={{ delay: 0.1 + index * 0.1 }} // Stagger animation
-                  whileHover={{ y: -1 }} // Subtle lift effect on hover
-                  whileTap={{ scale: 0.97 }}
-                >
-                    <Link href={item.href}>
-                     {/* Always show icon + text for clarity */}
-                    <item.icon className="mr-1.5 h-4 w-4 inline-block shrink-0" />
-                    <span className="">{t(item.labelKey as any)}</span>
-                     {/* Underline effect for hover and active states */}
-                     <span className={cn(
-                        "absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-accent w-0 group-hover:w-[80%] transition-all duration-300", // Centered underline grow on hover
-                         isActive ? 'w-[80%]' : 'w-0' // Ensure underline stays for active item
-                     )}></span>
-                    </Link>
-                </MotionButton>
-              );
-           })}
+                 // Wrap Link with MotionDiv instead of using MotionButton asChild
+                 <MotionDiv
+                   key={item.href}
+                   initial="hidden"
+                   animate="visible"
+                   variants={navItemVariants}
+                   transition={{ delay: 0.1 + index * 0.1 }} // Stagger animation
+                   whileHover={{ y: -1 }} // Subtle lift effect on hover
+                   whileTap={{ scale: 0.97 }}
+                 >
+                   <Button
+                     asChild // Button still needs asChild to render Link correctly
+                     variant="ghost"
+                     className={cn(
+                       'transition-colors text-sm font-medium relative group px-3 py-2 rounded-md',
+                       isActive ? 'text-accent' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                     )}
+                   >
+                     <Link href={item.href}>
+                       <item.icon className="mr-1.5 h-4 w-4 inline-block shrink-0" />
+                       <span>{t(item.labelKey as any)}</span>
+                       <span className={cn(
+                         "absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-accent w-0 group-hover:w-[80%] transition-all duration-300",
+                         isActive ? 'w-[80%]' : 'w-0'
+                       )}></span>
+                     </Link>
+                   </Button>
+                 </MotionDiv>
+               );
+            })}
 
           {/* Language Dropdown */}
           <DropdownMenu>
@@ -137,19 +137,22 @@ export function Navbar() {
           </DropdownMenu>
 
           {/* Admin Login CTA Button */}
-          <MotionButton
-             asChild
-             variant="accent" // Use the accent variant for primary CTA
-             size="sm"
-             className="ml-2" // Add margin for spacing
-             variants={accentButtonVariants} // Use specific variants for accent button
+           <MotionDiv
+             variants={accentButtonVariants}
              whileHover="hover"
              whileTap="tap"
+             className="ml-2" // Apply margin to the wrapper div
            >
-            <Link href="/login">
-                <LogIn className="mr-1.5 h-4 w-4"/> {t('nav.admin_login')}
-            </Link>
-          </MotionButton>
+            <Button
+               asChild
+               variant="accent" // Use the accent variant for primary CTA
+               size="sm"
+             >
+              <Link href="/login">
+                  <LogIn className="mr-1.5 h-4 w-4"/> {t('nav.admin_login')}
+              </Link>
+            </Button>
+           </MotionDiv>
         </div>
 
         {/* Mobile Navigation Trigger */}
@@ -177,11 +180,12 @@ export function Navbar() {
             </SheetTrigger>
              <SheetContent side="right" className="w-[280px] bg-background p-0 flex flex-col border-l border-border/50"> {/* Added border */}
                <SheetHeader className="p-6 border-b border-border/50">
-                   <SheetTitle className="sr-only">{t('nav.toggle_menu')}</SheetTitle> {/* Hidden title for accessibility */}
-                   <Link href="/" className="flex items-center space-x-2 text-lg font-bold text-primary" onClick={closeMobileMenu}>
-                    <Scissors className="h-6 w-6 text-accent" />
-                    <span>BarberApp</span>
-                   </Link>
+                   <SheetTitle> {/* Keep title for accessibility, can be visually hidden if needed */}
+                       <Link href="/" className="flex items-center space-x-2 text-lg font-bold text-primary" onClick={closeMobileMenu}>
+                        <Scissors className="h-6 w-6 text-accent" />
+                        <span>BarberApp</span>
+                       </Link>
+                   </SheetTitle>
                </SheetHeader>
               <div className="flex-grow flex flex-col space-y-1.5 p-4 overflow-y-auto"> {/* Make menu scrollable */}
                  {navItems.map((item, index) => {
@@ -218,21 +222,25 @@ export function Navbar() {
               </div>
                {/* Mobile Admin Login CTA */}
                <div className="mt-auto p-4 border-t border-border/50">
-                <SheetClose asChild>
-                   <MotionButton
-                     asChild
-                     variant="accent" // Use accent variant for consistency
-                     className="w-full"
-                     onClick={closeMobileMenu}
-                     variants={accentButtonVariants} // Use accent variants
+                 {/* Wrap Link with MotionDiv instead of using MotionButton asChild */}
+                 <MotionDiv
+                     variants={accentButtonVariants}
                      whileHover="hover"
                      whileTap="tap"
-                    >
-                      <Link href="/login">
-                          <LogIn className="mr-2 h-4 w-4"/> {t('nav.admin_login')}
-                      </Link>
-                   </MotionButton>
-                  </SheetClose>
+                 >
+                    <SheetClose asChild>
+                       <Button
+                         asChild
+                         variant="accent" // Use accent variant for consistency
+                         className="w-full"
+                         onClick={closeMobileMenu}
+                        >
+                          <Link href="/login">
+                              <LogIn className="mr-2 h-4 w-4"/> {t('nav.admin_login')}
+                          </Link>
+                       </Button>
+                    </SheetClose>
+                  </MotionDiv>
                </div>
             </SheetContent>
           </Sheet>

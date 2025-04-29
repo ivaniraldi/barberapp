@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { useI18n, useCurrentLocale } from '@/locales/client';
 import { MotionDiv } from '@/components/motion-provider';
 import { cn } from '@/lib/utils';
+// Removed unused import: import { setStaticParamsLocale } from '@/locales/server'; // Import setStaticParamsLocale for build
 
 // Map locale strings to date-fns locale objects
 const dateLocales: { [key: string]: Locale } = {
@@ -54,7 +55,15 @@ const parseAppointments = (data: typeof mockAppointmentsData): Appointment[] => 
     })).filter(app => !isNaN(app.date.getTime())); // Filter out invalid dates
 };
 
+
+// This component is client-side, but the page itself might be pre-rendered.
+// We don't strictly need getStaticProps here as the component fetches data client-side.
+// However, if this page *were* a Server Component needing params, the setStaticParamsLocale would go here.
+
 export default function CalendarPage() {
+   // No need for setStaticParamsLocale here because it's a client component.
+   // The layout handles the locale setting for the route.
+
   const t = useI18n();
   const currentLocale = useCurrentLocale() as keyof typeof dateLocales; // Ensure type safety
   const locale = dateLocales[currentLocale] || pt; // Default to Portuguese locale

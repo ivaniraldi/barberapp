@@ -9,7 +9,9 @@ import { getServices } from "@/lib/services";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getI18n } from '@/locales/server'; // Import server-side i18n
+import { setStaticParamsLocale } from 'next-international/server'; // Correct import for setStaticParamsLocale
 import { MotionDiv } from '@/components/motion-provider'; // Import MotionDiv
+import { getCurrentLocale } from '@/locales/server'; // Import getCurrentLocale if needed for logic
 
 // Mock Appointments Data - Use ISO strings for consistency across server/client
 // In a real app, fetch this data from your backend/database
@@ -44,7 +46,10 @@ const cardHoverEffect = {
 };
 
 
-export default async function AdminPage() {
+export default async function AdminPage({ params }: { params: { locale: string } }) {
+  // Set locale for static generation (important for build)
+  setStaticParamsLocale(params.locale);
+
   const t = await getI18n(); // Get translation function
   // In a real app, you'd add authentication checks here, possibly using middleware or a HOC
   // For now, we assume access is granted if the user reaches this page (middleware handles basic check).
@@ -66,16 +71,22 @@ export default async function AdminPage() {
                 {t('admin_page.authenticated')}
             </span>
             {/* Logout Button - Professional Outline Style */}
-            <Button
-                variant="outline"
-                size="sm"
-                asChild
-                className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:border-destructive/70 transition-colors duration-200" // Destructive outline style
+             <MotionDiv
+                variants={itemVariants} // Apply animation variants if needed
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
              >
-                <Link href="/"> {/* Link back to homepage (locale handled) */}
-                    <LogOut className="mr-2 h-4 w-4"/> {t('nav.logout')}
-                </Link>
-            </Button>
+               <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:border-destructive/70 transition-colors duration-200" // Destructive outline style
+               >
+                  <Link href="/"> {/* Link back to homepage (locale handled) */}
+                      <LogOut className="mr-2 h-4 w-4"/> {t('nav.logout')}
+                  </Link>
+               </Button>
+             </MotionDiv>
          </div>
       </MotionDiv>
 

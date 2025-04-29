@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowRight, Images, CalendarCheck, ShoppingCart } from 'lucide-react'; // Added relevant icons
 import { getServices } from '@/lib/services';
 import { getI18n } from '@/locales/server'; // Import server-side i18n
+import { setStaticParamsLocale } from 'next-international/server'; // Correct import for setStaticParamsLocale
 import { MotionDiv } from '@/components/motion-provider'; // Import MotionDiv
 
 // Animation variants
@@ -38,7 +39,10 @@ const cardHoverEffect = {
   transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1.0] } // Custom ease for smooth transition
 };
 
-export default async function Home() {
+export default async function Home({ params }: { params: { locale: string } }) {
+   // Set locale for static generation (important for build)
+   setStaticParamsLocale(params.locale);
+
   const t = await getI18n(); // Get translation function
   const allServices = getServices();
 
@@ -95,11 +99,13 @@ export default async function Home() {
                  <p className="text-muted-foreground text-center py-4">{t('services_page.no_services')}</p>
                )}
                {/* CTA Button */}
-               <Button asChild variant="link" className="mt-6 text-accent px-0 self-start group hover:text-accent/80 transition-colors font-semibold">
-                <Link href="/services">
-                  {t('home.view_all_services')} <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" /> {/* Icon animation on hover */}
-                </Link>
-              </Button>
+                <MotionDiv whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                   <Button asChild variant="link" className="mt-6 text-accent px-0 self-start group hover:text-accent/80 transition-colors font-semibold">
+                    <Link href="/services">
+                      {t('home.view_all_services')} <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" /> {/* Icon animation on hover */}
+                    </Link>
+                  </Button>
+                </MotionDiv>
             </CardContent>
           </Card>
         </MotionDiv>
@@ -138,11 +144,13 @@ export default async function Home() {
         <GalleryGrid images={galleryImages} />
          {/* CTA to view full gallery */}
          <div className="text-center mt-12">
-            <Button asChild variant="outline" size="lg" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-colors shadow-sm hover:shadow-md">
-                <Link href="/cuts">
-                    {t('cuts_page.title')} <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-            </Button>
+             <MotionDiv whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                 <Button asChild variant="outline" size="lg" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-colors shadow-sm hover:shadow-md">
+                    <Link href="/cuts">
+                        {t('cuts_page.title')} <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                 </Button>
+             </MotionDiv>
          </div>
       </MotionDiv>
 
