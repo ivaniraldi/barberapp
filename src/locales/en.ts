@@ -30,6 +30,12 @@ export default {
     subtitle: 'Find the perfect grooming service for you.',
     no_services: 'No services currently available. Please check back later.',
     category_other: 'Other', // Default category name
+    // Added category translations (keys should be lowercase and use underscores)
+    category_haircuts: 'Haircuts',
+    category_beard_care: 'Beard Care',
+    category_shaves: 'Shaves',
+    category_styling: 'Styling',
+    category_coloring: 'Coloring',
   },
   // Cuts Page
   cuts_page: {

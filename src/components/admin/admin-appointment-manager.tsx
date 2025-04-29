@@ -19,6 +19,7 @@ import { Calendar, CheckCircle, XCircle, Clock, User, Phone, Mail, Scissors, Loa
 import { useToast } from '@/hooks/use-toast';
 import { useI18n, useCurrentLocale } from '@/locales/client'; // Import i18n hooks
 import { MotionDiv } from '@/components/motion-provider'; // Import MotionDiv
+import { AnimatePresence } from 'framer-motion'; // Import AnimatePresence
 
 interface Appointment {
   id: string;
@@ -68,7 +69,7 @@ export const AdminAppointmentManager: FC<AdminAppointmentManagerProps> = ({ init
   const [isClient, setIsClient] = useState(false);
   const { toast } = useToast();
   const t = useI18n(); // Get translation function
-  const currentLocale = useCurrentLocale(); // Get current locale for date formatting
+  const currentLocale = useCurrentLocale() as keyof typeof dateLocales; // Get current locale for date formatting and ensure type safety
 
   useEffect(() => {
     setIsClient(true); // Component has mounted on the client
@@ -132,84 +133,86 @@ export const AdminAppointmentManager: FC<AdminAppointmentManagerProps> = ({ init
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedAppointments.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground py-10">
-                  {t('admin_appointment.no_appointments')}
-                </TableCell>
-              </TableRow>
-            )}
-            {sortedAppointments.map((appointment, index) => {
-              const appointmentDate = safeParseDate(appointment.date);
-              const locale = dateLocales[currentLocale] || enUS; // Fallback to English
+             <AnimatePresence initial={false}> {/* Wrap TableBody content */}
+                {sortedAppointments.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center text-muted-foreground py-10">
+                      {t('admin_appointment.no_appointments')}
+                    </TableCell>
+                  </TableRow>
+                )}
+                {sortedAppointments.map((appointment, index) => {
+                  const appointmentDate = safeParseDate(appointment.date);
+                  const locale = dateLocales[currentLocale] || enUS; // Fallback to English
 
-              return (
-              <MotionDiv
-                key={appointment.id}
-                as={TableRow} // Render as TableRow
-                className="hover:bg-muted/30 transition-colors duration-150"
-                variants={tableRowVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                custom={index} // Pass index for stagger delay
-                layout // Animate layout changes (e.g., sorting)
-              >
-                <TableCell className="whitespace-nowrap"> {/* Prevent date/time wrapping */}
-                  {appointmentDate ? (
-                      <>
-                        {/* Use locale in format */}
-                        <div>{format(appointmentDate, 'PPP', { locale })}</div>
-                        {/* Client-side rendering check for time formatting */}
-                        <div className="text-sm text-muted-foreground h-4">
-                          {isClient ? format(appointmentDate, 'p', { locale }) : <Loader2 className="h-3 w-3 animate-spin"/>} {/* Show loader during hydration */}
-                        </div>
-                      </>
-                  ) : (
-                      <div className="text-destructive text-xs italic">{t('admin_appointment.invalid_date')}</div>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="font-medium text-foreground">{appointment.clientName}</div>
-                  <div className="text-xs text-muted-foreground flex flex-col sm:flex-row items-start sm:items-center gap-x-3 gap-y-1 mt-1">
-                      <a href={`tel:${appointment.clientPhone}`} className="hover:text-accent flex items-center transition-colors">
-                          <Phone className="mr-1 h-3 w-3"/> {appointment.clientPhone}
-                      </a>
-                      <a href={`mailto:${appointment.clientEmail}`} className="hover:text-accent flex items-center transition-colors">
-                          <Mail className="mr-1 h-3 w-3"/> {appointment.clientEmail}
-                      </a>
-                  </div>
-                </TableCell>
-                <TableCell className="text-muted-foreground">{appointment.serviceName}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={`border text-xs font-normal ${statusColors[appointment.status]}`}>
-                    {appointment.status === 'Pending' && <Clock className="mr-1 h-3 w-3" />}
-                    {appointment.status === 'Confirmed' && <CheckCircle className="mr-1 h-3 w-3" />}
-                    {appointment.status === 'Cancelled' && <XCircle className="mr-1 h-3 w-3" />}
-                    {appointment.status === 'Completed' && <CheckCircle className="mr-1 h-3 w-3" />}
-                    {/* Translate status */}
-                    {t(`admin_appointment.${appointment.status.toLowerCase()}` as any)}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                    <Select
-                      value={appointment.status}
-                      onValueChange={(newStatus: Appointment['status']) => updateAppointmentStatus(appointment.id, newStatus)}
-                    >
-                      <SelectTrigger className="w-[130px] h-8 text-xs bg-input/50 border-border/70 focus:ring-accent focus:border-accent">
-                        <SelectValue placeholder={t('admin_appointment.change_status')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {/* Translate status options */}
-                        <SelectItem value="Pending">{t('admin_appointment.pending')}</SelectItem>
-                        <SelectItem value="Confirmed">{t('admin_appointment.confirmed')}</SelectItem>
-                        <SelectItem value="Completed">{t('admin_appointment.completed')}</SelectItem>
-                        <SelectItem value="Cancelled">{t('admin_appointment.cancelled')}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                </TableCell>
-              </MotionDiv>
-            )})}
+                  return (
+                  <MotionDiv
+                    key={appointment.id}
+                    as={TableRow} // Render as TableRow
+                    className="hover:bg-muted/30 transition-colors duration-150"
+                    variants={tableRowVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    custom={index} // Pass index for stagger delay
+                    layout // Animate layout changes (e.g., sorting)
+                  >
+                    <TableCell className="whitespace-nowrap"> {/* Prevent date/time wrapping */}
+                      {appointmentDate ? (
+                          <>
+                            {/* Use locale in format */}
+                            <div>{format(appointmentDate, 'PPP', { locale })}</div>
+                            {/* Client-side rendering check for time formatting */}
+                            <div className="text-sm text-muted-foreground h-4">
+                              {isClient ? format(appointmentDate, 'p', { locale }) : <Loader2 className="h-3 w-3 animate-spin"/>} {/* Show loader during hydration */}
+                            </div>
+                          </>
+                      ) : (
+                          <div className="text-destructive text-xs italic">{t('admin_appointment.invalid_date')}</div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium text-foreground">{appointment.clientName}</div>
+                      <div className="text-xs text-muted-foreground flex flex-col sm:flex-row items-start sm:items-center gap-x-3 gap-y-1 mt-1">
+                          <a href={`tel:${appointment.clientPhone}`} className="hover:text-accent flex items-center transition-colors">
+                              <Phone className="mr-1 h-3 w-3"/> {appointment.clientPhone}
+                          </a>
+                          <a href={`mailto:${appointment.clientEmail}`} className="hover:text-accent flex items-center transition-colors">
+                              <Mail className="mr-1 h-3 w-3"/> {appointment.clientEmail}
+                          </a>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{appointment.serviceName}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={`border text-xs font-normal ${statusColors[appointment.status]}`}>
+                        {appointment.status === 'Pending' && <Clock className="mr-1 h-3 w-3" />}
+                        {appointment.status === 'Confirmed' && <CheckCircle className="mr-1 h-3 w-3" />}
+                        {appointment.status === 'Cancelled' && <XCircle className="mr-1 h-3 w-3" />}
+                        {appointment.status === 'Completed' && <CheckCircle className="mr-1 h-3 w-3" />}
+                        {/* Translate status */}
+                        {t(`admin_appointment.${appointment.status.toLowerCase()}` as any)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                        <Select
+                          value={appointment.status}
+                          onValueChange={(newStatus: Appointment['status']) => updateAppointmentStatus(appointment.id, newStatus)}
+                        >
+                          <SelectTrigger className="w-[130px] h-8 text-xs bg-input/50 border-border/70 focus:ring-accent focus:border-accent">
+                            <SelectValue placeholder={t('admin_appointment.change_status')} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {/* Translate status options */}
+                            <SelectItem value="Pending">{t('admin_appointment.pending')}</SelectItem>
+                            <SelectItem value="Confirmed">{t('admin_appointment.confirmed')}</SelectItem>
+                            <SelectItem value="Completed">{t('admin_appointment.completed')}</SelectItem>
+                            <SelectItem value="Cancelled">{t('admin_appointment.cancelled')}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                    </TableCell>
+                  </MotionDiv>
+                )})}
+            </AnimatePresence> {/* Close AnimatePresence */}
           </TableBody>
         </Table>
       </div>

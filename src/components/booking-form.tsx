@@ -57,7 +57,7 @@ const availableTimes = [
 export const BookingForm: FC<BookingFormProps> = ({ services }) => {
   const { toast } = useToast();
   const t = useI18n(); // Get translation function
-  const currentLocale = useCurrentLocale();
+  const currentLocale = useCurrentLocale() as keyof typeof dateLocales; // Ensure type safety
   const bookingSchema = getBookingSchema(t); // Get schema with translated messages
 
   const { register, handleSubmit, control, formState: { errors, isSubmitting }, reset } = useForm<z.infer<typeof bookingSchema>>({
@@ -100,6 +100,11 @@ export const BookingForm: FC<BookingFormProps> = ({ services }) => {
        hidden: { opacity: 0, y: 15 },
        visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
    };
+
+   const buttonVariants = {
+        hover: { scale: 1.05, boxShadow: "0px 5px 15px hsla(var(--accent)/0.25)" },
+        tap: { scale: 0.98 }
+    }
 
 
   return (
@@ -233,10 +238,11 @@ export const BookingForm: FC<BookingFormProps> = ({ services }) => {
 
         <MotionButton
            type="submit"
-           className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
+           className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold transition-all duration-300 transform shadow-md hover:shadow-lg"
            disabled={isSubmitting}
-           whileHover={{ scale: 1.05 }}
-           whileTap={{ scale: 0.98 }}
+           variants={buttonVariants}
+           whileHover="hover"
+           whileTap="tap"
          >
           {isSubmitting ? (
             <>

@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'; // Import Badge for category disp
 const groupServicesByCategory = (services: Service[]) => {
   return services.reduce((acc, service) => {
     // Use category directly if available, otherwise 'Other'
-    const category = service.category || 'Other';
+    const category = service.category || t('services_page.category_other'); // Use translation for 'Other'
     if (!acc[category]) {
       acc[category] = [];
     }
@@ -19,6 +19,10 @@ const groupServicesByCategory = (services: Service[]) => {
     return acc;
   }, {} as Record<string, Service[]>);
 };
+
+// Get translation function outside component scope (if possible or pass as prop)
+// This approach requires passing `t` or fetching it differently if needed inside groupServicesByCategory
+let t: Awaited<ReturnType<typeof getI18n>>; // Placeholder for type
 
 // Animation variants
 const containerVariants = {
@@ -48,10 +52,22 @@ const cardHoverEffect = {
 };
 
 export default async function ServicesPage() {
-  const t = await getI18n(); // Get translation function
+  t = await getI18n(); // Get translation function
   const allServices = getServices();
   const activeServices = allServices.filter(service => service.active); // Only show active services
-  const categorizedServices = groupServicesByCategory(activeServices);
+
+  // Corrected way to handle category grouping with translation
+   const categorizedServices = activeServices.reduce((acc, service) => {
+       const categoryKey = service.category || 'category_other'; // Use key for translation
+       const translatedCategory = t(`services_page.${categoryKey.toLowerCase().replace(/\s+/g, '_')}` as any, {}, service.category || t('services_page.category_other')); // Provide fallback
+
+       if (!acc[translatedCategory]) {
+         acc[translatedCategory] = [];
+       }
+       acc[translatedCategory].push(service);
+       return acc;
+     }, {} as Record<string, Service[]>);
+
   const categories = Object.keys(categorizedServices).sort(); // Sort categories alphabetically
 
   return (
@@ -77,7 +93,7 @@ export default async function ServicesPage() {
           <MotionDiv key={category} variants={itemVariants}>
             <h2 className="text-3xl font-semibold text-primary mb-6 pb-2 border-b-2 border-accent flex items-center gap-2">
                {/* Optionally add category icons */}
-               {category}
+               {category} {/* Display translated category name */}
             </h2>
              {/* Use MotionDiv for the grid as well to stagger card appearance */}
             <MotionDiv
@@ -96,7 +112,8 @@ export default async function ServicesPage() {
                      {/* Footer for category badge */}
                      {service.category && (
                         <div className="p-4 pt-0 mt-auto">
-                            <Badge variant="secondary" className="text-xs">{service.category}</Badge>
+                             {/* Translate the badge content if needed, or use the original category name */}
+                            <Badge variant="secondary" className="text-xs">{t(`services_page.${service.category.toLowerCase().replace(/\s+/g, '_')}` as any, {}, service.category)}</Badge>
                         </div>
                      )}
                   </Card>

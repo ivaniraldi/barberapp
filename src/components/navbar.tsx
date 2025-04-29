@@ -22,7 +22,7 @@ export function Navbar() {
   const pathname = usePathname();
   const t = useI18n(); // Translation hook
   const changeLocale = useChangeLocale();
-  const currentLocale = useCurrentLocale();
+  const currentLocale = useCurrentLocale() as 'en' | 'es' | 'pt'; // Ensure type safety
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -58,7 +58,7 @@ export function Navbar() {
 
   return (
     <MotionDiv
-      tag="nav"
+      tag="nav" // Ensure MotionDiv renders as nav semantically
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
@@ -75,36 +75,42 @@ export function Navbar() {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-1 lg:space-x-2"> {/* Reduced spacing */}
-           {navItems.map((item, index) => (
-            <MotionButton
-              key={item.href}
-              asChild
-              variant="ghost" // Use ghost for less emphasis, rely on underline/color
-              className={cn(
-                'transition-colors text-sm font-medium relative group px-3 py-2 rounded-md', // Added rounded-md
-                pathname === `/${currentLocale}${item.href}` || (item.href === '/' && pathname === `/${currentLocale}`)
-                ? 'text-accent'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50' // Changed hover color
-              )}
-              initial="hidden"
-              animate="visible"
-              variants={navItemVariants}
-              transition={{ delay: 0.1 + index * 0.1 }} // Stagger animation
-              whileHover={{ y: -1 }} // Subtle hover effect
-              whileTap={{ scale: 0.97 }}
-            >
-                <Link href={item.href}>
-                 {/* Always show icon + text for clarity */}
-                <item.icon className="mr-1.5 h-4 w-4 inline-block shrink-0" />
-                <span className="">{t(item.labelKey as any)}</span>
-                 {/* Underline effect */}
-                 <span className={cn(
-                    "absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-accent w-0 group-hover:w-[80%] transition-all duration-300", // Centered underline grow
-                     pathname === `/${currentLocale}${item.href}` || (item.href === '/' && pathname === `/${currentLocale}`) ? 'w-[80%]' : 'w-0'
-                 )}></span>
-                </Link>
-            </MotionButton>
-          ))}
+           {navItems.map((item, index) => {
+               // Determine if the link is active, handling the root path '/' correctly
+               const baseHref = `/${currentLocale}${item.href === '/' ? '' : item.href}`;
+               const isActive = pathname === baseHref || (item.href === '/' && pathname === `/${currentLocale}`);
+
+               return (
+                <MotionButton
+                  key={item.href}
+                  asChild
+                  variant="ghost" // Use ghost for less emphasis, rely on underline/color
+                  className={cn(
+                    'transition-colors text-sm font-medium relative group px-3 py-2 rounded-md', // Added rounded-md
+                    isActive
+                    ? 'text-accent'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50' // Changed hover color
+                  )}
+                  initial="hidden"
+                  animate="visible"
+                  variants={navItemVariants}
+                  transition={{ delay: 0.1 + index * 0.1 }} // Stagger animation
+                  whileHover={{ y: -1 }} // Subtle hover effect
+                  whileTap={{ scale: 0.97 }}
+                >
+                    <Link href={item.href}>
+                     {/* Always show icon + text for clarity */}
+                    <item.icon className="mr-1.5 h-4 w-4 inline-block shrink-0" />
+                    <span className="">{t(item.labelKey as any)}</span>
+                     {/* Underline effect */}
+                     <span className={cn(
+                        "absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-accent w-0 group-hover:w-[80%] transition-all duration-300", // Centered underline grow
+                         isActive ? 'w-[80%]' : 'w-0'
+                     )}></span>
+                    </Link>
+                </MotionButton>
+              );
+           })}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -118,9 +124,9 @@ export function Navbar() {
               </MotionButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => changeLocale('en')}>English (EN)</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLocale('es')}>Español (ES)</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLocale('pt')}>Português (PT)</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => changeLocale('en')} disabled={currentLocale === 'en'}>English (EN)</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => changeLocale('es')} disabled={currentLocale === 'es'}>Español (ES)</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => changeLocale('pt')} disabled={currentLocale === 'pt'}>Português (PT)</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -147,9 +153,9 @@ export function Navbar() {
               </MotionButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => changeLocale('en')}>EN</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLocale('es')}>ES</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLocale('pt')}>PT</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => changeLocale('en')} disabled={currentLocale === 'en'}>EN</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => changeLocale('es')} disabled={currentLocale === 'es'}>ES</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => changeLocale('pt')} disabled={currentLocale === 'pt'}>PT</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -169,31 +175,37 @@ export function Navbar() {
                    </Link>
                </SheetHeader>
               <div className="flex-grow flex flex-col space-y-1.5 p-4"> {/* Reduced space */}
-                 {navItems.map((item, index) => (
-                   <MotionDiv
-                     key={item.href}
-                     variants={mobileNavItemVariants}
-                     initial="hidden"
-                     animate="visible"
-                     transition={{ delay: index * 0.08 }} // Faster stagger
-                   >
-                     <SheetClose asChild>
-                       <Link
-                        href={item.href}
-                        className={cn(
-                          'flex items-center gap-3 text-base font-medium rounded-md px-3 py-2.5 transition-colors',
-                           pathname === `/${currentLocale}${item.href}` || (item.href === '/' && pathname === `/${currentLocale}`)
-                            ? 'bg-accent/10 text-accent'
-                            : 'text-foreground hover:bg-muted/70' // Adjusted hover
-                        )}
-                        onClick={closeMobileMenu}
+                 {navItems.map((item, index) => {
+                     // Determine if the link is active for mobile as well
+                     const baseHref = `/${currentLocale}${item.href === '/' ? '' : item.href}`;
+                     const isActive = pathname === baseHref || (item.href === '/' && pathname === `/${currentLocale}`);
+
+                     return (
+                       <MotionDiv
+                         key={item.href}
+                         variants={mobileNavItemVariants}
+                         initial="hidden"
+                         animate="visible"
+                         transition={{ delay: index * 0.08 }} // Faster stagger
                        >
-                         <item.icon className="h-5 w-5" />
-                         {t(item.labelKey as any)}
-                       </Link>
-                     </SheetClose>
-                    </MotionDiv>
-                 ))}
+                         <SheetClose asChild>
+                           <Link
+                            href={item.href}
+                            className={cn(
+                              'flex items-center gap-3 text-base font-medium rounded-md px-3 py-2.5 transition-colors',
+                               isActive
+                                ? 'bg-accent/10 text-accent'
+                                : 'text-foreground hover:bg-muted/70' // Adjusted hover
+                            )}
+                            onClick={closeMobileMenu}
+                           >
+                             <item.icon className="h-5 w-5" />
+                             {t(item.labelKey as any)}
+                           </Link>
+                         </SheetClose>
+                        </MotionDiv>
+                     );
+                   })}
 
               </div>
                <div className="mt-auto p-4 border-t border-border/50">

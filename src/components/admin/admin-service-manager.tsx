@@ -105,7 +105,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
      setServices(services.map(s => s.id === service.id ? { ...s, active: updatedStatus } : s));
      toast({
        title: t(titleKey as any),
-       description: t('admin_service.toggle_success_desc', { serviceName: service.name, status: t(statusKey).toLowerCase() }),
+       description: t('admin_service.toggle_success_desc', { serviceName: service.name, status: t(statusKey as any).toLowerCase() }),
      });
    };
 
@@ -146,76 +146,81 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
             {isModalOpen && (
               <DialogContent
                 className="sm:max-w-[525px] bg-card border-border/70"
-                as={MotionDiv} // Use MotionDiv for DialogContent
-                variants={modalVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
+                // Use MotionDiv for DialogContent - Requires custom DialogContent or wrapping
+                // For simplicity, wrap the form inside with MotionDiv
                 onEscapeKeyDown={closeModal} // Ensure ESC closes
                 onPointerDownOutside={closeModal} // Ensure click outside closes
               >
-                  <DialogHeader>
-                    <DialogTitle className="text-primary">{editingService ? t('admin_service.edit_service') : t('admin_service.add_service')}</DialogTitle>
-                  </DialogHeader>
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-3"> {/* Scrollable form */}
-                    <div className="space-y-1">
-                        <Label htmlFor="name" className="text-muted-foreground">{t('admin_service.service_name')}</Label>
-                        <Input id="name" {...register('name')} aria-invalid={errors.name ? "true" : "false"} className="bg-input/50 border-border/70"/>
-                        {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="category" className="text-muted-foreground">{t('admin_service.category')}</Label>
-                        <Input id="category" {...register('category')} aria-invalid={errors.category ? "true" : "false"} placeholder={t('admin_service.category_placeholder')} className="bg-input/50 border-border/70"/>
-                        {errors.category && <p className="text-sm text-destructive">{errors.category.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="description" className="text-muted-foreground">{t('admin_service.description')}</Label>
-                        <Textarea id="description" {...register('description')} aria-invalid={errors.description ? "true" : "false"} className="bg-input/50 border-border/70"/>
-                        {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                          <Label htmlFor="duration" className="text-muted-foreground">{t('admin_service.duration')}</Label>
-                          <Input id="duration" type="number" {...register('duration')} aria-invalid={errors.duration ? "true" : "false"} className="bg-input/50 border-border/70"/>
-                          {errors.duration && <p className="text-sm text-destructive">{errors.duration.message}</p>}
-                      </div>
+                 <MotionDiv
+                    variants={modalVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="flex flex-col" // Add flex container if needed
+                 >
+                      <DialogHeader>
+                        <DialogTitle className="text-primary">{editingService ? t('admin_service.edit_service') : t('admin_service.add_service')}</DialogTitle>
+                      </DialogHeader>
+                      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-3"> {/* Scrollable form */}
                         <div className="space-y-1">
-                          <Label htmlFor="price" className="text-muted-foreground">{t('admin_service.price')}</Label>
-                          <Input id="price" type="number" step="0.01" {...register('price')} aria-invalid={errors.price ? "true" : "false"} className="bg-input/50 border-border/70"/>
-                          {errors.price && <p className="text-sm text-destructive">{errors.price.message}</p>}
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2 pt-2">
-                        <Controller
-                            name="active"
-                            control={control}
-                            render={({ field }) => (
-                                <Switch
-                                    id="active"
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                    aria-label={t('admin_service.active_status')}
-                                    className="data-[state=checked]:bg-accent focus-visible:ring-accent"
-                                />
-                            )}
-                        />
-                        <Label htmlFor="active" className="text-muted-foreground">{t('admin_service.active_status')}</Label>
-                    </div>
-                    <DialogFooter className="pt-4">
-                        <DialogClose asChild>
-                            <Button type="button" variant="outline">{t('admin_service.cancel')}</Button>
-                        </DialogClose>
-                        <MotionButton
-                           type="submit"
-                           className="bg-accent hover:bg-accent/90 text-accent-foreground"
-                           disabled={isSubmitting}
-                           whileHover={{ scale: 1.05 }}
-                           whileTap={{ scale: 0.95 }}
-                         >
-                            {editingService ? t('admin_service.save_changes') : t('admin_service.add_service')}
-                         </MotionButton>
-                    </DialogFooter>
-                  </form>
+                            <Label htmlFor="name" className="text-muted-foreground">{t('admin_service.service_name')}</Label>
+                            <Input id="name" {...register('name')} aria-invalid={errors.name ? "true" : "false"} className="bg-input/50 border-border/70"/>
+                            {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="category" className="text-muted-foreground">{t('admin_service.category')}</Label>
+                            <Input id="category" {...register('category')} aria-invalid={errors.category ? "true" : "false"} placeholder={t('admin_service.category_placeholder')} className="bg-input/50 border-border/70"/>
+                            {errors.category && <p className="text-sm text-destructive">{errors.category.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="description" className="text-muted-foreground">{t('admin_service.description')}</Label>
+                            <Textarea id="description" {...register('description')} aria-invalid={errors.description ? "true" : "false"} className="bg-input/50 border-border/70"/>
+                            {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                              <Label htmlFor="duration" className="text-muted-foreground">{t('admin_service.duration')}</Label>
+                              <Input id="duration" type="number" {...register('duration')} aria-invalid={errors.duration ? "true" : "false"} className="bg-input/50 border-border/70"/>
+                              {errors.duration && <p className="text-sm text-destructive">{errors.duration.message}</p>}
+                          </div>
+                            <div className="space-y-1">
+                              <Label htmlFor="price" className="text-muted-foreground">{t('admin_service.price')}</Label>
+                              <Input id="price" type="number" step="0.01" {...register('price')} aria-invalid={errors.price ? "true" : "false"} className="bg-input/50 border-border/70"/>
+                              {errors.price && <p className="text-sm text-destructive">{errors.price.message}</p>}
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2 pt-2">
+                            <Controller
+                                name="active"
+                                control={control}
+                                render={({ field }) => (
+                                    <Switch
+                                        id="active"
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                        aria-label={t('admin_service.active_status')}
+                                        className="data-[state=checked]:bg-accent focus-visible:ring-accent"
+                                    />
+                                )}
+                            />
+                            <Label htmlFor="active" className="text-muted-foreground">{t('admin_service.active_status')}</Label>
+                        </div>
+                        <DialogFooter className="pt-4">
+                            <DialogClose asChild>
+                                <Button type="button" variant="outline">{t('admin_service.cancel')}</Button>
+                            </DialogClose>
+                            <MotionButton
+                               type="submit"
+                               className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                               disabled={isSubmitting}
+                               whileHover={{ scale: 1.05 }}
+                               whileTap={{ scale: 0.95 }}
+                             >
+                                {editingService ? t('admin_service.save_changes') : t('admin_service.add_service')}
+                             </MotionButton>
+                        </DialogFooter>
+                      </form>
+                 </MotionDiv>
               </DialogContent>
              )}
             </AnimatePresence>

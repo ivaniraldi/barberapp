@@ -30,6 +30,12 @@ export default {
     subtitle: 'Encontre o serviço de cuidado perfeito para você.',
     no_services: 'Nenhum serviço disponível no momento. Por favor, volte mais tarde.',
     category_other: 'Outros',
+     // Added category translations (keys should be lowercase and use underscores)
+     category_haircuts: 'Cortes de Cabelo',
+     category_beard_care: 'Cuidado com a Barba',
+     category_shaves: 'Barbear',
+     category_styling: 'Estilização',
+     category_coloring: 'Coloração',
   },
    // Cuts Page
   cuts_page: {

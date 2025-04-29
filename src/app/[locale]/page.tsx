@@ -128,7 +128,7 @@ export default async function Home() {
       <MotionDiv variants={itemVariants} className="mb-16 sm:mb-24">
         <header className="text-center mb-12">
           <h2 className="text-4xl font-bold text-primary mb-3 flex items-center justify-center gap-3">
-            <Images className="h-8 w-8 text-accent animate-pulse" /> {/* Subtle infinite animation */}
+            <Images className="h-8 w-8 text-accent animate-subtle-pulse" /> {/* Added subtle infinite animation */}
             {t('home.our_work')}
           </h2>
           <p className="text-lg text-muted-foreground">{t('home.our_work_desc')}</p>

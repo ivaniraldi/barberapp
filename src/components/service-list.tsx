@@ -22,7 +22,11 @@ interface ServiceListProps {
 
 const listItemVariants = {
     hidden: { opacity: 0, x: -10 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.4 } }
+    visible: (i: number) => ({ // Accept custom index for staggering
+        opacity: 1,
+        x: 0,
+        transition: { delay: i * 0.05, duration: 0.4 }
+     })
 };
 
 export const ServiceList: FC<ServiceListProps> = ({ services }) => {
@@ -38,9 +42,10 @@ export const ServiceList: FC<ServiceListProps> = ({ services }) => {
             // Apply variants only if part of a list (not single display)
             initial={isSingleService ? undefined : "hidden"}
             animate={isSingleService ? undefined : "visible"}
-            // Stagger children if it's a list
+            // Pass index for stagger delay
             custom={index}
-            transition={isSingleService ? undefined : { delay: index * 0.05 }}
+            // Remove transition prop here as it's defined in variants
+            // transition={isSingleService ? undefined : { delay: index * 0.05 }}
         >
           {/* Use Card styling implicitly via parent or keep transparent */}
           <div className={isSingleService ? "p-0" : "p-0"}> {/* Adjusted padding */}

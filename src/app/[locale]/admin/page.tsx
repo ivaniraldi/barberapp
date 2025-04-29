@@ -61,7 +61,7 @@ export default async function AdminPage() {
         <h1 className="text-3xl font-bold text-primary mb-4 sm:mb-0">{t('admin_page.title')}</h1>
          <div className="flex items-center gap-4">
             <span className="flex items-center text-muted-foreground text-sm">
-                <Lock className="mr-2 h-4 w-4 text-green-500 animate-pulse" /> {/* Subtle pulse */}
+                <Lock className="mr-2 h-4 w-4 text-green-500 animate-subtle-pulse" /> {/* Subtle infinite animation */}
                 {t('admin_page.authenticated')}
             </span>
             {/* Add a simple Logout button - in real app, this would trigger auth state change */}

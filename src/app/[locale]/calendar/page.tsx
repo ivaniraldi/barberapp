@@ -56,15 +56,16 @@ const parseAppointments = (data: typeof mockAppointmentsData): Appointment[] => 
 
 export default function CalendarPage() {
   const t = useI18n();
-  const currentLocale = useCurrentLocale();
+  const currentLocale = useCurrentLocale() as keyof typeof dateLocales; // Ensure type safety
   const locale = dateLocales[currentLocale] || pt; // Default to Portuguese locale
   const [currentMonth, setCurrentMonth] = React.useState(startOfMonth(new Date()));
   const [selectedDate, setSelectedDate] = React.useState<Date | null>(new Date());
   const [appointments, setAppointments] = React.useState<Appointment[]>([]);
+  const [isClient, setIsClient] = React.useState(false); // State to track client-side mount
 
-  // Fetch and parse appointments on mount (simulate API call)
   React.useEffect(() => {
-      // In a real app, fetch appointments for the currentMonth range here
+      setIsClient(true); // Set to true when component mounts on the client
+      // Fetch and parse appointments on mount (simulate API call)
       const parsedApps = parseAppointments(mockAppointmentsData);
       setAppointments(parsedApps);
   }, []);
@@ -107,6 +108,18 @@ export default function CalendarPage() {
       hover: { scale: 1.1, zIndex: 1, backgroundColor: "hsla(var(--accent)/0.1)"},
       tap: { scale: 0.95 }
   };
+
+  if (!isClient) {
+      // Render a placeholder or null during server-side rendering & hydration phase
+      // to avoid mismatches related to date formatting or locale differences.
+      // Or, render a basic structure without client-specific logic.
+      // For simplicity, returning null here. Adjust as needed for better UX.
+       return ( // Basic loading state
+         <div className="container mx-auto px-4 py-12 sm:py-16 text-center">
+           <p>Loading Calendar...</p>
+         </div>
+       );
+  }
 
   return (
     <MotionDiv
@@ -259,4 +272,3 @@ calendar_page: {
     click_date_prompt: 'Clique em uma data no calendário para ver os agendamentos.',
 },
 */
-

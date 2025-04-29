@@ -3,9 +3,9 @@
 
 import type { FC } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion'; // Import AnimatePresence
 import { cn } from '@/lib/utils';
-import { Maximize } from 'lucide-react'; // Icon for potential zoom interaction
+import { Maximize, X } from 'lucide-react'; // Icon for potential zoom interaction and close
 import * as Dialog from '@radix-ui/react-dialog'; // For potential modal view
 import { useState } from 'react';
 
@@ -123,32 +123,54 @@ export const GalleryGrid: FC<GalleryGridProps> = ({ images }) => {
     </motion.div>
 
      {/* Image Modal */}
-     <Dialog.Root open={!!selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)}>
-       <Dialog.Portal>
-         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-         <Dialog.Content className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-3xl translate-x-[-50%] translate-y-[-50%] gap-4 border-none bg-transparent p-0 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
-           {selectedImage && (
-             <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}>
-               <Image
-                 src={selectedImage.src}
-                 alt={selectedImage.alt}
-                 width={800} // Adjust max width as needed
-                 height={600} // Adjust max height as needed
-                 className="rounded-lg object-contain max-h-[80svh] w-auto mx-auto"
-               />
-               <p className="text-center text-white/90 mt-3 text-sm bg-black/50 px-3 py-1 rounded-full inline-block absolute bottom-4 left-1/2 -translate-x-1/2">{selectedImage.alt}</p>
-                <Dialog.Close className="absolute right-2 top-2 rounded-full p-1.5 bg-black/50 text-white/80 hover:bg-black/70 transition-colors">
-                    <X className="h-5 w-5" />
-                    <span className="sr-only">Close</span>
-                </Dialog.Close>
-             </motion.div>
-           )}
-         </Dialog.Content>
-       </Dialog.Portal>
+      <Dialog.Root open={!!selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)}>
+       <AnimatePresence>
+         {selectedImage && (
+           <Dialog.Portal forceMount> {/* Keep portal mounted for exit animation */}
+             <Dialog.Overlay asChild>
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
+                />
+             </Dialog.Overlay>
+             <Dialog.Content asChild>
+                 <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-3xl translate-x-[-50%] translate-y-[-50%] gap-4 border-none bg-transparent p-0 shadow-lg"
+                  >
+                   <Image
+                     src={selectedImage.src}
+                     alt={selectedImage.alt}
+                     width={800} // Adjust max width as needed
+                     height={600} // Adjust max height as needed
+                     className="rounded-lg object-contain max-h-[80svh] w-auto mx-auto"
+                   />
+                   <p className="text-center text-white/90 mt-3 text-sm bg-black/50 px-3 py-1 rounded-full inline-block absolute bottom-4 left-1/2 -translate-x-1/2">{selectedImage.alt}</p>
+                    <Dialog.Close asChild>
+                         <motion.button
+                            initial={{ opacity: 0, scale: 0.5 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.5 }}
+                            whileHover={{ scale: 1.1, rotate: 90 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="absolute right-2 top-2 rounded-full p-1.5 bg-black/50 text-white/80 hover:bg-black/70 transition-colors z-10"
+                            aria-label="Close"
+                          >
+                            <X className="h-5 w-5" />
+                         </motion.button>
+                    </Dialog.Close>
+                 </motion.div>
+             </Dialog.Content>
+           </Dialog.Portal>
+         )}
+       </AnimatePresence>
      </Dialog.Root>
     </>
   );
 };
-
-// Re-export X icon if not already done
-import { X } from 'lucide-react';

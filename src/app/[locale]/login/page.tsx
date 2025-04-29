@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { LogIn, Mail, Lock, Loader2 } from 'lucide-react'; // Added Loader2 for loading state
 import { useI18n } from '@/locales/client'; // Import client-side i18n hook
-import { MotionDiv } from '@/components/motion-provider'; // Import MotionDiv
+import { MotionDiv, MotionButton } from '@/components/motion-provider'; // Import MotionDiv and MotionButton
 
 const loginSchema = z.object({
   email: z.string().email({ message: "login_page.email_error" }), // Use translation keys
@@ -76,6 +76,11 @@ export default function LoginPage() {
       visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: "easeOut" } }
    };
 
+   const buttonVariants = {
+       hover: { scale: 1.05, boxShadow: "0px 5px 15px hsla(var(--accent)/0.25)" },
+       tap: { scale: 0.98 }
+   }
+
 
   return (
     <main className="flex items-center justify-center min-h-screen bg-gradient-to-br from-background via-background/90 to-secondary/20 p-4 overflow-hidden">
@@ -93,7 +98,7 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent className="p-6 sm:p-8">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-               <MotionDiv variants={inputVariants} custom={0} initial="hidden" animate="visible">
+               <MotionDiv variants={inputVariants} custom={0} initial="hidden" animate="visible" transition={{delay: 0.3}}>
                   <div className="space-y-2">
                     <Label htmlFor="email" className="flex items-center text-foreground font-medium">
                       <Mail className="mr-2 h-4 w-4 text-accent" /> {t('login_page.email')}
@@ -109,7 +114,7 @@ export default function LoginPage() {
                     {errors.email && <p className="text-sm text-destructive pt-1">{t(errors.email.message as any)}</p>}
                   </div>
                </MotionDiv>
-               <MotionDiv variants={inputVariants} custom={1} initial="hidden" animate="visible">
+               <MotionDiv variants={inputVariants} custom={1} initial="hidden" animate="visible" transition={{delay: 0.4}}>
                   <div className="space-y-2">
                     <Label htmlFor="password" className="flex items-center text-foreground font-medium">
                       <Lock className="mr-2 h-4 w-4 text-accent" /> {t('login_page.password')}
@@ -125,8 +130,15 @@ export default function LoginPage() {
                     {errors.password && <p className="text-sm text-destructive pt-1">{t(errors.password.message as any)}</p>}
                   </div>
                </MotionDiv>
-              <MotionDiv initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }}>
-                  <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg" disabled={isLoading}>
+              <MotionDiv initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.5 }}>
+                  <MotionButton
+                     type="submit"
+                     className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold transition-all duration-300 transform shadow-md hover:shadow-lg"
+                     disabled={isLoading}
+                     variants={buttonVariants}
+                     whileHover="hover"
+                     whileTap="tap"
+                  >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('login_page.logging_in_button')}
@@ -136,7 +148,7 @@ export default function LoginPage() {
                       <LogIn className="mr-2 h-4 w-4" /> {t('login_page.login_button')}
                     </>
                   )}
-                  </Button>
+                  </MotionButton>
               </MotionDiv>
             </form>
           </CardContent>
