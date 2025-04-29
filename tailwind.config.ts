@@ -11,9 +11,9 @@ export default {
   theme: {
     extend: { // Use extend to add to existing theme
         fontFamily: {
-            // Add Geist Sans and Mono using CSS variables defined in layout
-            sans: ["var(--font-geist-sans)", ...fontFamily.sans],
-            mono: ["var(--font-geist-mono)", ...fontFamily.mono],
+            // Removed Geist Sans and Mono as they are not installed
+            sans: [...fontFamily.sans],
+            mono: [...fontFamily.mono],
             // Example: Add custom elegant fonts if you defined them in globals.css
             // primary: ['var(--font-primary)', ...fontFamily.sans],
             // secondary: ['var(--font-secondary)', ...fontFamily.sans],

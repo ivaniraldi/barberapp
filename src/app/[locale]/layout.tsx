@@ -1,7 +1,8 @@
 // src/app/[locale]/layout.tsx
 import type { Metadata } from 'next';
-import { GeistSans } from 'geist/font/sans'; // Correct import for Geist Sans
-import { GeistMono } from 'geist/font/mono'; // Correct import for Geist Mono
+// Removed Geist font imports as the dependency is not installed
+// import { GeistSans } from 'geist/font/sans';
+// import { GeistMono } from 'geist/font/mono';
 import '../globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Navbar } from '@/components/navbar';
@@ -23,7 +24,8 @@ export const metadata: Metadata = {
 
 export default function LocaleLayout({ children, params: { locale } }: LocaleLayoutProps) {
   return (
-    <html lang={locale} className={`dark ${GeistSans.variable} ${GeistMono.variable}`}>
+    // Removed Geist font variables from html tag
+    <html lang={locale} className={`dark`}>
       <body className="antialiased bg-gradient-to-br from-background via-background/95 to-secondary/10 text-foreground min-h-screen flex flex-col">
         {/* Wrap content with I18nProviderClient */}
         <I18nProviderClient locale={locale}>

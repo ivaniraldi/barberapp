@@ -120,9 +120,8 @@
   }
   body {
     @apply bg-background text-foreground;
-    /* Use a more elegant font if available */
-    /* font-family: var(--font-primary), sans-serif; */
-    font-family: var(--font-geist-sans), sans-serif; /* Fallback to Geist */
+    /* Use default sans-serif font stack */
+    font-family: sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
