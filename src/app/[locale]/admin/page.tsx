@@ -36,10 +36,11 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
+// Enhanced card hover effect for admin panels
 const cardHoverEffect = {
-  scale: 1.02,
-  boxShadow: "0px 5px 15px rgba(0,0,0,0.1)",
-  transition: { duration: 0.3 }
+  scale: 1.015, // More subtle scale for admin context
+  boxShadow: "0px 8px 20px hsla(var(--primary) / 0.08), 0px 4px 8px hsla(var(--primary) / 0.04)", // Softer shadow
+  transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1.0] }
 };
 
 
@@ -52,20 +53,25 @@ export default async function AdminPage() {
 
   return (
     <MotionDiv
-      className="container mx-auto px-4 py-8"
+      className="container mx-auto px-4 py-8 sm:py-12" // Standard padding
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
-      <MotionDiv variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-primary mb-4 sm:mb-0">{t('admin_page.title')}</h1>
+      <MotionDiv variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-between mb-10"> {/* Increased margin */}
+        <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4 sm:mb-0">{t('admin_page.title')}</h1>
          <div className="flex items-center gap-4">
-            <span className="flex items-center text-muted-foreground text-sm">
+            <span className="flex items-center text-muted-foreground text-sm font-medium"> {/* Slightly bolder text */}
                 <Lock className="mr-2 h-4 w-4 text-green-500 animate-subtle-pulse" /> {/* Subtle infinite animation */}
                 {t('admin_page.authenticated')}
             </span>
-            {/* Add a simple Logout button - in real app, this would trigger auth state change */}
-            <Button variant="outline" size="sm" asChild className="border-destructive/50 text-destructive hover:bg-destructive/10">
+            {/* Logout Button - Professional Outline Style */}
+            <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:border-destructive/70 transition-colors duration-200" // Destructive outline style
+             >
                 <Link href="/"> {/* Link back to homepage (locale handled) */}
                     <LogOut className="mr-2 h-4 w-4"/> {t('nav.logout')}
                 </Link>
@@ -74,16 +80,23 @@ export default async function AdminPage() {
       </MotionDiv>
 
       <MotionDiv variants={itemVariants}>
-        <Separator className="mb-8 border-border/50" />
+        <Separator className="mb-10 border-border/50" /> {/* Increased margin */}
       </MotionDiv>
 
       <Tabs defaultValue="appointments" className="w-full">
          <MotionDiv variants={itemVariants}>
-            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 mb-6 bg-muted/60 p-1 h-auto sm:h-10">
-              <TabsTrigger value="appointments" className="flex items-center gap-2 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:hover:bg-muted transition-colors">
+            {/* Improved TabsList Styling */}
+            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 mb-8 bg-muted/60 p-1 h-auto sm:h-11 rounded-lg shadow-inner"> {/* Rounded-lg, inner shadow */}
+              <TabsTrigger
+                value="appointments"
+                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md data-[state=inactive]:hover:bg-muted/80 transition-all duration-200 text-sm font-medium py-2 rounded-md" // Enhanced active/inactive states
+               >
                  <CalendarDays className="h-4 w-4"/> {t('admin_page.manage_appointments')}
               </TabsTrigger>
-              <TabsTrigger value="services" className="flex items-center gap-2 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:hover:bg-muted transition-colors">
+              <TabsTrigger
+                value="services"
+                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md data-[state=inactive]:hover:bg-muted/80 transition-all duration-200 text-sm font-medium py-2 rounded-md" // Enhanced active/inactive states
+               >
                   <Settings className="h-4 w-4"/> {t('admin_page.manage_services')}
               </TabsTrigger>
             </TabsList>
@@ -91,12 +104,13 @@ export default async function AdminPage() {
 
         <TabsContent value="appointments">
            <MotionDiv variants={itemVariants} whileHover={cardHoverEffect}>
-              <Card className="bg-card/80 backdrop-blur-sm border-border/50 shadow-md overflow-hidden">
-                <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5">
-                  <CardTitle>{t('admin_page.appointments_title')}</CardTitle>
-                  <CardDescription>{t('admin_page.appointments_desc')}</CardDescription>
+              {/* Professional Card Styling */}
+              <Card className="bg-card/80 backdrop-blur-sm border border-border/50 shadow-lg overflow-hidden rounded-xl"> {/* Rounded-xl */}
+                <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b border-border/30 p-5"> {/* Slightly more padding */}
+                  <CardTitle className="text-xl font-semibold">{t('admin_page.appointments_title')}</CardTitle> {/* Adjusted size */}
+                  <CardDescription className="text-base">{t('admin_page.appointments_desc')}</CardDescription> {/* Adjusted size */}
                 </CardHeader>
-                <CardContent className="p-4 sm:p-6">
+                <CardContent className="p-5 sm:p-6"> {/* Consistent padding */}
                   {/* Pass initial data and translation function */}
                   <AdminAppointmentManager initialAppointments={mockAppointments} />
                 </CardContent>
@@ -106,12 +120,13 @@ export default async function AdminPage() {
 
         <TabsContent value="services">
            <MotionDiv variants={itemVariants} whileHover={cardHoverEffect}>
-              <Card className="bg-card/80 backdrop-blur-sm border-border/50 shadow-md overflow-hidden">
-                <CardHeader className="bg-gradient-to-l from-primary/5 to-accent/5">
-                  <CardTitle>{t('admin_page.services_title')}</CardTitle>
-                  <CardDescription>{t('admin_page.services_desc')}</CardDescription>
+               {/* Professional Card Styling */}
+              <Card className="bg-card/80 backdrop-blur-sm border border-border/50 shadow-lg overflow-hidden rounded-xl"> {/* Rounded-xl */}
+                <CardHeader className="bg-gradient-to-l from-primary/5 to-accent/5 border-b border-border/30 p-5"> {/* Slightly more padding */}
+                  <CardTitle className="text-xl font-semibold">{t('admin_page.services_title')}</CardTitle> {/* Adjusted size */}
+                  <CardDescription className="text-base">{t('admin_page.services_desc')}</CardDescription> {/* Adjusted size */}
                 </CardHeader>
-                <CardContent className="p-4 sm:p-6">
+                <CardContent className="p-5 sm:p-6"> {/* Consistent padding */}
                     {/* Pass fetched services and translation function */}
                     <AdminServiceManager initialServices={services} />
                 </CardContent>
@@ -120,7 +135,8 @@ export default async function AdminPage() {
         </TabsContent>
       </Tabs>
 
-       <MotionDiv variants={itemVariants} className="mt-16 pt-8 border-t border-border/30 text-center text-muted-foreground text-sm">
+       {/* Footer */}
+       <MotionDiv variants={itemVariants} className="mt-20 pt-10 border-t border-border/30 text-center text-muted-foreground text-sm">
           <p>{t('admin_page.footer_copy', { year: new Date().getFullYear() })}</p>
        </MotionDiv>
     </MotionDiv>

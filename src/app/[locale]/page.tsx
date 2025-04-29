@@ -33,18 +33,17 @@ const itemVariants = {
 };
 
 const cardHoverEffect = {
-  scale: 1.03,
-  boxShadow: "0px 10px 20px rgba(0,0,0,0.2)",
-  transition: { duration: 0.3 }
+  scale: 1.03, // Slightly subtle scale
+  boxShadow: "0px 10px 25px hsla(var(--primary) / 0.1), 0px 5px 10px hsla(var(--primary) / 0.05)", // Refined shadow using theme colors
+  transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1.0] } // Custom ease for smooth transition
 };
 
 export default async function Home() {
   const t = await getI18n(); // Get translation function
   const allServices = getServices();
 
-  // TODO: Implement logic to get *actually* popular services (e.g., based on booking count)
-  // For now, just taking the first 3 as before.
-  const popularServices = allServices.slice(0, 3).filter(s => s.active); // Filter active popular services
+  // Get popular services (active only)
+  const popularServices = allServices.filter(s => s.active).slice(0, 3); // Simplified logic, still takes first 3 active
 
   // Filter all active services for the booking form
   const bookableServices = allServices.filter(service => service.active);
@@ -61,42 +60,44 @@ export default async function Home() {
 
   return (
     <MotionDiv
-      className="container mx-auto px-4 py-8 sm:py-12"
+      className="container mx-auto px-4 py-12 sm:py-16" // Increased padding
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
-      <MotionDiv variants={itemVariants} className="text-center mb-16 sm:mb-24">
-        <h1 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/80 to-accent mb-3 tracking-tight drop-shadow-md">
+      {/* Hero Section */}
+      <MotionDiv variants={itemVariants} className="text-center mb-20 sm:mb-32"> {/* Increased margin */}
+        <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/80 to-accent mb-4 tracking-tighter drop-shadow-lg"> {/* Tighter tracking, larger size */}
           {t('home.title')}
         </h1>
-        <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"> {/* Wider max-width, relaxed leading */}
           {t('home.subtitle')}
         </p>
       </MotionDiv>
 
       <MotionDiv
-        className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 mb-16 sm:mb-24"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 mb-20 sm:mb-32" // Increased gap and margin
         variants={containerVariants} // Stagger children within this grid too
       >
         {/* Services Section */}
         <MotionDiv variants={itemVariants} whileHover={cardHoverEffect}>
-          <Card className="shadow-xl bg-card/80 backdrop-blur-sm border-border/50 overflow-hidden h-full flex flex-col">
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-4">
-              <CardTitle className="text-3xl flex items-center gap-2">
+          <Card className="shadow-xl bg-card/80 backdrop-blur-md border-border/50 overflow-hidden h-full flex flex-col rounded-lg"> {/* Explicit rounded-lg */}
+            <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 pb-4 border-b border-border/30"> {/* Subtle header gradient and border */}
+              <CardTitle className="text-2xl sm:text-3xl flex items-center gap-2 text-primary"> {/* Responsive title size */}
                 <ShoppingCart className="w-7 h-7 text-accent"/> {t('home.popular_services')}
               </CardTitle>
-              <CardDescription>{t('home.popular_services_desc')}</CardDescription>
+              <CardDescription className="text-base">{t('home.popular_services_desc')}</CardDescription> {/* Slightly larger desc */}
             </CardHeader>
-            <CardContent className="pt-6 flex-grow flex flex-col justify-between">
+            <CardContent className="pt-6 flex-grow flex flex-col justify-between p-6"> {/* Standard padding */}
                {popularServices.length > 0 ? (
                  <ServiceList services={popularServices} />
                ) : (
                  <p className="text-muted-foreground text-center py-4">{t('services_page.no_services')}</p>
                )}
-               <Button asChild variant="link" className="mt-6 text-accent px-0 self-start hover:text-accent/80 transition-colors">
+               {/* CTA Button */}
+               <Button asChild variant="link" className="mt-6 text-accent px-0 self-start group hover:text-accent/80 transition-colors font-semibold">
                 <Link href="/services">
-                  {t('home.view_all_services')} <ArrowRight className="ml-2 h-4 w-4" />
+                  {t('home.view_all_services')} <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" /> {/* Icon animation on hover */}
                 </Link>
               </Button>
             </CardContent>
@@ -105,14 +106,14 @@ export default async function Home() {
 
         {/* Booking Section */}
         <MotionDiv variants={itemVariants} whileHover={cardHoverEffect}>
-          <Card className="shadow-xl bg-card/80 backdrop-blur-sm border-border/50 overflow-hidden h-full flex flex-col">
-            <CardHeader className="bg-gradient-to-l from-primary/10 to-accent/10 pb-4">
-              <CardTitle className="text-3xl flex items-center gap-2">
+          <Card className="shadow-xl bg-card/80 backdrop-blur-md border-border/50 overflow-hidden h-full flex flex-col rounded-lg"> {/* Explicit rounded-lg */}
+            <CardHeader className="bg-gradient-to-l from-primary/5 to-accent/5 pb-4 border-b border-border/30"> {/* Subtle header gradient and border */}
+              <CardTitle className="text-2xl sm:text-3xl flex items-center gap-2 text-primary"> {/* Responsive title size */}
                  <CalendarCheck className="w-7 h-7 text-accent"/> {t('home.book_appointment')}
               </CardTitle>
-              <CardDescription>{t('home.book_appointment_desc')}</CardDescription>
+              <CardDescription className="text-base">{t('home.book_appointment_desc')}</CardDescription> {/* Slightly larger desc */}
             </CardHeader>
-            <CardContent className="pt-6 flex-grow">
+            <CardContent className="pt-6 flex-grow p-6"> {/* Standard padding */}
               {/* Pass only active services and translation function to booking form */}
               <BookingForm services={bookableServices} />
             </CardContent>
@@ -121,23 +122,32 @@ export default async function Home() {
       </MotionDiv>
 
       <MotionDiv variants={itemVariants}>
-        <Separator className="my-16 sm:my-24 bg-gradient-to-r from-transparent via-border to-transparent h-[1px]" />
+        <Separator className="my-20 sm:my-32 bg-gradient-to-r from-transparent via-border/50 to-transparent h-[1px]" /> {/* Faded separator */}
       </MotionDiv>
 
       {/* Our Work Gallery Section */}
-      <MotionDiv variants={itemVariants} className="mb-16 sm:mb-24">
-        <header className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-primary mb-3 flex items-center justify-center gap-3">
+      <MotionDiv variants={itemVariants} className="mb-20 sm:mb-32"> {/* Increased margin */}
+        <header className="text-center mb-12 sm:mb-16"> {/* Increased margin */}
+          <h2 className="text-4xl md:text-5xl font-bold text-primary mb-3 flex items-center justify-center gap-3">
             <Images className="h-8 w-8 text-accent animate-subtle-pulse" /> {/* Added subtle infinite animation */}
             {t('home.our_work')}
           </h2>
-          <p className="text-lg text-muted-foreground">{t('home.our_work_desc')}</p>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">{t('home.our_work_desc')}</p> {/* Relaxed leading */}
         </header>
         {/* Pass images with category */}
         <GalleryGrid images={galleryImages} />
+         {/* CTA to view full gallery */}
+         <div className="text-center mt-12">
+            <Button asChild variant="outline" size="lg" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-colors shadow-sm hover:shadow-md">
+                <Link href="/cuts">
+                    {t('cuts_page.title')} <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+            </Button>
+         </div>
       </MotionDiv>
 
-      <MotionDiv variants={itemVariants} className="mt-20 sm:mt-32 pt-10 border-t border-border/30 text-center text-muted-foreground text-sm">
+      {/* Footer */}
+      <MotionDiv variants={itemVariants} className="mt-24 sm:mt-40 pt-10 border-t border-border/30 text-center text-muted-foreground text-sm">
         <p>&copy; {new Date().getFullYear()} {t('home.title')}. {t('home.footer_rights')}</p>
         <p>{t('home.footer_address')}</p>
       </MotionDiv>

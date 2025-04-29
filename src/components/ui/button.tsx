@@ -18,7 +18,7 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm hover:shadow-md", // Added shadow
         ghost: "hover:bg-accent hover:text-accent-foreground", // Ghost usually doesn't have shadow
         link: "text-primary underline-offset-4 hover:underline", // Link doesn't need shadow
-        // Added Accent variant
+        // Added Accent variant with stronger shadow
         accent: "bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-lg",
       },
       size: {
