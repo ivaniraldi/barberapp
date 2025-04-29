@@ -5,6 +5,7 @@ export default {
     home: 'Início',
     services: 'Serviços',
     cuts: 'Cortes',
+    calendar: 'Calendário', // Added Calendar link
     admin_login: 'Login Admin',
     toggle_menu: 'Alternar Menu',
     logout: 'Sair',
@@ -40,14 +41,25 @@ export default {
       shaves: 'Barbear',
       styling: 'Estilização',
   },
+  // Calendar Page
+  calendar_page: {
+      title: 'Calendário de Agendamentos',
+      subtitle: 'Veja os agendamentos programados por data.',
+      previous_month: 'Mês Anterior',
+      next_month: 'Próximo Mês',
+      select_date: 'Selecione uma Data',
+      appointments_for_day: 'Agendamentos para este dia',
+      no_appointments_today: 'Nenhum agendamento programado para este dia.',
+      click_date_prompt: 'Clique em uma data no calendário para ver os agendamentos.',
+  },
   // Booking Form
   booking_form: {
     name: 'Nome',
     name_placeholder: 'Seu Nome Completo',
     name_error: 'O nome deve ter pelo menos 2 caracteres.',
     phone: 'Telefone',
-    phone_placeholder: '+1234567890',
-    phone_error: 'Formato de número de telefone inválido.',
+    phone_placeholder: '+5511999998888', // Example BR format
+    phone_error: 'Formato de número de telefone inválido (ex: +5511999998888).', // Added example format
     email: 'Email',
     email_placeholder: 'seu.email@exemplo.com',
     email_error: 'Endereço de email inválido.',
@@ -128,7 +140,7 @@ export default {
       description_error: 'A descrição deve ter pelo menos 5 caracteres.',
       duration: 'Duração (min)',
       duration_error: 'A duração deve ser um número positivo (minutos).',
-      price: 'Preço ($)', // Considere mudar o símbolo $ se necessário
+      price: 'Preço (R$)', // Changed currency symbol
       price_error: 'O preço deve ser um número positivo.',
       active_status: 'Status Ativo',
       // Table Headers

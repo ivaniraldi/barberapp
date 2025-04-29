@@ -5,6 +5,7 @@ export default {
     home: 'Home',
     services: 'Services',
     cuts: 'Cuts', // New Cuts link
+    calendar: 'Calendar', // Added Calendar link
     admin_login: 'Admin Login',
     toggle_menu: 'Toggle Menu',
     logout: 'Logout',
@@ -41,6 +42,17 @@ export default {
       shaves: 'Shaves',
       styling: 'Styling',
   },
+  // Calendar Page
+  calendar_page: {
+      title: 'Appointment Calendar',
+      subtitle: 'View scheduled appointments by date.',
+      previous_month: 'Previous Month',
+      next_month: 'Next Month',
+      select_date: 'Select a Date',
+      appointments_for_day: 'Appointments for this day',
+      no_appointments_today: 'No appointments scheduled for this day.',
+      click_date_prompt: 'Click on a date in the calendar to see appointments.',
+  },
   // Booking Form
   booking_form: {
     name: 'Name',
@@ -48,7 +60,7 @@ export default {
     name_error: 'Name must be at least 2 characters.',
     phone: 'Phone',
     phone_placeholder: '+1234567890',
-    phone_error: 'Invalid phone number format.',
+    phone_error: 'Invalid phone number format (e.g., +1234567890).', // Added example format
     email: 'Email',
     email_placeholder: 'your.email@example.com',
     email_error: 'Invalid email address.',

@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { Menu, Scissors, LogIn, Home, Briefcase, GalleryVertical, Globe } from 'lucide-react'; // Added icons
+import { Menu, Scissors, LogIn, Home, Briefcase, GalleryVertical, Globe, CalendarDays } from 'lucide-react'; // Added CalendarDays
 import { useState } from 'react';
 import { useI18n, useChangeLocale, useCurrentLocale } from '@/locales/client'; // Import i18n hooks
 import {
@@ -28,7 +28,8 @@ export function Navbar() {
   const navItems = [
     { href: '/', labelKey: 'nav.home', icon: Home },
     { href: '/services', labelKey: 'nav.services', icon: Briefcase },
-    { href: '/cuts', labelKey: 'nav.cuts', icon: GalleryVertical }, // Added Cuts page
+    { href: '/cuts', labelKey: 'nav.cuts', icon: GalleryVertical },
+    { href: '/calendar', labelKey: 'nav.calendar', icon: CalendarDays }, // Added Calendar
   ];
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
@@ -50,7 +51,7 @@ export function Navbar() {
   }
 
   const buttonVariants = {
-    hover: { scale: 1.05, boxShadow: "0px 4px 10px hsla(var(--accent)/0.3)" },
+    hover: { scale: 1.05, boxShadow: "0px 4px 10px hsla(var(--accent)/0.2)" }, // Adjusted shadow
     tap: { scale: 0.98 }
   }
 
@@ -61,7 +62,7 @@ export function Navbar() {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/90 backdrop-blur-lg supports-[backdrop-filter]:bg-background/70 shadow-sm"
+      className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60 shadow-sm" // Increased blur/reduced opacity
     >
       <div className="container flex h-16 items-center justify-between px-4">
         {/* Logo/Brand */}
@@ -73,31 +74,33 @@ export function Navbar() {
          </MotionDiv>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
+        <div className="hidden md:flex items-center space-x-1 lg:space-x-2"> {/* Reduced spacing */}
            {navItems.map((item, index) => (
             <MotionButton
               key={item.href}
               asChild
-              variant="ghost"
+              variant="ghost" // Use ghost for less emphasis, rely on underline/color
               className={cn(
-                'transition-colors text-sm font-medium relative group px-3 py-2', // Adjusted padding
+                'transition-colors text-sm font-medium relative group px-3 py-2 rounded-md', // Added rounded-md
                 pathname === `/${currentLocale}${item.href}` || (item.href === '/' && pathname === `/${currentLocale}`)
                 ? 'text-accent'
-                : 'text-muted-foreground hover:text-accent'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50' // Changed hover color
               )}
               initial="hidden"
               animate="visible"
               variants={navItemVariants}
               transition={{ delay: 0.1 + index * 0.1 }} // Stagger animation
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ y: -1 }} // Subtle hover effect
+              whileTap={{ scale: 0.97 }}
             >
                 <Link href={item.href}>
-                <item.icon className="mr-2 h-4 w-4 inline-block lg:hidden" /> {/* Show icon on smaller screens */}
-                <span className="hidden lg:inline-block">{t(item.labelKey as any)}</span> {/* Show text on larger screens */}
+                 {/* Always show icon + text for clarity */}
+                <item.icon className="mr-1.5 h-4 w-4 inline-block shrink-0" />
+                <span className="">{t(item.labelKey as any)}</span>
+                 {/* Underline effect */}
                  <span className={cn(
-                    "absolute bottom-0 left-0 h-0.5 bg-accent w-0 group-hover:w-full transition-all duration-300",
-                     pathname === `/${currentLocale}${item.href}` || (item.href === '/' && pathname === `/${currentLocale}`) ? 'w-full' : 'w-0'
+                    "absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-accent w-0 group-hover:w-[80%] transition-all duration-300", // Centered underline grow
+                     pathname === `/${currentLocale}${item.href}` || (item.href === '/' && pathname === `/${currentLocale}`) ? 'w-[80%]' : 'w-0'
                  )}></span>
                 </Link>
             </MotionButton>
@@ -108,10 +111,10 @@ export function Navbar() {
               <MotionButton
                 variant="outline"
                 size="sm"
-                className="border-border/70 hover:bg-muted"
+                className="border-border/70 hover:bg-muted/70 text-muted-foreground hover:text-foreground" // Adjusted style
                 variants={buttonVariants} whileHover="hover" whileTap="tap"
               >
-                <Globe className="mr-2 h-4 w-4" /> {currentLocale.toUpperCase()}
+                <Globe className="mr-1.5 h-4 w-4" /> {currentLocale.toUpperCase()}
               </MotionButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -123,13 +126,14 @@ export function Navbar() {
 
           <MotionButton
              asChild
-             variant="outline"
+             variant="accent" // Use the new accent variant
              size="sm"
-             className="border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-colors"
+             className="ml-2" // Add margin
+             // className="border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-colors"
              variants={buttonVariants} whileHover="hover" whileTap="tap"
            >
             <Link href="/login">
-                <LogIn className="mr-2 h-4 w-4"/> {t('nav.admin_login')}
+                <LogIn className="mr-1.5 h-4 w-4"/> {t('nav.admin_login')}
             </Link>
           </MotionButton>
         </div>
@@ -138,7 +142,7 @@ export function Navbar() {
         <div className="md:hidden flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-               <MotionButton variant="ghost" size="icon" variants={buttonVariants} whileHover="hover" whileTap="tap">
+               <MotionButton variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" variants={buttonVariants} whileHover="hover" whileTap="tap">
                 <Globe className="h-5 w-5" />
               </MotionButton>
             </DropdownMenuTrigger>
@@ -150,7 +154,7 @@ export function Navbar() {
           </DropdownMenu>
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-              <MotionButton variant="ghost" size="icon" variants={buttonVariants} whileHover="hover" whileTap="tap">
+              <MotionButton variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" variants={buttonVariants} whileHover="hover" whileTap="tap">
                 <Menu className="h-6 w-6" />
                 <span className="sr-only">{t('nav.toggle_menu')}</span>
               </MotionButton>
@@ -162,14 +166,14 @@ export function Navbar() {
                   <span>BarberApp</span>
                 </Link>
               </div>
-              <div className="flex-grow flex flex-col space-y-2 p-4">
+              <div className="flex-grow flex flex-col space-y-1.5 p-4"> {/* Reduced space */}
                  {navItems.map((item, index) => (
                    <MotionDiv
                      key={item.href}
                      variants={mobileNavItemVariants}
                      initial="hidden"
                      animate="visible"
-                     transition={{ delay: index * 0.1 }}
+                     transition={{ delay: index * 0.08 }} // Faster stagger
                    >
                      <SheetClose asChild>
                        <Link
@@ -178,7 +182,7 @@ export function Navbar() {
                           'flex items-center gap-3 text-base font-medium rounded-md px-3 py-2.5 transition-colors',
                            pathname === `/${currentLocale}${item.href}` || (item.href === '/' && pathname === `/${currentLocale}`)
                             ? 'bg-accent/10 text-accent'
-                            : 'text-foreground hover:bg-muted'
+                            : 'text-foreground hover:bg-muted/70' // Adjusted hover
                         )}
                         onClick={closeMobileMenu}
                        >
@@ -194,8 +198,9 @@ export function Navbar() {
                 <SheetClose asChild>
                    <MotionButton
                      asChild
-                     variant="outline"
-                     className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-colors"
+                     variant="accent" // Use accent variant
+                     className="w-full"
+                     // className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-colors"
                      onClick={closeMobileMenu}
                      variants={buttonVariants} whileHover="hover" whileTap="tap"
                     >

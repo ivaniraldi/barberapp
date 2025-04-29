@@ -11,37 +11,38 @@
 } */
 
 @layer base {
-  /* Dark Theme Variables (Primary Theme) */
+  /* Dark Theme Variables (Primary Theme - Enhanced Elegance) */
   .dark {
-    --background: 228 12% 10%; /* Dark Slate Blue/Gray */
-    --foreground: 210 40% 96%; /* Very Light Gray/Off-White */
+    --background: 220 18% 8%; /* Deeper, slightly bluish dark gray */
+    --foreground: 215 25% 92%; /* Slightly softer off-white */
 
-    --card: 228 10% 15%; /* Slightly Lighter Dark Slate */
-    --card-foreground: 210 40% 94%; /* Light Gray */
+    --card: 220 15% 12%; /* Slightly lighter than background, subtle blue tint */
+    --card-foreground: 215 25% 90%; /* Matching foreground */
 
-    --popover: 228 12% 9%; /* Darker Popover */
-    --popover-foreground: 210 40% 96%;
+    --popover: 220 20% 7%; /* Darker Popover */
+    --popover-foreground: 215 25% 92%;
 
-    --primary: 210 40% 92%; /* Lighter primary for text contrast */
-    --primary-foreground: 228 15% 18%; /* Dark foreground for primary elements */
+    /* Primary adjusted for better contrast on dark bg */
+    --primary: 215 30% 88%; /* Lighter gray-blue for main text/elements */
+    --primary-foreground: 220 20% 10%; /* Dark foreground for primary buttons/elements */
 
-    --secondary: 228 8% 25%; /* Muted Dark Slate */
-    --secondary-foreground: 210 30% 85%; /* Muted Light Gray */
+    --secondary: 220 10% 22%; /* Muted dark slate */
+    --secondary-foreground: 215 20% 75%; /* Muted light gray */
 
-    --muted: 228 8% 22%; /* Darker Muted Slate */
-    --muted-foreground: 210 25% 65%; /* Medium Gray */
+    --muted: 220 10% 18%; /* Darker muted slate */
+    --muted-foreground: 215 15% 55%; /* Medium gray */
 
-    --accent: 45 100% 65%; /* Vivid Gold/Yellow */
-    --accent-foreground: 30 50% 15%; /* Dark Brown/Black for accent text */
+    --accent: 43 95% 55%; /* Refined Gold - slightly less bright, richer */
+    --accent-foreground: 30 50% 12%; /* Dark Brown/Black for accent text */
 
-    --destructive: 0 70% 55%; /* Slightly desaturated Red */
+    --destructive: 0 65% 50%; /* Slightly desaturated Red */
     --destructive-foreground: 0 0% 98%; /* White */
 
-    --border: 228 10% 25%; /* Subtle Border */
-    --input: 228 10% 20%; /* Input Background */
-    --ring: 45 100% 70%; /* Brighter Gold for Rings */
+    --border: 220 12% 20%; /* Subtle Border, slightly lighter */
+    --input: 220 12% 16%; /* Input Background */
+    --ring: 43 90% 60%; /* Gold for Rings */
 
-    --radius: 0.75rem; /* Slightly larger radius for elegance */
+    --radius: 0.8rem; /* Slightly larger radius */
 
     /* Chart colors (adjust as needed) */
     --chart-1: 210 70% 60%; /* Brighter Blue */
@@ -51,47 +52,48 @@
     --chart-5: 340 75% 65%; /* Pink */
 
     /* Sidebar specific colors (if using sidebar component) */
-     --sidebar-background: 228 12% 8%; /* Even Darker */
-     --sidebar-foreground: 210 40% 90%;
-     --sidebar-primary: 45 100% 68%; /* Sidebar Gold */
-     --sidebar-primary-foreground: 30 50% 12%;
-     --sidebar-accent: 228 10% 20%;
-     --sidebar-accent-foreground: 210 40% 95%;
-     --sidebar-border: 228 10% 18%;
-     --sidebar-ring: 45 100% 70%;
+     --sidebar-background: 220 18% 6%; /* Even Darker */
+     --sidebar-foreground: 215 25% 88%;
+     --sidebar-primary: 43 95% 58%; /* Sidebar Gold */
+     --sidebar-primary-foreground: 30 50% 10%;
+     --sidebar-accent: 220 12% 15%;
+     --sidebar-accent-foreground: 215 25% 90%;
+     --sidebar-border: 220 10% 15%;
+     --sidebar-ring: 43 90% 60%;
   }
 
   /* Light Theme Variables (Kept for reference or future use) */
   :root {
      --background: 0 0% 100%; /* White */
-     --foreground: 228 12% 15%; /* Dark Slate Text */
+     --foreground: 220 15% 15%; /* Dark Slate Text */
 
      --card: 0 0% 98%; /* Very Light Gray Card */
-     --card-foreground: 228 12% 20%;
+     --card-foreground: 220 15% 20%;
 
      --popover: 0 0% 100%;
-     --popover-foreground: 228 12% 15%;
+     --popover-foreground: 220 15% 15%;
 
-     --primary: 16 30% 30%; /* Deep Brown (Primary Color) */
-     --primary-foreground: 40 50% 95%; /* Cream/Light Foreground */
+     /* Primary using the requested deep brown and cream */
+     --primary: 27 34% 25%;    /* #4E342E - Deep Brown */
+     --primary-foreground: 40 100% 97%; /* #FFFDD0 - Cream */
 
-     --secondary: 50 15% 90%; /* Light Cream/Beige */
-     --secondary-foreground: 16 25% 35%; /* Darker Brown */
+     --secondary: 40 100% 97%;  /* #FFFDD0 - Cream */
+     --secondary-foreground: 27 30% 30%; /* Darker Brown for contrast */
 
-     --muted: 50 15% 92%; /* Slightly darker muted cream */
-     --muted-foreground: 16 20% 50%; /* Medium Brown */
+     --muted: 40 50% 94%; /* Lighter Cream/Gray */
+     --muted-foreground: 27 20% 40%; /* Medium Brown */
 
-     --accent: 45 90% 50%; /* Gold */
-     --accent-foreground: 30 50% 15%; /* Dark Brown/Black */
+     --accent: 45 100% 50%; /* #FFD700 - Gold */
+     --accent-foreground: 30 50% 10%; /* Dark Brown/Black for accent text */
 
      --destructive: 0 84.2% 60.2%;
      --destructive-foreground: 0 0% 98%;
 
-     --border: 50 10% 88%; /* Light border */
-     --input: 50 10% 90%; /* Light input */
-     --ring: 45 90% 55%; /* Gold ring */
+     --border: 40 20% 90%; /* Light border, cream-ish */
+     --input: 40 20% 92%; /* Light input, cream-ish */
+     --ring: 45 95% 55%; /* Gold ring */
 
-     --radius: 0.75rem;
+     --radius: 0.8rem; /* Slightly larger radius */
 
      /* Chart colors for light theme */
      --chart-1: 12 76% 61%;
@@ -101,14 +103,14 @@
      --chart-5: 27 87% 67%;
 
      /* Sidebar specific colors for light theme */
-     --sidebar-background: 16 20% 96%; /* Light sidebar bg */
-     --sidebar-foreground: 16 30% 25%;
-     --sidebar-primary: 45 90% 50%; /* Gold */
+     --sidebar-background: 40 30% 97%; /* Light cream sidebar bg */
+     --sidebar-foreground: 27 30% 25%;
+     --sidebar-primary: 45 100% 50%; /* Gold */
      --sidebar-primary-foreground: 30 50% 10%;
-     --sidebar-accent: 50 15% 88%;
-     --sidebar-accent-foreground: 16 25% 30%;
-     --sidebar-border: 50 10% 85%;
-     --sidebar-ring: 45 90% 55%;
+     --sidebar-accent: 40 20% 90%;
+     --sidebar-accent-foreground: 27 25% 30%;
+     --sidebar-border: 40 15% 88%;
+     --sidebar-ring: 45 95% 55%;
   }
 }
 
@@ -121,20 +123,21 @@
   body {
     @apply bg-background text-foreground;
     /* Use default sans-serif font stack */
-    font-family: sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Subtle background gradient */
-   body::before {
+  /* Subtle background gradient for dark theme */
+   .dark body::before {
      content: '';
      position: fixed;
      top: 0; left: 0; right: 0; bottom: 0;
-     background: radial-gradient(ellipse at top left, hsla(var(--primary)/0.03), transparent 50%),
-                 radial-gradient(ellipse at bottom right, hsla(var(--accent)/0.05), transparent 60%);
+     background: radial-gradient(ellipse at top left, hsla(var(--primary) / 0.02), transparent 60%), /* Softer primary gradient */
+                 radial-gradient(ellipse at bottom right, hsla(var(--accent) / 0.04), transparent 70%); /* Softer accent gradient */
      z-index: -1; /* Place behind content */
      pointer-events: none;
+     opacity: 0.7;
    }
 
 
@@ -185,8 +188,8 @@
    }
 
     @keyframes subtle-glow {
-      from { box-shadow: 0 0 5px 0px hsla(var(--accent) / 0.2); }
-      to { box-shadow: 0 0 15px 3px hsla(var(--accent) / 0.3); }
+      from { box-shadow: 0 0 5px 0px hsla(var(--accent) / 0.15); } /* Reduced glow intensity */
+      to { box-shadow: 0 0 15px 3px hsla(var(--accent) / 0.25); } /* Reduced glow intensity */
     }
 
 }

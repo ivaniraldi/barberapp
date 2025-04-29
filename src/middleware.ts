@@ -4,7 +4,7 @@ import { createI18nMiddleware } from 'next-international/middleware';
 // Define supported locales
 const I18nMiddleware = createI18nMiddleware({
   locales: ['en', 'es', 'pt'],
-  defaultLocale: 'en',
+  defaultLocale: 'pt', // Set Portuguese as default
   urlMappingStrategy: 'rewrite', // Use path-based routing (e.g., /es/services)
 });
 
@@ -20,7 +20,7 @@ export function middleware(request: NextRequest) {
     //
     // if (!isAuthenticated) {
     //   // Redirect to login page if not authenticated
-    //   const loginUrl = new URL(`/${request.nextUrl.locale || 'en'}/login`, request.url) // Use detected or default locale
+    //   const loginUrl = new URL(`/${request.nextUrl.locale || 'pt'}/login`, request.url) // Use detected or default locale (pt)
     //   loginUrl.searchParams.set('redirectedFrom', pathname) // Optional: pass original path
     //   return NextResponse.redirect(loginUrl)
     // }
