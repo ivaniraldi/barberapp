@@ -29,7 +29,8 @@ export default function LocaleLayout({ children, params: { locale } }: LocaleLay
 
   return (
     // Removed Geist font variables from html tag
-    <html lang={validLocale} className={`dark`}> {/* Use validated locale */}
+    // Ensure no extra whitespace or comments directly inside the html tag
+    <html lang={validLocale} className={`dark`}>
       <body className="antialiased bg-gradient-to-br from-background via-background/95 to-secondary/10 text-foreground min-h-screen flex flex-col">
         {/* Wrap content with I18nProviderClient */}
         <I18nProviderClient locale={validLocale}> {/* Pass validated locale */}
