@@ -1,7 +1,10 @@
+// src/components/service-list.tsx
 import type { FC } from 'react';
 import { Scissors, Clock, DollarSign } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card'; // Removed CardHeader, CardTitle, CardDescription
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { useI18n } from '@/locales/client'; // Import i18n hook for client component
+import { MotionDiv } from './motion-provider'; // Import MotionDiv
 
 interface Service {
   id: string;
@@ -9,44 +12,56 @@ interface Service {
   description: string;
   duration: number;
   price: number;
-  // Category might exist but is not displayed here
 }
 
 interface ServiceListProps {
-  services: Service[]; // Can be one or multiple services
+  services: Service[];
 }
 
+const listItemVariants = {
+    hidden: { opacity: 0, x: -10 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.4 } }
+};
+
 export const ServiceList: FC<ServiceListProps> = ({ services }) => {
-  // Determine if it's a single service display (used on the /services page card)
+  const t = useI18n(); // Get translation function
   const isSingleService = services.length === 1;
 
   return (
-    <div className={isSingleService ? '' : 'space-y-4'}> {/* Remove outer spacing if only one service */}
+    <div className={isSingleService ? '' : 'space-y-4'}>
       {services.map((service, index) => (
-        <div key={service.id}>
-          {/* Use Card only if it's NOT a single service display */}
-          <Card className={isSingleService ? "border-none shadow-none p-0 bg-transparent" : "border-none shadow-none p-0"}>
-            <CardContent className="p-0">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-semibold flex items-center text-primary"> {/* Ensure text color */}
-                  {!isSingleService && <Scissors className="mr-2 h-5 w-5 text-primary" />} {/* Show icon only if multiple */}
+        <MotionDiv
+            key={service.id}
+            variants={listItemVariants}
+            // Apply variants only if part of a list (not single display)
+            initial={isSingleService ? undefined : "hidden"}
+            animate={isSingleService ? undefined : "visible"}
+            // Stagger children if it's a list
+            custom={index}
+            transition={isSingleService ? undefined : { delay: index * 0.05 }}
+        >
+          {/* Use Card styling implicitly via parent or keep transparent */}
+          <div className={isSingleService ? "p-0" : "p-0"}> {/* Adjusted padding */}
+              <div className="flex items-start sm:items-center justify-between mb-2 flex-col sm:flex-row gap-2 sm:gap-0">
+                <h3 className="text-lg font-semibold flex items-center text-primary">
+                  {!isSingleService && <Scissors className="mr-2 h-5 w-5 text-primary shrink-0" />}
                    {service.name}
                 </h3>
-                <span className="text-lg font-semibold text-primary flex items-center"> {/* Ensure text color */}
-                  <DollarSign className="mr-1 h-4 w-4 text-accent" /> {/* Accent color for price icon */}
-                  {service.price.toFixed(2)} {/* Format price */}
+                <span className="text-lg font-semibold text-primary flex items-center shrink-0">
+                  <DollarSign className="mr-1 h-4 w-4 text-accent" />
+                  {service.price.toFixed(2)}
                 </span>
               </div>
               <p className="text-sm text-muted-foreground mb-2">{service.description}</p>
               <div className="text-sm text-muted-foreground flex items-center">
                 <Clock className="mr-1 h-4 w-4" />
-                <span>{service.duration} minutes</span>
+                {/* Use translation for duration */}
+                <span>{t('booking_form.duration_minutes', { duration: service.duration })}</span>
               </div>
-            </CardContent>
-          </Card>
+          </div>
           {/* Add separator only if there are multiple services and it's not the last one */}
           {!isSingleService && index < services.length - 1 && <Separator className="my-4 border-border/50" />}
-        </div>
+        </MotionDiv>
       ))}
     </div>
   );

@@ -1,49 +1,49 @@
-// src/middleware.ts
-import type { NextRequest } from 'next/server'
-import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server';
+import { createI18nMiddleware } from 'next-international/middleware';
 
-// This function can be marked `async` if using `await` inside
+// Define supported locales
+const I18nMiddleware = createI18nMiddleware({
+  locales: ['en', 'es', 'pt'],
+  defaultLocale: 'en',
+  urlMappingStrategy: 'rewrite', // Use path-based routing (e.g., /es/services)
+});
+
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  const { pathname } = request.nextUrl;
 
-  // Check if the user is trying to access the /admin route
-  if (pathname.startsWith('/admin')) {
-    // --- AUTHENTICATION LOGIC ---
+  // --- AUTHENTICATION LOGIC for /admin ---
+  if (pathname.startsWith('/admin') || pathname.startsWith('/en/admin') || pathname.startsWith('/es/admin') || pathname.startsWith('/pt/admin')) {
     // In a real application, you would check for a valid session cookie, token, etc.
-    // For this example, we'll assume no authentication check for simplicity.
-    // If you implemented session/token checks, you'd do it here.
     // Example (placeholder):
     // const sessionToken = request.cookies.get('session-token')?.value;
     // const isAuthenticated = await verifyToken(sessionToken); // Replace with your auth verification
     //
     // if (!isAuthenticated) {
     //   // Redirect to login page if not authenticated
-    //   const loginUrl = new URL('/login', request.url)
+    //   const loginUrl = new URL(`/${request.nextUrl.locale || 'en'}/login`, request.url) // Use detected or default locale
     //   loginUrl.searchParams.set('redirectedFrom', pathname) // Optional: pass original path
     //   return NextResponse.redirect(loginUrl)
     // }
     // --- END AUTHENTICATION LOGIC ---
-
-    // If authenticated (or no check needed for now), allow access
-    return NextResponse.next()
   }
 
-  // Allow other requests to pass through
-  return NextResponse.next()
+  // Apply i18n middleware to handle locale detection and rewriting
+  return I18nMiddleware(request);
 }
 
-// See "Matching Paths" below to learn more
 export const config = {
   matcher: [
-      /*
+    /*
      * Match all request paths except for the ones starting with:
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - login (allow access to login page itself)
+     * - healthz (health check endpoint) - Added
+     * - genkit (genkit internal endpoint) - Added
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|login).*)',
-    '/admin/:path*', // Specifically match admin routes
-    ],
-}
+    '/((?!api|_next/static|_next/image|favicon.ico|healthz|genkit).*)',
+    // No need for specific /admin matcher here, as the general matcher covers it
+    // and the authentication check is done above based on pathname prefix.
+  ],
+};

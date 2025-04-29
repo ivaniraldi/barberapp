@@ -2,92 +2,192 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: var(--font-geist-sans), sans-serif;
-}
+/* Define custom font properties if needed */
+/* @layer base {
+  :root {
+    --font-primary: 'Your Elegant Font', sans-serif;
+    --font-secondary: 'Your Readable Font', sans-serif;
+  }
+} */
 
 @layer base {
-  /* Light Theme Variables (Kept for reference, but dark is default) */
-  :root {
-    --background: 58 100% 91%; /* Cream */
-    --foreground: 16 21% 25%; /* Deep Brown */
-    --card: 58 100% 93%; /* Slightly Off-Cream */
-    --card-foreground: 16 21% 25%; /* Deep Brown */
-    --popover: 58 100% 91%; /* Cream */
-    --popover-foreground: 16 21% 25%; /* Deep Brown */
-    --primary: 16 21% 25%; /* Deep Brown */
-    --primary-foreground: 58 100% 91%; /* Cream */
-    --secondary: 58 50% 95%; /* Lighter Cream/Beige */
-    --secondary-foreground: 16 21% 25%; /* Deep Brown */
-    --muted: 58 50% 95%; /* Lighter Cream/Beige */
-    --muted-foreground: 16 21% 40%; /* Slightly Darker Brown */
-    --accent: 51 100% 50%; /* Gold */
-    --accent-foreground: 16 21% 25%; /* Deep Brown */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 58 50% 85%; /* Slightly Darker Cream */
-    --input: 58 50% 85%; /* Slightly Darker Cream */
-    --ring: 51 100% 50%; /* Gold */
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-    --sidebar-background: 16 21% 20%; /* Darker Brown for sidebar in light mode */
-    --sidebar-foreground: 58 100% 91%; /* Cream */
-    --sidebar-primary: 51 100% 50%; /* Gold */
-    --sidebar-primary-foreground: 16 21% 10%; /* Deepest Brown */
-    --sidebar-accent: 16 21% 30%; /* Lighter Brown */
-    --sidebar-accent-foreground: 58 100% 91%; /* Cream */
-    --sidebar-border: 16 21% 25%; /* Deep Brown */
-    --sidebar-ring: 51 100% 50%; /* Gold */
-  }
-
-  /* Dark Theme Variables */
+  /* Dark Theme Variables (Primary Theme) */
   .dark {
-    --background: 220 20% 8%; /* Very Dark Blue/Gray */
-    --foreground: 210 40% 98%; /* Almost White */
-    --card: 220 20% 12%; /* Slightly Lighter Dark Blue/Gray */
-    --card-foreground: 210 40% 96%; /* Slightly Off-White */
-    --popover: 220 20% 8%; /* Very Dark Blue/Gray */
-    --popover-foreground: 210 40% 98%; /* Almost White */
-    --primary: 210 40% 96%; /* Slightly Off-White */
-    --primary-foreground: 220 20% 10%; /* Dark Blue/Gray */
-    --secondary: 220 20% 15%; /* Medium Dark Blue/Gray */
-    --secondary-foreground: 210 40% 96%; /* Slightly Off-White */
-    --muted: 220 20% 15%; /* Medium Dark Blue/Gray */
-    --muted-foreground: 210 40% 70%; /* Lighter Gray */
-    --accent: 45 90% 55%; /* Gold/Yellow */
-    --accent-foreground: 220 20% 10%; /* Dark Blue/Gray */
-    --destructive: 0 70% 50%; /* Red */
+    --background: 228 12% 10%; /* Dark Slate Blue/Gray */
+    --foreground: 210 40% 96%; /* Very Light Gray/Off-White */
+
+    --card: 228 10% 15%; /* Slightly Lighter Dark Slate */
+    --card-foreground: 210 40% 94%; /* Light Gray */
+
+    --popover: 228 12% 9%; /* Darker Popover */
+    --popover-foreground: 210 40% 96%;
+
+    --primary: 210 40% 92%; /* Lighter primary for text contrast */
+    --primary-foreground: 228 15% 18%; /* Dark foreground for primary elements */
+
+    --secondary: 228 8% 25%; /* Muted Dark Slate */
+    --secondary-foreground: 210 30% 85%; /* Muted Light Gray */
+
+    --muted: 228 8% 22%; /* Darker Muted Slate */
+    --muted-foreground: 210 25% 65%; /* Medium Gray */
+
+    --accent: 45 100% 65%; /* Vivid Gold/Yellow */
+    --accent-foreground: 30 50% 15%; /* Dark Brown/Black for accent text */
+
+    --destructive: 0 70% 55%; /* Slightly desaturated Red */
     --destructive-foreground: 0 0% 98%; /* White */
-    --border: 220 20% 20%; /* Medium Dark Blue/Gray */
-    --input: 220 20% 20%; /* Medium Dark Blue/Gray */
-    --ring: 45 90% 55%; /* Gold/Yellow */
-    --chart-1: 220 70% 60%; /* Brighter Blue */
+
+    --border: 228 10% 25%; /* Subtle Border */
+    --input: 228 10% 20%; /* Input Background */
+    --ring: 45 100% 70%; /* Brighter Gold for Rings */
+
+    --radius: 0.75rem; /* Slightly larger radius for elegance */
+
+    /* Chart colors (adjust as needed) */
+    --chart-1: 210 70% 60%; /* Brighter Blue */
     --chart-2: 160 60% 55%; /* Teal */
-    --chart-3: 30 80% 65%; /* Orange */
+    --chart-3: 45 90% 60%;  /* Gold */
     --chart-4: 280 65% 70%; /* Purple */
     --chart-5: 340 75% 65%; /* Pink */
-    --sidebar-background: 220 20% 6%; /* Even Darker Blue/Gray */
-    --sidebar-foreground: 210 40% 98%; /* Almost White */
-    --sidebar-primary: 45 90% 55%; /* Gold/Yellow */
-    --sidebar-primary-foreground: 220 20% 8%; /* Very Dark Blue/Gray */
-    --sidebar-accent: 220 20% 15%; /* Medium Dark Blue/Gray */
-    --sidebar-accent-foreground: 210 40% 98%; /* Almost White */
-    --sidebar-border: 220 20% 12%; /* Slightly Lighter Dark */
-    --sidebar-ring: 45 90% 55%; /* Gold/Yellow */
+
+    /* Sidebar specific colors (if using sidebar component) */
+     --sidebar-background: 228 12% 8%; /* Even Darker */
+     --sidebar-foreground: 210 40% 90%;
+     --sidebar-primary: 45 100% 68%; /* Sidebar Gold */
+     --sidebar-primary-foreground: 30 50% 12%;
+     --sidebar-accent: 228 10% 20%;
+     --sidebar-accent-foreground: 210 40% 95%;
+     --sidebar-border: 228 10% 18%;
+     --sidebar-ring: 45 100% 70%;
+  }
+
+  /* Light Theme Variables (Kept for reference or future use) */
+  :root {
+     --background: 0 0% 100%; /* White */
+     --foreground: 228 12% 15%; /* Dark Slate Text */
+
+     --card: 0 0% 98%; /* Very Light Gray Card */
+     --card-foreground: 228 12% 20%;
+
+     --popover: 0 0% 100%;
+     --popover-foreground: 228 12% 15%;
+
+     --primary: 16 30% 30%; /* Deep Brown (Primary Color) */
+     --primary-foreground: 40 50% 95%; /* Cream/Light Foreground */
+
+     --secondary: 50 15% 90%; /* Light Cream/Beige */
+     --secondary-foreground: 16 25% 35%; /* Darker Brown */
+
+     --muted: 50 15% 92%; /* Slightly darker muted cream */
+     --muted-foreground: 16 20% 50%; /* Medium Brown */
+
+     --accent: 45 90% 50%; /* Gold */
+     --accent-foreground: 30 50% 15%; /* Dark Brown/Black */
+
+     --destructive: 0 84.2% 60.2%;
+     --destructive-foreground: 0 0% 98%;
+
+     --border: 50 10% 88%; /* Light border */
+     --input: 50 10% 90%; /* Light input */
+     --ring: 45 90% 55%; /* Gold ring */
+
+     --radius: 0.75rem;
+
+     /* Chart colors for light theme */
+     --chart-1: 12 76% 61%;
+     --chart-2: 173 58% 39%;
+     --chart-3: 197 37% 24%;
+     --chart-4: 43 74% 66%;
+     --chart-5: 27 87% 67%;
+
+     /* Sidebar specific colors for light theme */
+     --sidebar-background: 16 20% 96%; /* Light sidebar bg */
+     --sidebar-foreground: 16 30% 25%;
+     --sidebar-primary: 45 90% 50%; /* Gold */
+     --sidebar-primary-foreground: 30 50% 10%;
+     --sidebar-accent: 50 15% 88%;
+     --sidebar-accent-foreground: 16 25% 30%;
+     --sidebar-border: 50 10% 85%;
+     --sidebar-ring: 45 90% 55%;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+    /* Smooth scrolling */
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-background text-foreground;
-    /* Optional: Add a subtle background pattern or gradient */
-    /* background-image: linear-gradient(to bottom right, hsl(var(--background)), hsl(var(--secondary) / 0.5)); */
+    /* Use a more elegant font if available */
+    /* font-family: var(--font-primary), sans-serif; */
+    font-family: var(--font-geist-sans), sans-serif; /* Fallback to Geist */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+
+  /* Subtle background gradient */
+   body::before {
+     content: '';
+     position: fixed;
+     top: 0; left: 0; right: 0; bottom: 0;
+     background: radial-gradient(ellipse at top left, hsla(var(--primary)/0.03), transparent 50%),
+                 radial-gradient(ellipse at bottom right, hsla(var(--accent)/0.05), transparent 60%);
+     z-index: -1; /* Place behind content */
+     pointer-events: none;
+   }
+
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight; /* Tighter tracking for headings */
+  }
+
+  /* Style scrollbars for a cleaner look */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: hsl(var(--background) / 0.5);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: hsl(var(--border));
+      border-radius: 10px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: hsl(var(--muted-foreground));
+       background-clip: content-box;
+        border: 2px solid transparent;
+    }
+}
+
+/* Add subtle animations/transitions globally */
+@layer components {
+  .transition-default {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+   /* Example subtle infinite animation class */
+   .animate-subtle-pulse {
+      animation: subtle-pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+   }
+
+   @keyframes subtle-pulse {
+     0%, 100% { opacity: 1; }
+     50% { opacity: 0.7; }
+   }
+
+   .animate-subtle-glow {
+     animation: subtle-glow 3s ease-in-out infinite alternate;
+   }
+
+    @keyframes subtle-glow {
+      from { box-shadow: 0 0 5px 0px hsla(var(--accent) / 0.2); }
+      to { box-shadow: 0 0 15px 3px hsla(var(--accent) / 0.3); }
+    }
+
 }

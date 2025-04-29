@@ -18,6 +18,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // No explicit i18n config needed here when using next-international middleware
+  // i18n: {
+  //   locales: ['en', 'es', 'pt'],
+  //   defaultLocale: 'en',
+  // },
 };
 
 export default nextConfig;
