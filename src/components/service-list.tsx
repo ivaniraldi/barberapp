@@ -1,4 +1,6 @@
 // src/components/service-list.tsx
+'use client'; // Add this directive
+
 import type { FC } from 'react';
 import { Scissors, Clock, DollarSign } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
