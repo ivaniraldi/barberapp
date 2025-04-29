@@ -7,6 +7,7 @@ body {
 }
 
 @layer base {
+  /* Light Theme Variables (Kept for reference, but dark is default) */
   :root {
     --background: 58 100% 91%; /* Cream */
     --foreground: 16 21% 25%; /* Deep Brown */
@@ -42,39 +43,41 @@ body {
     --sidebar-border: 16 21% 25%; /* Deep Brown */
     --sidebar-ring: 51 100% 50%; /* Gold */
   }
+
+  /* Dark Theme Variables */
   .dark {
-    --background: 16 21% 10%; /* Darker Brown */
-    --foreground: 58 100% 91%; /* Cream */
-    --card: 16 21% 12%; /* Slightly Lighter Dark Brown */
-    --card-foreground: 58 100% 91%; /* Cream */
-    --popover: 16 21% 10%; /* Darker Brown */
-    --popover-foreground: 58 100% 91%; /* Cream */
-    --primary: 58 100% 91%; /* Cream */
-    --primary-foreground: 16 21% 10%; /* Darker Brown */
-    --secondary: 16 21% 15%; /* Medium Brown */
-    --secondary-foreground: 58 100% 91%; /* Cream */
-    --muted: 16 21% 15%; /* Medium Brown */
-    --muted-foreground: 58 50% 80%; /* Lighter Cream */
-    --accent: 51 100% 50%; /* Gold */
-    --accent-foreground: 16 21% 10%; /* Darker Brown */
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 16 21% 20%; /* Medium Brown */
-    --input: 16 21% 20%; /* Medium Brown */
-    --ring: 51 100% 50%; /* Gold */
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 16 21% 8%; /* Even Darker Brown for sidebar */
-    --sidebar-foreground: 58 100% 91%; /* Cream */
-    --sidebar-primary: 51 100% 50%; /* Gold */
-    --sidebar-primary-foreground: 16 21% 10%; /* Darker Brown */
-    --sidebar-accent: 16 21% 15%; /* Medium Brown */
-    --sidebar-accent-foreground: 58 100% 91%; /* Cream */
-    --sidebar-border: 16 21% 12%; /* Slightly Lighter Dark Brown */
-    --sidebar-ring: 51 100% 50%; /* Gold */
+    --background: 220 20% 8%; /* Very Dark Blue/Gray */
+    --foreground: 210 40% 98%; /* Almost White */
+    --card: 220 20% 12%; /* Slightly Lighter Dark Blue/Gray */
+    --card-foreground: 210 40% 96%; /* Slightly Off-White */
+    --popover: 220 20% 8%; /* Very Dark Blue/Gray */
+    --popover-foreground: 210 40% 98%; /* Almost White */
+    --primary: 210 40% 96%; /* Slightly Off-White */
+    --primary-foreground: 220 20% 10%; /* Dark Blue/Gray */
+    --secondary: 220 20% 15%; /* Medium Dark Blue/Gray */
+    --secondary-foreground: 210 40% 96%; /* Slightly Off-White */
+    --muted: 220 20% 15%; /* Medium Dark Blue/Gray */
+    --muted-foreground: 210 40% 70%; /* Lighter Gray */
+    --accent: 45 90% 55%; /* Gold/Yellow */
+    --accent-foreground: 220 20% 10%; /* Dark Blue/Gray */
+    --destructive: 0 70% 50%; /* Red */
+    --destructive-foreground: 0 0% 98%; /* White */
+    --border: 220 20% 20%; /* Medium Dark Blue/Gray */
+    --input: 220 20% 20%; /* Medium Dark Blue/Gray */
+    --ring: 45 90% 55%; /* Gold/Yellow */
+    --chart-1: 220 70% 60%; /* Brighter Blue */
+    --chart-2: 160 60% 55%; /* Teal */
+    --chart-3: 30 80% 65%; /* Orange */
+    --chart-4: 280 65% 70%; /* Purple */
+    --chart-5: 340 75% 65%; /* Pink */
+    --sidebar-background: 220 20% 6%; /* Even Darker Blue/Gray */
+    --sidebar-foreground: 210 40% 98%; /* Almost White */
+    --sidebar-primary: 45 90% 55%; /* Gold/Yellow */
+    --sidebar-primary-foreground: 220 20% 8%; /* Very Dark Blue/Gray */
+    --sidebar-accent: 220 20% 15%; /* Medium Dark Blue/Gray */
+    --sidebar-accent-foreground: 210 40% 98%; /* Almost White */
+    --sidebar-border: 220 20% 12%; /* Slightly Lighter Dark */
+    --sidebar-ring: 45 90% 55%; /* Gold/Yellow */
   }
 }
 
@@ -84,5 +87,7 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    /* Optional: Add a subtle background pattern or gradient */
+    /* background-image: linear-gradient(to bottom right, hsl(var(--background)), hsl(var(--secondary) / 0.5)); */
   }
 }

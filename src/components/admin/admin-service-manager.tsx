@@ -1,3 +1,4 @@
+// src/components/admin/admin-service-manager.tsx
 'use client';
 
 import type { FC } from 'react';
@@ -19,30 +20,25 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { PlusCircle, Edit, Trash2, Power, PowerOff, DollarSign, Clock } from 'lucide-react';
+import { PlusCircle, Edit, Power, PowerOff, DollarSign, Clock, Tag } from 'lucide-react'; // Added Tag icon
 import { useToast } from '@/hooks/use-toast';
-
-interface Service {
-  id: string;
-  name: string;
-  description: string;
-  duration: number;
-  price: number;
-  active: boolean;
-}
+import type { Service } from '@/lib/services'; // Import the actual Service type
 
 interface AdminServiceManagerProps {
   initialServices: Service[];
 }
 
+// Define Zod schema matching the Service type, including category
 const serviceSchema = z.object({
   name: z.string().min(3, { message: "Service name must be at least 3 characters." }),
   description: z.string().min(5, { message: "Description must be at least 5 characters." }),
-  duration: z.coerce.number().int().positive({ message: "Duration must be a positive number." }),
+  duration: z.coerce.number().int().positive({ message: "Duration must be a positive number (minutes)." }),
   price: z.coerce.number().positive({ message: "Price must be a positive number." }),
+  category: z.string().min(2, { message: "Category name must be at least 2 characters." }),
   active: z.boolean().default(true),
 });
 
+// Infer the type from the Zod schema
 type ServiceFormData = z.infer<typeof serviceSchema>;
 
 export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServices }) => {
@@ -53,25 +49,25 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
 
   const { register, handleSubmit, control, reset, formState: { errors } } = useForm<ServiceFormData>({
     resolver: zodResolver(serviceSchema),
-    defaultValues: { active: true }
+    defaultValues: { name: '', description: '', duration: 0, price: 0, category: '', active: true } // Add category default
   });
 
   const openModalForEdit = (service: Service) => {
     setEditingService(service);
-    reset(service); // Pre-fill form with service data
+    reset(service); // Pre-fill form with service data, including category
     setIsModalOpen(true);
   };
 
   const openModalForNew = () => {
     setEditingService(null);
-    reset({ name: '', description: '', duration: 0, price: 0, active: true }); // Reset form for new entry
+    reset({ name: '', description: '', duration: 0, price: 0, category: '', active: true }); // Reset form
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingService(null);
-    reset({ name: '', description: '', duration: 0, price: 0, active: true }); // Ensure reset on close
+    reset({ name: '', description: '', duration: 0, price: 0, category: '', active: true }); // Ensure reset on close
   };
 
   const onSubmit = async (data: ServiceFormData) => {
@@ -80,10 +76,12 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
 
     if (editingService) {
       // Update existing service
-      setServices(services.map(s => s.id === editingService.id ? { ...editingService, ...data } : s));
+      const updatedService = { ...editingService, ...data };
+      setServices(services.map(s => s.id === editingService.id ? updatedService : s));
       toast({ title: "Service Updated", description: `"${data.name}" has been updated.` });
     } else {
       // Add new service
+      // In a real app, the ID would come from the backend after saving
       const newService: Service = { ...data, id: `service-${Date.now()}` }; // Generate temporary ID
       setServices([...services, newService]);
       toast({ title: "Service Added", description: `"${data.name}" has been added.` });
@@ -102,53 +100,44 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
      });
     };
 
-    // Deletion is commented out as it might be destructive. Implement with caution.
-    /*
-    const deleteService = async (serviceId: string) => {
-        // Add confirmation dialog here
-        if (!confirm("Are you sure you want to delete this service? This cannot be undone.")) {
-            return;
-        }
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 500));
-        setServices(services.filter(s => s.id !== serviceId));
-        toast({ title: "Service Deleted", variant: 'destructive' });
-    };
-    */
-
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
-         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+         <Dialog open={isModalOpen} onOpenChange={(isOpen) => { if (!isOpen) closeModal(); setIsModalOpen(isOpen); }}>
            <DialogTrigger asChild>
-            <Button onClick={openModalForNew}>
+            <Button onClick={openModalForNew} className="bg-accent hover:bg-accent/90 text-accent-foreground">
                 <PlusCircle className="mr-2 h-4 w-4" /> Add New Service
             </Button>
            </DialogTrigger>
-           <DialogContent className="sm:max-w-[525px]">
+           <DialogContent className="sm:max-w-[525px] bg-card border-border/70">
               <DialogHeader>
-                <DialogTitle>{editingService ? 'Edit Service' : 'Add New Service'}</DialogTitle>
+                <DialogTitle className="text-primary">{editingService ? 'Edit Service' : 'Add New Service'}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
                  <div className="space-y-1">
-                    <Label htmlFor="name">Service Name</Label>
-                    <Input id="name" {...register('name')} aria-invalid={errors.name ? "true" : "false"} />
+                    <Label htmlFor="name" className="text-muted-foreground">Service Name</Label>
+                    <Input id="name" {...register('name')} aria-invalid={errors.name ? "true" : "false"} className="bg-input/50 border-border/70"/>
                     {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="category" className="text-muted-foreground">Category</Label>
+                    <Input id="category" {...register('category')} aria-invalid={errors.category ? "true" : "false"} placeholder="e.g., Haircuts, Beard Care" className="bg-input/50 border-border/70"/>
+                    {errors.category && <p className="text-sm text-destructive">{errors.category.message}</p>}
+                 </div>
                  <div className="space-y-1">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea id="description" {...register('description')} aria-invalid={errors.description ? "true" : "false"} />
+                    <Label htmlFor="description" className="text-muted-foreground">Description</Label>
+                    <Textarea id="description" {...register('description')} aria-invalid={errors.description ? "true" : "false"} className="bg-input/50 border-border/70"/>
                     {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
                  </div>
                  <div className="grid grid-cols-2 gap-4">
                    <div className="space-y-1">
-                      <Label htmlFor="duration">Duration (minutes)</Label>
-                      <Input id="duration" type="number" {...register('duration')} aria-invalid={errors.duration ? "true" : "false"} />
+                      <Label htmlFor="duration" className="text-muted-foreground">Duration (min)</Label>
+                      <Input id="duration" type="number" {...register('duration')} aria-invalid={errors.duration ? "true" : "false"} className="bg-input/50 border-border/70"/>
                       {errors.duration && <p className="text-sm text-destructive">{errors.duration.message}</p>}
                    </div>
                     <div className="space-y-1">
-                      <Label htmlFor="price">Price ($)</Label>
-                      <Input id="price" type="number" step="0.01" {...register('price')} aria-invalid={errors.price ? "true" : "false"} />
+                      <Label htmlFor="price" className="text-muted-foreground">Price ($)</Label>
+                      <Input id="price" type="number" step="0.01" {...register('price')} aria-invalid={errors.price ? "true" : "false"} className="bg-input/50 border-border/70"/>
                       {errors.price && <p className="text-sm text-destructive">{errors.price.message}</p>}
                    </div>
                  </div>
@@ -162,16 +151,17 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                                 aria-label="Service Status"
+                                className="data-[state=checked]:bg-accent"
                             />
                         )}
                     />
-                    <Label htmlFor="active">Active Status</Label>
+                    <Label htmlFor="active" className="text-muted-foreground">Active Status</Label>
                  </div>
                  <DialogFooter>
                      <DialogClose asChild>
-                         <Button type="button" variant="outline" onClick={closeModal}>Cancel</Button>
+                         <Button type="button" variant="outline">Cancel</Button>
                      </DialogClose>
-                     <Button type="submit">{editingService ? 'Save Changes' : 'Add Service'}</Button>
+                     <Button type="submit" className="bg-accent hover:bg-accent/90 text-accent-foreground">{editingService ? 'Save Changes' : 'Add Service'}</Button>
                  </DialogFooter>
               </form>
            </DialogContent>
@@ -182,8 +172,9 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
-            <TableHead>Duration</TableHead>
-            <TableHead>Price</TableHead>
+            <TableHead><Tag className="inline mr-1 h-4 w-4" />Category</TableHead> {/* Add Category column */}
+            <TableHead><Clock className="inline mr-1 h-4 w-4" />Duration</TableHead>
+            <TableHead><DollarSign className="inline mr-1 h-4 w-4" />Price</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -191,29 +182,32 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
         <TableBody>
           {services.length === 0 && (
              <TableRow>
-               <TableCell colSpan={5} className="text-center text-muted-foreground">No services found.</TableCell>
+               <TableCell colSpan={6} className="text-center text-muted-foreground">No services found.</TableCell>
              </TableRow>
            )}
           {services.map((service) => (
-            <TableRow key={service.id}>
-              <TableCell className="font-medium">{service.name}</TableCell>
-              <TableCell className="flex items-center"><Clock className="mr-1 h-4 w-4 text-muted-foreground" /> {service.duration} min</TableCell>
-              <TableCell className="flex items-center"><DollarSign className="mr-1 h-4 w-4 text-muted-foreground" /> {service.price.toFixed(2)}</TableCell>
+            <TableRow key={service.id} className="hover:bg-muted/50">
+              <TableCell className="font-medium text-primary">{service.name}</TableCell>
+              <TableCell className="text-muted-foreground">{service.category}</TableCell> {/* Display category */}
+              <TableCell className="text-muted-foreground">{service.duration} min</TableCell>
+              <TableCell className="text-muted-foreground">${service.price.toFixed(2)}</TableCell>
               <TableCell>
-                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${service.active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}`}>
+                 <span className={`px-2 py-1 rounded-full text-xs font-medium border ${service.active ? 'bg-green-900/50 border-green-700 text-green-300' : 'bg-red-900/50 border-red-700 text-red-300'}`}>
                     {service.active ? 'Active' : 'Inactive'}
                  </span>
               </TableCell>
-              <TableCell className="text-right space-x-2">
+              <TableCell className="text-right space-x-1">
                 <Button variant="ghost" size="icon" onClick={() => toggleServiceStatus(service)} title={service.active ? "Deactivate Service" : "Activate Service"}>
                    {service.active ? <PowerOff className="h-4 w-4 text-red-500" /> : <Power className="h-4 w-4 text-green-500" />}
                 </Button>
                 <Button variant="ghost" size="icon" onClick={() => openModalForEdit(service)} title="Edit Service">
-                  <Edit className="h-4 w-4" />
+                  <Edit className="h-4 w-4 text-blue-400" />
                 </Button>
-                {/* <Button variant="ghost" size="icon" onClick={() => deleteService(service.id)} title="Delete Service" className="text-destructive hover:text-destructive/80">
-                  <Trash2 className="h-4 w-4" />
-                </Button> */}
+                {/* Delete button remains commented out for safety
+                 <Button variant="ghost" size="icon" onClick={() => deleteService(service.id)} title="Delete Service" className="text-destructive hover:text-destructive/80">
+                   <Trash2 className="h-4 w-4" />
+                 </Button>
+                */}
               </TableCell>
             </TableRow>
           ))}

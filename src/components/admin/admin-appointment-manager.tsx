@@ -1,7 +1,8 @@
+// src/components/admin/admin-appointment-manager.tsx
 'use client';
 
 import type { FC } from 'react';
-import { useState, useEffect } from 'react'; // Import useEffect
+import { useState } from 'react'; // Removed useEffect
 import { format } from 'date-fns';
 import {
   Table,
@@ -12,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+// Removed Button as Select is used for actions now
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, CheckCircle, XCircle, Clock, User, Phone, Mail, Scissors } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -23,7 +24,7 @@ interface Appointment {
   clientPhone: string;
   clientEmail: string;
   serviceName: string;
-  date: Date;
+  date: Date; // Keep as Date object
   status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
 }
 
@@ -32,24 +33,20 @@ interface AdminAppointmentManagerProps {
 }
 
 const statusColors: Record<Appointment['status'], string> = {
-    Pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-    Confirmed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-    Cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-    Completed: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+    Pending: 'bg-yellow-900/50 border-yellow-700 text-yellow-300', // Dark theme adjustment
+    Confirmed: 'bg-green-900/50 border-green-700 text-green-300', // Dark theme adjustment
+    Cancelled: 'bg-red-900/50 border-red-700 text-red-300', // Dark theme adjustment
+    Completed: 'bg-blue-900/50 border-blue-700 text-blue-300', // Dark theme adjustment
 };
 
 export const AdminAppointmentManager: FC<AdminAppointmentManagerProps> = ({ initialAppointments }) => {
   const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
-  const [isClient, setIsClient] = useState(false); // State to track client-side mount
+  // Removed isClient state
   const { toast } = useToast();
 
-  // Set isClient to true only after the component mounts
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   // Sort appointments by date, upcoming first
-  const sortedAppointments = [...appointments].sort((a, b) => a.date.getTime() - b.date.getTime());
+  // Ensure date comparison works correctly
+  const sortedAppointments = [...appointments].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
    const updateAppointmentStatus = async (appointmentId: string, newStatus: Appointment['status']) => {
        // Simulate API call
@@ -64,6 +61,7 @@ export const AdminAppointmentManager: FC<AdminAppointmentManagerProps> = ({ init
        toast({
          title: "Appointment Status Updated",
          description: `Appointment ID ${appointmentId} set to ${newStatus}.`,
+         variant: 'default' // Ensure variant is set for dark theme contrast
        });
      };
 
@@ -84,26 +82,32 @@ export const AdminAppointmentManager: FC<AdminAppointmentManagerProps> = ({ init
         <TableBody>
           {sortedAppointments.length === 0 && (
              <TableRow>
-               <TableCell colSpan={5} className="text-center text-muted-foreground">No appointments found.</TableCell>
+               <TableCell colSpan={5} className="text-center text-muted-foreground py-6">No appointments found.</TableCell>
              </TableRow>
            )}
           {sortedAppointments.map((appointment) => (
-            <TableRow key={appointment.id}>
+            <TableRow key={appointment.id} className="hover:bg-muted/50">
               <TableCell>
-                {/* Only format the time on the client side after mount */}
-                <div>{isClient ? format(appointment.date, 'PPP') : ''}</div>
-                <div className="text-sm text-muted-foreground">{isClient ? format(appointment.date, 'p') : '...'}</div>
+                 {/* Format date directly. Ensure the Date object is valid. */}
+                 {/* If initialAppointments pass dates as strings, parse them first */}
+                <div>{format(new Date(appointment.date), 'PPP')}</div>
+                <div className="text-sm text-muted-foreground">{format(new Date(appointment.date), 'p')}</div>
               </TableCell>
               <TableCell>
-                <div className="font-medium">{appointment.clientName}</div>
-                <div className="text-sm text-muted-foreground flex items-center gap-2">
-                    <a href={`tel:${appointment.clientPhone}`} className="hover:text-primary flex items-center"><Phone className="mr-1 h-3 w-3"/> {appointment.clientPhone}</a>
-                    <a href={`mailto:${appointment.clientEmail}`} className="hover:text-primary flex items-center"><Mail className="mr-1 h-3 w-3"/> {appointment.clientEmail}</a>
+                <div className="font-medium text-primary">{appointment.clientName}</div>
+                <div className="text-sm text-muted-foreground flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-1">
+                    <a href={`tel:${appointment.clientPhone}`} className="hover:text-accent flex items-center text-xs">
+                        <Phone className="mr-1 h-3 w-3"/> {appointment.clientPhone}
+                    </a>
+                    <a href={`mailto:${appointment.clientEmail}`} className="hover:text-accent flex items-center text-xs">
+                        <Mail className="mr-1 h-3 w-3"/> {appointment.clientEmail}
+                    </a>
                 </div>
               </TableCell>
-              <TableCell>{appointment.serviceName}</TableCell>
+              <TableCell className="text-muted-foreground">{appointment.serviceName}</TableCell>
               <TableCell>
-                <Badge variant="outline" className={`border-none ${statusColors[appointment.status]}`}>
+                {/* Adjusted Badge styling for dark theme */}
+                <Badge variant="outline" className={`border ${statusColors[appointment.status]}`}>
                    {appointment.status === 'Pending' && <Clock className="mr-1 h-3 w-3" />}
                    {appointment.status === 'Confirmed' && <CheckCircle className="mr-1 h-3 w-3" />}
                    {appointment.status === 'Cancelled' && <XCircle className="mr-1 h-3 w-3" />}
@@ -116,7 +120,7 @@ export const AdminAppointmentManager: FC<AdminAppointmentManagerProps> = ({ init
                     value={appointment.status}
                     onValueChange={(newStatus: Appointment['status']) => updateAppointmentStatus(appointment.id, newStatus)}
                   >
-                    <SelectTrigger className="w-[130px] h-8 text-xs">
+                    <SelectTrigger className="w-[130px] h-8 text-xs bg-input/50 border-border/70">
                       <SelectValue placeholder="Change Status" />
                     </SelectTrigger>
                     <SelectContent>
