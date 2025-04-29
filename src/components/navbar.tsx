@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet'; // Added SheetHeader, SheetTitle
 import { cn } from '@/lib/utils';
 import { Menu, Scissors, LogIn, Home, Briefcase, GalleryVertical, Globe, CalendarDays } from 'lucide-react'; // Added CalendarDays
 import { useState } from 'react';
@@ -160,12 +160,14 @@ export function Navbar() {
               </MotionButton>
             </SheetTrigger>
              <SheetContent side="right" className="w-[280px] bg-background p-0 flex flex-col">
-              <div className="p-6 border-b border-border/50">
-                 <Link href="/" className="flex items-center space-x-2 text-lg font-bold text-primary" onClick={closeMobileMenu}>
-                  <Scissors className="h-6 w-6 text-accent" />
-                  <span>BarberApp</span>
-                </Link>
-              </div>
+               {/* Add visually hidden Title for accessibility */}
+               <SheetHeader className="p-6 border-b border-border/50">
+                   <SheetTitle className="sr-only">{t('nav.toggle_menu')}</SheetTitle> {/* Hidden title */}
+                   <Link href="/" className="flex items-center space-x-2 text-lg font-bold text-primary" onClick={closeMobileMenu}>
+                    <Scissors className="h-6 w-6 text-accent" />
+                    <span>BarberApp</span>
+                   </Link>
+               </SheetHeader>
               <div className="flex-grow flex flex-col space-y-1.5 p-4"> {/* Reduced space */}
                  {navItems.map((item, index) => (
                    <MotionDiv
