@@ -148,7 +148,7 @@ export default {
       description_error: 'Description must be at least 5 characters.',
       duration: 'Duration (min)',
       duration_error: 'Duration must be a positive number (minutes).',
-      price: 'Price ($)',
+      price: 'Price ({symbol})', // Updated price label
       price_error: 'Price must be a positive number.',
       active_status: 'Active Status',
       // Table Headers

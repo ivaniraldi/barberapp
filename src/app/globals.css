@@ -13,7 +13,7 @@
 @layer base {
   /* Dark Theme Variables (Primary Theme - Enhanced Elegance) */
   .dark {
-    --background: 220 18% 8%; /* Deeper, slightly bluish dark gray */
+    --background: 220 20% 5%; /* Even Darker Black */
     --foreground: 215 25% 92%; /* Slightly softer off-white */
 
     --card: 220 15% 12%; /* Slightly lighter than background, subtle blue tint */
@@ -133,11 +133,11 @@
      content: '';
      position: fixed;
      top: 0; left: 0; right: 0; bottom: 0;
-     background: radial-gradient(ellipse at top left, hsla(var(--primary) / 0.02), transparent 60%), /* Softer primary gradient */
-                 radial-gradient(ellipse at bottom right, hsla(var(--accent) / 0.04), transparent 70%); /* Softer accent gradient */
+     background: radial-gradient(ellipse at top left, hsla(var(--primary) / 0.01), transparent 70%), /* Even softer primary gradient */
+                 radial-gradient(ellipse at bottom right, hsla(var(--accent) / 0.02), transparent 80%); /* Even softer accent gradient */
      z-index: -1; /* Place behind content */
      pointer-events: none;
-     opacity: 0.7;
+     opacity: 0.6; /* Further reduced opacity */
    }
 
 

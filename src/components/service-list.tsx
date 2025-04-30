@@ -2,10 +2,10 @@
 'use client'; // Add this directive
 
 import type { FC } from 'react';
-import { Scissors, Clock, DollarSign } from 'lucide-react';
+import { Scissors, Clock, DollarSign, Euro } from 'lucide-react'; // Added Euro
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { useI18n } from '@/locales/client'; // Import i18n hook for client component
+import { useI18n, useCurrentLocale } from '@/locales/client'; // Import i18n hook for client component
 import { MotionDiv } from './motion-provider'; // Import MotionDiv
 
 interface Service {
@@ -20,6 +20,28 @@ interface ServiceListProps {
   services: Service[];
 }
 
+// Helper to format currency based on locale (same as in admin manager)
+const formatCurrency = (price: number, locale: string): string => {
+    const options: Intl.NumberFormatOptions = { style: 'currency', minimumFractionDigits: 2, maximumFractionDigits: 2 };
+    let currencyCode = 'USD'; // Default
+    if (locale === 'pt') currencyCode = 'BRL';
+    else if (locale === 'es') currencyCode = 'EUR';
+    // Add more locales/currencies as needed
+
+    options.currency = currencyCode;
+
+    // Handle potential errors during formatting
+    try {
+        return new Intl.NumberFormat(locale, options).format(price);
+    } catch (error) {
+        console.error("Currency formatting error:", error);
+        // Fallback to simple formatting
+        const symbol = locale === 'pt' ? 'R$' : locale === 'es' ? '€' : '$';
+        return `${symbol}${price.toFixed(2)}`;
+    }
+};
+
+
 const listItemVariants = {
     hidden: { opacity: 0, x: -10 },
     visible: (i: number) => ({ // Accept custom index for staggering
@@ -31,6 +53,7 @@ const listItemVariants = {
 
 export const ServiceList: FC<ServiceListProps> = ({ services }) => {
   const t = useI18n(); // Get translation function
+  const currentLocale = useCurrentLocale() as 'en' | 'es' | 'pt'; // Get current locale
   const isSingleService = services.length === 1;
 
   return (
@@ -54,8 +77,8 @@ export const ServiceList: FC<ServiceListProps> = ({ services }) => {
                    {service.name}
                 </h3>
                 <span className="text-lg font-semibold text-primary flex items-center shrink-0">
-                  <DollarSign className="mr-1 h-4 w-4 text-accent" />
-                  {service.price.toFixed(2)}
+                   {/* Use formatted currency */}
+                   {formatCurrency(service.price, currentLocale)}
                 </span>
               </div>
               <p className="text-sm text-muted-foreground mb-2">{service.description}</p>

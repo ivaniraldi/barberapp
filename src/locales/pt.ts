@@ -146,7 +146,7 @@ export default {
       description_error: 'A descrição deve ter pelo menos 5 caracteres.',
       duration: 'Duração (min)',
       duration_error: 'A duração deve ser um número positivo (minutos).',
-      price: 'Preço (R$)', // Changed currency symbol
+      price: 'Preço ({symbol})', // Updated price label
       price_error: 'O preço deve ser um número positivo.',
       active_status: 'Status Ativo',
       // Table Headers

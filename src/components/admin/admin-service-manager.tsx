@@ -20,10 +20,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { PlusCircle, Edit, Power, PowerOff, DollarSign, Clock, Tag, Trash2 } from 'lucide-react'; // Added Trash2, Tag
+import { PlusCircle, Edit, Power, PowerOff, DollarSign, Clock, Tag, Trash2, Euro, PoundSterling } from 'lucide-react'; // Added currency icons
 import { useToast } from '@/hooks/use-toast';
 import type { Service } from '@/lib/services';
-import { useI18n } from '@/locales/client'; // Import i18n hook
+import { useI18n, useCurrentLocale } from '@/locales/client'; // Import i18n hook
 import { MotionDiv, MotionButton } from '@/components/motion-provider'; // Import motion components
 import { AnimatePresence } from 'framer-motion'; // For exit animations
 
@@ -45,12 +45,34 @@ const getServiceSchema = (t: ReturnType<typeof useI18n>) => z.object({
 // Infer the type from the Zod schema
 type ServiceFormData = z.infer<ReturnType<typeof getServiceSchema>>;
 
+// Helper to format currency based on locale
+const formatCurrency = (price: number, locale: string): string => {
+    const options: Intl.NumberFormatOptions = { style: 'currency', minimumFractionDigits: 2, maximumFractionDigits: 2 };
+    let currencyCode = 'USD'; // Default
+    if (locale === 'pt') currencyCode = 'BRL';
+    else if (locale === 'es') currencyCode = 'EUR';
+    // Add more locales/currencies as needed
+
+    options.currency = currencyCode;
+
+    // Handle potential errors during formatting
+    try {
+        return new Intl.NumberFormat(locale, options).format(price);
+    } catch (error) {
+        console.error("Currency formatting error:", error);
+        // Fallback to simple formatting
+        const symbol = locale === 'pt' ? 'R$' : locale === 'es' ? '€' : '$';
+        return `${symbol}${price.toFixed(2)}`;
+    }
+};
+
 export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServices }) => {
   const [services, setServices] = useState<Service[]>(initialServices);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const { toast } = useToast();
   const t = useI18n(); // Get translation function
+  const currentLocale = useCurrentLocale() as 'en' | 'es' | 'pt'; // Get current locale
   const serviceSchema = getServiceSchema(t); // Get schema with translated messages
 
   const { register, handleSubmit, control, reset, formState: { errors, isSubmitting } } = useForm<ServiceFormData>({
@@ -184,7 +206,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                               {errors.duration && <p className="text-sm text-destructive">{errors.duration.message}</p>}
                           </div>
                             <div className="space-y-1">
-                              <Label htmlFor="price" className="text-muted-foreground">{t('admin_service.price')}</Label>
+                               <Label htmlFor="price" className="text-muted-foreground">{t('admin_service.price', { symbol: currentLocale === 'pt' ? 'R$' : currentLocale === 'es' ? '€' : '$' })}</Label>
                               <Input id="price" type="number" step="0.01" {...register('price')} aria-invalid={errors.price ? "true" : "false"} className="bg-input/50 border-border/70"/>
                               {errors.price && <p className="text-sm text-destructive">{errors.price.message}</p>}
                           </div>
@@ -234,7 +256,13 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                 <TableHead>{t('admin_service.th_name')}</TableHead>
                 <TableHead><Tag className="inline mr-1 h-4 w-4" />{t('admin_service.th_category')}</TableHead>
                 <TableHead><Clock className="inline mr-1 h-4 w-4" />{t('admin_service.th_duration')}</TableHead>
-                <TableHead><DollarSign className="inline mr-1 h-4 w-4" />{t('admin_service.th_price')}</TableHead>
+                <TableHead>
+                   {/* Dynamically select currency icon */}
+                  {currentLocale === 'pt' && <span className="inline mr-1">R$</span>}
+                  {currentLocale === 'es' && <Euro className="inline mr-1 h-4 w-4" />}
+                  {currentLocale === 'en' && <DollarSign className="inline mr-1 h-4 w-4" />}
+                  {t('admin_service.th_price')}
+                </TableHead>
                 <TableHead>{t('admin_service.th_status')}</TableHead>
                 <TableHead className="text-right">{t('admin_service.th_actions')}</TableHead>
               </TableRow>
@@ -261,7 +289,9 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                       <TableCell className="font-medium text-foreground">{service.name}</TableCell>
                       <TableCell className="text-muted-foreground">{service.category}</TableCell>
                       <TableCell className="text-muted-foreground">{service.duration} min</TableCell>
-                      <TableCell className="text-muted-foreground">${service.price.toFixed(2)}</TableCell>
+                       <TableCell className="text-muted-foreground">
+                         {formatCurrency(service.price, currentLocale)}
+                       </TableCell>
                       <TableCell>
                         <span className={`px-2 py-1 rounded-full text-xs font-normal border ${service.active ? 'bg-green-500/10 border-green-500/50 text-green-400' : 'bg-red-500/10 border-red-500/50 text-red-400'}`}>
                             {service.active ? t('admin_service.status_active') : t('admin_service.status_inactive')}
