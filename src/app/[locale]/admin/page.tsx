@@ -1,20 +1,19 @@
 // src/app/[locale]/admin/page.tsx
-'use client'; // This component interacts with state and API, so it needs to be client-side
+'use client'; // Keep AdminPageContent as a client component
 
-import { Suspense } from 'react'; // Added Suspense
+import { Suspense, useEffect, useState } from 'react'; // Import Suspense, useEffect, useState
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminServiceManager } from "@/components/admin/admin-service-manager";
 import { AdminAppointmentManager } from "@/components/admin/admin-appointment-manager";
 import { Separator } from "@/components/ui/separator";
-import { Lock, LogOut, Settings, CalendarDays, Loader2 } from "lucide-react"; // Added Loader2
-import { getServices, type Service } from "@/lib/services"; // Import server-side fetch for initial data
+import { Lock, LogOut, Settings, CalendarDays } from "lucide-react";
+import { getServices, type Service } from "@/lib/services";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useI18n } from '@/locales/client'; // Use client-side hook
 import { MotionDiv } from '@/components/motion-provider'; // Import MotionDiv
 import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
-import { useEffect, useState } from 'react'; // Import hooks needed for client-side interaction
 
 // Mock Appointments Data - Use ISO strings for consistency across server/client
 // In a real app, fetch this data from your backend/database
@@ -48,14 +47,19 @@ const cardHoverEffect = {
 };
 
 
-// Component content extracted for Suspense
+// Client Component for the main content, using client hooks
 function AdminPageContent({ initialServices }: { initialServices: Service[] }) {
   const t = useI18n(); // Get translation function (client-side)
 
   // State for managing services within the component (used by AdminServiceManager)
-  // This can be passed down or AdminServiceManager can fetch its own data if needed
-  // For simplicity, we pass the initialServices fetched on the server
+  // Initialized with server-fetched data
   const [services, setServices] = useState<Service[]>(initialServices);
+
+  // Example: Update services state if initialServices prop changes (e.g., parent revalidates)
+   useEffect(() => {
+      setServices(initialServices);
+   }, [initialServices]);
+
 
   return (
       <MotionDiv
@@ -155,44 +159,31 @@ function AdminPageContent({ initialServices }: { initialServices: Service[] }) {
   );
 }
 
-export default function AdminPageWrapper({ params }: { params: { locale: string } }) {
-  // This wrapper will fetch initial data and pass it to the client component
-  // NOTE: This pattern (fetching in Server Component and passing down)
-  // is generally preferred over fetching directly in the Client Component
-  // unless client-side fetching is strictly necessary for interactivity.
 
-  const fetchInitialServices = async () => {
-      try {
-          const services = await getServices();
-          return services;
-      } catch (error) {
-          console.error("Failed to fetch initial services for admin page:", error);
-          return []; // Return empty array on error
-      }
-  };
+// Server Component Wrapper to fetch data and provide Suspense boundary
+export default async function AdminPageWrapper({ params }: { params: { locale: string } }) {
+  // Fetch initial services data on the server
+  let initialServices: Service[] = [];
+  try {
+      initialServices = await getServices();
+  } catch (error) {
+      console.error("Failed to fetch initial services for admin page:", error);
+      // Handle error appropriately, maybe pass an error flag or empty array
+      initialServices = [];
+  }
 
-  // Wrap the main content with Suspense
+  // The client component AdminPageContent uses hooks like useI18n.
+  // Wrapping it in Suspense allows these hooks to work correctly during client-side rendering after the initial server render.
   return (
-    <Suspense fallback={<AdminPageFallback />} >
-       {/* Await data fetching and pass to client component */}
-       <AdminPageDataLoader fetcher={fetchInitialServices} />
+    <Suspense fallback={<AdminPageFallback />}>
+      <AdminPageContent initialServices={initialServices} />
     </Suspense>
   );
-}
-
-// Separate component to handle data loading to keep the Suspense boundary clean
-async function AdminPageDataLoader({ fetcher }: { fetcher: () => Promise<Service[]> }) {
-    const initialServices = await fetcher();
-    return <AdminPageContent initialServices={initialServices} />;
 }
 
 
 // Fallback component for Suspense
 function AdminPageFallback() {
-    // Assuming 'useI18n' is available client-side for translations in fallback
-    // const t = useI18n();
-    // If not, use static text or pass translations if necessary
-
     return (
         <div className="container mx-auto px-4 py-12 sm:py-16 space-y-12">
             <div className="flex flex-col sm:flex-row items-center justify-between">
