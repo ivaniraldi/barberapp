@@ -196,7 +196,7 @@ function AdminPageContent() {
 export default function AdminPage() {
   // Wrap the main content with Suspense
   return (
-    <Suspense fallback={<AdminPageFallback />}>
+    <Suspense fallback={<AdminPageFallback />} >
       <AdminPageContent />
     </Suspense>
   );
@@ -225,5 +225,3 @@ function AdminPageFallback() {
         </div>
     );
 }
-
-    
