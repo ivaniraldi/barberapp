@@ -1,7 +1,7 @@
 // src/components/locale-provider.tsx
 'use client';
 
-import React, { useEffect, useState, createContext, useContext, type ReactNode } from 'react';
+import React, { useEffect, useState, createContext, useContext, type ReactNode, Suspense } from 'react'; // Import Suspense
 import { I18nProviderClient, useChangeLocale, useCurrentLocale } from '@/locales/client';
 
 interface LocaleProviderProps {
@@ -39,7 +39,9 @@ export function LocaleProvider({ initialLocale, children }: LocaleProviderProps)
       // No valid locale saved, use the one from the URL (or default if URL has none)
       setEffectiveLocale(currentLocale);
        // Optionally save the current/default locale if none was stored
-       // localStorage.setItem('locale', currentLocale);
+        if (validLocales.includes(currentLocale)) { // Only save valid locales
+          localStorage.setItem('locale', currentLocale);
+        }
     }
   }, [changeLocale, currentLocale]); // Rerun when currentLocale changes (due to navigation)
 
@@ -48,7 +50,10 @@ export function LocaleProvider({ initialLocale, children }: LocaleProviderProps)
   return (
     <I18nProviderClient locale={effectiveLocale} key={effectiveLocale}>
         <LocaleContext.Provider value={{ effectiveLocale }}>
-          {isClient ? children : null /* Avoid rendering children until locale is determined */}
+           {/* Wrap children with Suspense to handle client-side hooks like useSearchParams */}
+           <Suspense fallback={null}> {/* Use null or a minimal loading indicator */}
+              {isClient ? children : null /* Avoid rendering children until locale is determined */}
+           </Suspense>
         </LocaleContext.Provider>
     </I18nProviderClient>
   );
