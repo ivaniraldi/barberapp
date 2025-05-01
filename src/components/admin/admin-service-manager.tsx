@@ -47,6 +47,7 @@ import { getServices as fetchServices, addService as apiAddService, updateServic
 import { useI18n, useCurrentLocale } from '@/locales/client';
 import { MotionDiv, MotionButton } from '@/components/motion-provider';
 import { AnimatePresence } from 'framer-motion';
+import { Skeleton } from '../ui/skeleton';
 
 
 interface AdminServiceManagerProps {
@@ -102,20 +103,19 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
 
   // Fetch services on mount (optional, if initialServices might be stale)
   useEffect(() => {
-    // Example: Fetch fresh data if needed
-    // const loadServices = async () => {
-    //   setIsLoading(true);
-    //   try {
-    //     const freshServices = await fetchServices(); // Use your actual fetch function
-    //     setServices(freshServices);
-    //   } catch (error) {
-    //     toast({ title: t('admin_service.fetch_error_title'), description: t('admin_service.fetch_error_desc'), variant: 'destructive' });
-    //   } finally {
-    //     setIsLoading(false);
-    //   }
-    // };
-    // loadServices();
-  }, []); // Empty dependency array ensures it runs once on mount
+    const loadServices = async () => {
+      setIsLoading(true);
+      try {
+        const freshServices = await fetchServices(); // Use your actual fetch function
+        setServices(freshServices);
+      } catch (error) {
+        toast({ title: t('admin_service.fetch_error_title'), description: t('admin_service.fetch_error_desc'), variant: 'destructive' });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadServices();
+  }, [t, toast]); // Add dependencies for hooks used inside effect
 
 
   const openModalForEdit = (service: Service) => {
@@ -233,7 +233,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
             <MotionButton
                 onClick={openModalForNew}
                 className="bg-accent hover:bg-accent/90 text-accent-foreground"
-                whileHover={{ scale: 1.03 }} // Subtle hover
+                whileHover={{ y: -2 }} // Subtle hover lift
                 whileTap={{ scale: 0.97 }} // Subtle tap
              >
                 <PlusCircle className="mr-2 h-4 w-4" /> {t('admin_service.add_new')}
@@ -311,8 +311,8 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                                type="submit"
                                className="bg-accent hover:bg-accent/90 text-accent-foreground min-w-[110px]" // Min width to prevent resizing
                                disabled={isSubmitting || isLoading} // Disable during form submit or API call
-                               whileHover={{ scale: 1.03 }} // Subtle hover
-                               whileTap={{ scale: 0.97 }} // Subtle tap
+                                whileHover={{ y: -2 }} // Subtle hover lift
+                                whileTap={{ scale: 0.97 }} // Subtle tap
                              >
                                 {isSubmitting || isLoading ? (
                                    <Loader2 className="h-4 w-4 animate-spin" />
@@ -424,7 +424,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                            onClick={() => toggleServiceStatus(service)}
                            title={service.active ? t('admin_service.deactivate_tooltip') : t('admin_service.activate_tooltip')}
                            className="hover:bg-muted/50"
-                           whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                           whileHover={{ scale: 1.1, y: -1 }} whileTap={{ scale: 0.9 }}
                          >
                           {service.active ? <PowerOff className="h-4 w-4 text-red-500" /> : <Power className="h-4 w-4 text-green-500" />}
                         </MotionButton>
@@ -434,7 +434,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                            onClick={() => openModalForEdit(service)}
                            title={t('admin_service.edit_tooltip')}
                            className="hover:bg-muted/50"
-                           whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                           whileHover={{ scale: 1.1, y: -1 }} whileTap={{ scale: 0.9 }}
                          >
                           <Edit className="h-4 w-4 text-blue-400" />
                         </MotionButton>
@@ -446,7 +446,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                                 onClick={() => handleDeleteConfirmation(service)} // Set service to delete
                                 title={t('admin_service.delete_tooltip')}
                                 className="text-destructive hover:bg-destructive/10"
-                                whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                                whileHover={{ scale: 1.1, y: -1 }} whileTap={{ scale: 0.9 }}
                               >
                                <Trash2 className="h-4 w-4" />
                              </MotionButton>
@@ -461,4 +461,3 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
     </div>
   );
 };
-
