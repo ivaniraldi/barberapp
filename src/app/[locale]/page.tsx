@@ -72,7 +72,7 @@ export default function Home() {
       {/* Hero Section */}
       <MotionDiv variants={itemVariants} className="text-center mb-24 sm:mb-32"> {/* Increased margin */}
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/80 to-accent mb-4 tracking-tighter drop-shadow-lg"> {/* Tighter tracking, larger size */}
-          {t('home.title')}
+          BarberApp
         </h1>
         <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"> {/* Wider max-width, relaxed leading */}
           {t('home.subtitle')}
