@@ -2,18 +2,16 @@
 'use client'; // Make this a client component to use hooks
 
 import { ServiceList } from '@/components/service-list';
-import { Card, CardContent } from '@/components/ui/card'; // Only Card and CardContent needed here
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // Use Card components
 import { getServices, type Service } from '@/lib/services'; // Import function and type
 import { useI18n } from '@/locales/client'; // Use client-side i18n hook
-// Removed setStaticParamsLocale import
 import { MotionDiv } from '@/components/motion-provider'; // Import MotionDiv
-// Removed Badge import as it's no longer used here
 import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton for loading states
 import { useEffect, useState, useMemo } from 'react'; // Import React hooks
 import { Loader2 } from 'lucide-react'; // Import Loader2
 
 // Helper function to group services by category key
-const groupServicesByCategoryKey = (services: Service[]) => {
+const groupServicesByCategoryKey = (services: Service[], t: ReturnType<typeof useI18n>) => {
   return services.reduce((acc, service) => {
     // Generate a consistent key from the category name (lowercase, underscore, no accents)
     const categoryKey = (service.category || 'other_services') // Use 'other_services' as default key
@@ -22,16 +20,16 @@ const groupServicesByCategoryKey = (services: Service[]) => {
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
         .replace(/\s+/g, '_') // Replace spaces with underscores
         .replace(/[^\w-]+/g, ''); // Remove non-alphanumeric characters except underscore/hyphen
+
+    const defaultCategoryName = t('services_page.category_other_services'); // Get default name here
+
     if (!acc[categoryKey]) {
-      acc[categoryKey] = { originalName: service.category || t('services_page.category_other_services'), services: [] }; // Use translation key for default category name
+      acc[categoryKey] = { originalName: service.category || defaultCategoryName, services: [] };
     }
     acc[categoryKey].services.push(service);
     return acc;
   }, {} as Record<string, { originalName: string, services: Service[] }>);
 };
-
-// Temporary t function for default category name (will be replaced by actual hook)
-const t = (key: string) => key.split('.').pop()?.replace(/_/g, ' ') || 'Other Services';
 
 
 // Animation variants
@@ -55,7 +53,7 @@ const itemVariants = {
   },
 };
 
-// Enhanced hover effect for service cards (removed scale)
+// Enhanced hover effect for service cards
 const cardHoverEffect = {
   boxShadow: "0px 10px 25px hsla(var(--primary) / 0.1), 0px 5px 10px hsla(var(--primary) / 0.05)", // Refined shadow using theme colors
   transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1.0] } // Custom ease
@@ -92,29 +90,27 @@ function useFetchServices() {
 
 
 export default function ServicesPage() {
-  // Removed params prop and setStaticParamsLocale call
-
   const t = useI18n(); // Get translation function
   const { services: allServices, isLoading: isLoadingServices, error: servicesError } = useFetchServices();
 
   // Filter and categorize services after fetching
   const activeServices = useMemo(() => allServices.filter(service => service.active), [allServices]);
-  const categorizedServicesData = useMemo(() => groupServicesByCategoryKey(activeServices), [activeServices]);
+  const categorizedServicesData = useMemo(() => groupServicesByCategoryKey(activeServices, t), [activeServices, t]); // Pass t
   const categoryKeys = useMemo(() => Object.keys(categorizedServicesData).sort(), [categorizedServicesData]);
 
   return (
     <MotionDiv
-      className="container mx-auto px-4 py-12 sm:py-16"
+      className="container mx-auto px-4 py-16 sm:py-24" // Increased padding
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
-      <MotionDiv variants={itemVariants} className="text-center mb-12 sm:mb-16">
+      <MotionDiv variants={itemVariants} className="text-center mb-16 sm:mb-20"> {/* Increased margin */}
         <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2">{t('services_page.title')}</h1>
         <p className="text-lg text-muted-foreground">{t('services_page.subtitle')}</p>
       </MotionDiv>
 
-      <MotionDiv className="space-y-12" variants={containerVariants}>
+      <MotionDiv className="space-y-16" variants={containerVariants}> {/* Increased space between categories */}
         {isLoadingServices && (
             <MotionDiv variants={itemVariants} className="flex justify-center items-center py-20">
                 <Loader2 className="h-12 w-12 animate-spin text-accent"/>
@@ -141,22 +137,23 @@ export default function ServicesPage() {
 
           return (
             <MotionDiv key={categoryKey} variants={itemVariants}>
-              <h2 className="text-3xl font-semibold text-primary mb-6 pb-2 border-b-2 border-accent flex items-center gap-2">
+              <h2 className="text-3xl font-semibold text-primary mb-8 pb-3 border-b-2 border-accent flex items-center gap-2"> {/* Increased margin bottom */}
                  {/* Display the potentially translated category name */}
                  {translatedCategoryName}
               </h2>
               <MotionDiv
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" // Adjusted grid columns for responsiveness
                   variants={containerVariants}
               >
                 {categoryData.services.map(service => (
                   <MotionDiv key={service.id} variants={itemVariants} whileHover={cardHoverEffect}>
-                    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card/80 backdrop-blur-sm border-border/50 overflow-hidden h-full flex flex-col rounded-lg">
-                      <CardContent className="p-6 flex-grow flex flex-col justify-between">
+                    {/* Use Card component for each service */}
+                    <Card className="shadow-md hover:shadow-xl transition-shadow duration-300 bg-card/90 backdrop-blur-sm border-border/50 overflow-hidden h-full flex flex-col rounded-xl">
+                       {/* CardContent now wraps the ServiceList which handles the inner details */}
+                      <CardContent className="flex-grow flex flex-col justify-between"> {/* Use default padding */}
                          {/* Pass the single service to ServiceList */}
                          <ServiceList services={[service]} />
                       </CardContent>
-                       {/* Removed redundant category badge display from here */}
                     </Card>
                   </MotionDiv>
                 ))}

@@ -44,9 +44,9 @@ const itemVariants = {
     },
   },
    hover: {
-      scale: 1.05,
+      scale: 1.04, // Slightly reduced scale
       zIndex: 10, // Bring hovered item to front
-      boxShadow: "0px 15px 25px rgba(0,0,0,0.25)",
+      boxShadow: "0px 15px 30px hsla(var(--background) / 0.3)", // Use background with opacity for shadow
       transition: { duration: 0.3 }
    }
 };
@@ -71,52 +71,52 @@ export const GalleryGrid: FC<GalleryGridProps> = ({ images }) => {
   return (
     <>
     <motion.div
-      className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 auto-rows-[150px] sm:auto-rows-[200px]" // Responsive row height
+      className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 auto-rows-[180px] sm:auto-rows-[220px]" // Responsive row height, increased gap
       variants={containerVariants}
       initial="hidden"
       whileInView="visible" // Animate when the grid comes into view
-      viewport={{ once: true, amount: 0.15 }} // Trigger animation once, when 15% is visible
+      viewport={{ once: true, amount: 0.1 }} // Trigger animation once, when 10% is visible
     >
       {images.map((image, index) => (
         <motion.div
           key={image.id}
           className={cn(
-            'relative overflow-hidden rounded-xl shadow-lg group cursor-pointer border border-white/10', // Rounded-xl for softer look
+            'relative overflow-hidden rounded-xl shadow-lg group cursor-pointer border border-border/60', // Rounded-xl, added border
             itemSizes[index % itemSizes.length] // Cycle through sizes
           )}
           variants={itemVariants}
           whileHover="hover"
           onClick={() => setSelectedImage(image)} // Open modal on click
         >
-          {/* Glassmorphism effect container */}
-          <div className="absolute inset-0 bg-black/10 backdrop-blur-[3px] rounded-xl transition duration-300 group-hover:backdrop-blur-[1px]">
+          {/* Image with slight inner padding simulated by the wrapper */}
+          <div className="absolute inset-0.5 rounded-[11px] overflow-hidden"> {/* Inner div for image clipping */}
              <Image
                 src={image.src}
                 alt={image.alt}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" // Adjusted sizes for breakpoints
                 style={{ objectFit: 'cover' }}
-                className="transform transition-transform duration-500 ease-in-out group-hover:scale-110" // Slightly more zoom
+                className="transform transition-transform duration-500 ease-in-out group-hover:scale-105" // Slightly less zoom
                 priority={index < 6} // Prioritize loading more initial images
               />
           </div>
            {/* Overlay Gradient and Text */}
            <div
-            className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 z-10 flex flex-col justify-end p-3 sm:p-4"
+            className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 z-10 flex flex-col justify-end p-4 sm:p-5" // Increased padding
             aria-hidden="true"
            >
-                <p className="text-white text-xs sm:text-sm font-medium drop-shadow-lg translate-y-4 group-hover:translate-y-0 transition-transform duration-300 ease-out">
+                <p className="text-white text-sm sm:text-base font-medium drop-shadow-lg translate-y-4 group-hover:translate-y-0 transition-transform duration-300 ease-out">
                     {image.alt}
                 </p>
                  {image.category && (
-                    <span className="text-[10px] sm:text-xs text-accent font-semibold mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
+                    <span className="text-xs sm:text-sm text-accent font-semibold mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
                         {image.category}
                     </span>
                  )}
            </div>
             {/* Zoom icon on hover */}
-           <div className="absolute top-2 right-2 z-20 p-1.5 bg-black/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
-             <Maximize className="w-3 h-3 sm:w-4 sm:h-4 text-white/80" />
+           <div className="absolute top-3 right-3 z-20 p-1.5 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm border border-white/20"> {/* Adjusted position, added border */}
+             <Maximize className="w-4 h-4 sm:w-5 sm:h-5 text-white/90" /> {/* Slightly larger icon */}
            </div>
         </motion.div>
       ))}
@@ -133,7 +133,7 @@ export const GalleryGrid: FC<GalleryGridProps> = ({ images }) => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
+                    className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md" // Increased z-index, blur
                 />
              </Dialog.Overlay>
              <Dialog.Content asChild>
@@ -142,24 +142,24 @@ export const GalleryGrid: FC<GalleryGridProps> = ({ images }) => {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: 10 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-3xl translate-x-[-50%] translate-y-[-50%] gap-4 border-none bg-transparent p-0 shadow-lg"
+                    className="fixed left-[50%] top-[50%] z-[101] grid w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] gap-4 border-none bg-transparent p-2 shadow-lg" // Increased z-index, max-width
                   >
                    <Image
                      src={selectedImage.src}
                      alt={selectedImage.alt}
-                     width={800} // Adjust max width as needed
-                     height={600} // Adjust max height as needed
-                     className="rounded-lg object-contain max-h-[80svh] w-auto mx-auto"
+                     width={1000} // Adjust max width as needed
+                     height={750} // Adjust max height as needed
+                     className="rounded-lg object-contain max-h-[85svh] w-auto mx-auto shadow-2xl" // Added shadow
                    />
-                   <p className="text-center text-white/90 mt-3 text-sm bg-black/50 px-3 py-1 rounded-full inline-block absolute bottom-4 left-1/2 -translate-x-1/2">{selectedImage.alt}</p>
+                   <p className="text-center text-white/90 mt-4 text-base bg-black/60 px-4 py-1.5 rounded-full inline-block absolute bottom-5 left-1/2 -translate-x-1/2 backdrop-blur-sm">{selectedImage.alt}</p> {/* Enhanced caption */}
                     <Dialog.Close asChild>
                          <motion.button
                             initial={{ opacity: 0, scale: 0.5 }}
-                            animate={{ opacity: 1, scale: 1 }}
+                            animate={{ opacity: 1, scale: 1, transition: {delay: 0.1} }} // Add delay
                             exit={{ opacity: 0, scale: 0.5 }}
-                            whileHover={{ scale: 1.1, rotate: 90 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="absolute right-2 top-2 rounded-full p-1.5 bg-black/50 text-white/80 hover:bg-black/70 transition-colors z-10"
+                            whileHover={{ scale: 1.15, rotate: 90, backgroundColor: 'hsla(0, 0%, 0%, 0.7)' }} // Increased scale, rotate, darker bg
+                            whileTap={{ scale: 0.95 }}
+                            className="absolute right-3 top-3 rounded-full p-2 bg-black/50 text-white/80 hover:text-white transition-all z-[102]" // Adjusted position/padding, increased z-index
                             aria-label="Close"
                           >
                             <X className="h-5 w-5" />

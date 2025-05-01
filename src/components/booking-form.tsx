@@ -114,18 +114,18 @@ export const BookingForm: FC<BookingFormProps> = ({ services }) => {
             <Label htmlFor="name" className="flex items-center text-sm font-medium text-muted-foreground">
               <User className="mr-2 h-4 w-4 text-accent" /> {t('booking_form.name')}
             </Label>
-            <Input id="name" {...register('name')} placeholder={t('booking_form.name_placeholder')} aria-invalid={errors.name ? "true" : "false"} className="bg-input/50 border-border/70 focus:border-accent focus:ring-accent transition-colors duration-200" />
+            <Input id="name" {...register('name')} placeholder={t('booking_form.name_placeholder')} aria-invalid={errors.name ? "true" : "false"} className="bg-input/50 border-border/70 focus-visible:ring-accent transition-colors duration-200" /> {/* Use focus-visible */}
             {errors.name && <p className="text-sm text-destructive pt-1">{errors.name.message}</p>}
           </div>
         </MotionDiv>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> {/* Increased gap */}
          <MotionDiv variants={formItemVariants}>
              <div className="space-y-2">
                 <Label htmlFor="phone" className="flex items-center text-sm font-medium text-muted-foreground">
                   <Phone className="mr-2 h-4 w-4 text-accent" /> {t('booking_form.phone')}
                 </Label>
-                <Input id="phone" type="tel" {...register('phone')} placeholder={t('booking_form.phone_placeholder')} aria-invalid={errors.phone ? "true" : "false"} className="bg-input/50 border-border/70 focus:border-accent focus:ring-accent transition-colors duration-200" />
+                <Input id="phone" type="tel" {...register('phone')} placeholder={t('booking_form.phone_placeholder')} aria-invalid={errors.phone ? "true" : "false"} className="bg-input/50 border-border/70 focus-visible:ring-accent transition-colors duration-200" /> {/* Use focus-visible */}
                 {errors.phone && <p className="text-sm text-destructive pt-1">{errors.phone.message}</p>}
               </div>
           </MotionDiv>
@@ -134,7 +134,7 @@ export const BookingForm: FC<BookingFormProps> = ({ services }) => {
                 <Label htmlFor="email" className="flex items-center text-sm font-medium text-muted-foreground">
                   <Mail className="mr-2 h-4 w-4 text-accent" /> {t('booking_form.email')}
                 </Label>
-                <Input id="email" type="email" {...register('email')} placeholder={t('booking_form.email_placeholder')} aria-invalid={errors.email ? "true" : "false"} className="bg-input/50 border-border/70 focus:border-accent focus:ring-accent transition-colors duration-200" />
+                <Input id="email" type="email" {...register('email')} placeholder={t('booking_form.email_placeholder')} aria-invalid={errors.email ? "true" : "false"} className="bg-input/50 border-border/70 focus-visible:ring-accent transition-colors duration-200" /> {/* Use focus-visible */}
                 {errors.email && <p className="text-sm text-destructive pt-1">{errors.email.message}</p>}
               </div>
            </MotionDiv>
@@ -150,7 +150,7 @@ export const BookingForm: FC<BookingFormProps> = ({ services }) => {
               control={control}
               render={({ field }) => (
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <SelectTrigger id="serviceId" aria-invalid={errors.serviceId ? "true" : "false"} className="bg-input/50 border-border/70 focus:border-accent focus:ring-accent transition-colors duration-200">
+                  <SelectTrigger id="serviceId" aria-invalid={errors.serviceId ? "true" : "false"} className="bg-input/50 border-border/70 focus:ring-accent transition-colors duration-200"> {/* Keep focus style for select */}
                     <SelectValue placeholder={t('booking_form.select_service')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -167,7 +167,7 @@ export const BookingForm: FC<BookingFormProps> = ({ services }) => {
           </div>
        </MotionDiv>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> {/* Increased gap */}
          <MotionDiv variants={formItemVariants}>
             <div className="space-y-2">
               <Label htmlFor="date" className="flex items-center text-sm font-medium text-muted-foreground">
@@ -182,7 +182,7 @@ export const BookingForm: FC<BookingFormProps> = ({ services }) => {
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "w-full justify-start text-left font-normal bg-input/50 border-border/70 hover:bg-muted/50 focus:border-accent focus:ring-accent transition-colors duration-200", // Applied input-like styling
+                          "w-full justify-start text-left font-normal bg-input/50 border-border/70 hover:bg-muted/50 focus:ring-accent focus:ring-2 focus:ring-offset-2 transition-colors duration-200", // Applied input-like styling with focus ring
                           !field.value && "text-muted-foreground"
                         )}
                         aria-invalid={errors.date ? "true" : "false"}
@@ -191,7 +191,7 @@ export const BookingForm: FC<BookingFormProps> = ({ services }) => {
                         {field.value ? format(field.value, "PPP", { locale: dateLocales[currentLocale] || enUS }) : <span>{t('booking_form.pick_a_date')}</span>}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 border-border/70"> {/* Added border */}
+                    <PopoverContent className="w-auto p-0 border-border/70 bg-popover shadow-lg rounded-md"> {/* Added popover styling */}
                       <Calendar
                         mode="single"
                         selected={field.value}
@@ -218,7 +218,7 @@ export const BookingForm: FC<BookingFormProps> = ({ services }) => {
                 control={control}
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <SelectTrigger id="time" aria-invalid={errors.time ? "true" : "false"} className="bg-input/50 border-border/70 focus:border-accent focus:ring-accent transition-colors duration-200">
+                    <SelectTrigger id="time" aria-invalid={errors.time ? "true" : "false"} className="bg-input/50 border-border/70 focus:ring-accent transition-colors duration-200"> {/* Keep focus style */}
                       <SelectValue placeholder={t('booking_form.select_a_time')} />
                     </SelectTrigger>
                     <SelectContent>
@@ -237,7 +237,8 @@ export const BookingForm: FC<BookingFormProps> = ({ services }) => {
       </div>
 
         {/* CTA Button */}
-        <MotionButton
+       <MotionDiv initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }} className="pt-2"> {/* Add slight delay */}
+         <MotionButton
            type="submit"
            variant="accent" // Use accent variant
            size="lg" // Make button larger for emphasis
@@ -254,7 +255,8 @@ export const BookingForm: FC<BookingFormProps> = ({ services }) => {
           ) : (
             t('booking_form.book_button')
           )}
-        </MotionButton>
+         </MotionButton>
+        </MotionDiv>
     </form>
   );
 };

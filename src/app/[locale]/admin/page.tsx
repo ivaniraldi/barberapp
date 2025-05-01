@@ -40,33 +40,28 @@ const itemVariants = {
 
 // Enhanced card hover effect for admin panels
 const cardHoverEffect = {
-  // Removed scale effect
   boxShadow: "0px 8px 20px hsla(var(--primary) / 0.08), 0px 4px 8px hsla(var(--primary) / 0.04)", // Softer shadow
   transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1.0] }
 };
 
 
 export default async function AdminPage({ params }: { params: { locale: string } }) {
-  // Set locale for static generation (important for build)
   setStaticParamsLocale(params.locale);
 
   const t = await getI18n(); // Get translation function
-  // In a real app, you'd add authentication checks here, possibly using middleware or a HOC
-  // For now, we assume access is granted if the user reaches this page (middleware handles basic check).
-
   const services = await getServices(); // Await the promise
 
   return (
     <MotionDiv
-      className="container mx-auto px-4 py-8 sm:py-12" // Standard padding
+      className="container mx-auto px-4 py-12 sm:py-16" // Consistent padding
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
-      <MotionDiv variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-between mb-10"> {/* Increased margin */}
+      <MotionDiv variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-between mb-12"> {/* Increased margin */}
         <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4 sm:mb-0">{t('admin_page.title')}</h1>
          <div className="flex items-center gap-4">
-            <span className="flex items-center text-muted-foreground text-sm font-medium"> {/* Slightly bolder text */}
+            <span className="flex items-center text-muted-foreground text-sm font-medium"> {/* Subtle text */}
                 <Lock className="mr-2 h-4 w-4 text-green-500 animate-subtle-pulse" /> {/* Subtle infinite animation */}
                 {t('admin_page.authenticated')}
             </span>
@@ -80,7 +75,7 @@ export default async function AdminPage({ params }: { params: { locale: string }
                   variant="outline"
                   size="sm"
                   asChild
-                  className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:border-destructive/70 transition-colors duration-200" // Destructive outline style
+                  className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/70 transition-colors duration-200" // Destructive outline style
                >
                   <Link href="/"> {/* Link back to homepage (locale handled) */}
                       <LogOut className="mr-2 h-4 w-4"/> {t('nav.logout')}
@@ -91,13 +86,13 @@ export default async function AdminPage({ params }: { params: { locale: string }
       </MotionDiv>
 
       <MotionDiv variants={itemVariants}>
-        <Separator className="mb-10 border-border/50" /> {/* Increased margin */}
+        <Separator className="mb-12 border-border/50" /> {/* Increased margin */}
       </MotionDiv>
 
       <Tabs defaultValue="appointments" className="w-full">
          <MotionDiv variants={itemVariants}>
             {/* Improved TabsList Styling */}
-            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 mb-8 bg-muted/60 p-1 h-auto sm:h-11 rounded-lg shadow-inner"> {/* Rounded-lg, inner shadow */}
+            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 mb-10 bg-muted/60 p-1 h-auto sm:h-11 rounded-lg shadow-inner"> {/* Rounded-lg, inner shadow */}
               <TabsTrigger
                 value="appointments"
                 className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md data-[state=inactive]:hover:bg-muted/80 transition-all duration-200 text-sm font-medium py-2 rounded-md" // Enhanced active/inactive states
@@ -116,12 +111,12 @@ export default async function AdminPage({ params }: { params: { locale: string }
         <TabsContent value="appointments">
            <MotionDiv variants={itemVariants} whileHover={cardHoverEffect}>
               {/* Professional Card Styling */}
-              <Card className="bg-card/80 backdrop-blur-sm border border-border/50 shadow-lg overflow-hidden rounded-xl"> {/* Rounded-xl */}
-                <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b border-border/30 p-5"> {/* Slightly more padding */}
+              <Card className="bg-card/90 backdrop-blur-sm border border-border/50 shadow-lg overflow-hidden rounded-xl"> {/* Rounded-xl */}
+                <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b border-border/30"> {/* Use default padding */}
                   <CardTitle className="text-xl font-semibold">{t('admin_page.appointments_title')}</CardTitle> {/* Adjusted size */}
-                  <CardDescription className="text-base">{t('admin_page.appointments_desc')}</CardDescription> {/* Adjusted size */}
+                  <CardDescription>{t('admin_page.appointments_desc')}</CardDescription> {/* Use CardDescription component */}
                 </CardHeader>
-                <CardContent className="p-5 sm:p-6"> {/* Consistent padding */}
+                <CardContent> {/* Use default padding */}
                   {/* Pass initial data and translation function */}
                   <AdminAppointmentManager initialAppointments={mockAppointments} />
                 </CardContent>
@@ -132,12 +127,12 @@ export default async function AdminPage({ params }: { params: { locale: string }
         <TabsContent value="services">
            <MotionDiv variants={itemVariants} whileHover={cardHoverEffect}>
                {/* Professional Card Styling */}
-              <Card className="bg-card/80 backdrop-blur-sm border border-border/50 shadow-lg overflow-hidden rounded-xl"> {/* Rounded-xl */}
-                <CardHeader className="bg-gradient-to-l from-primary/5 to-accent/5 border-b border-border/30 p-5"> {/* Slightly more padding */}
+              <Card className="bg-card/90 backdrop-blur-sm border border-border/50 shadow-lg overflow-hidden rounded-xl"> {/* Rounded-xl */}
+                <CardHeader className="bg-gradient-to-l from-primary/5 to-accent/5 border-b border-border/30"> {/* Use default padding */}
                   <CardTitle className="text-xl font-semibold">{t('admin_page.services_title')}</CardTitle> {/* Adjusted size */}
-                  <CardDescription className="text-base">{t('admin_page.services_desc')}</CardDescription> {/* Adjusted size */}
+                  <CardDescription>{t('admin_page.services_desc')}</CardDescription> {/* Use CardDescription component */}
                 </CardHeader>
-                <CardContent className="p-5 sm:p-6"> {/* Consistent padding */}
+                <CardContent> {/* Use default padding */}
                     {/* Pass fetched services and translation function */}
                     <AdminServiceManager initialServices={services} />
                 </CardContent>
@@ -147,7 +142,7 @@ export default async function AdminPage({ params }: { params: { locale: string }
       </Tabs>
 
        {/* Footer */}
-       <MotionDiv variants={itemVariants} className="mt-20 pt-10 border-t border-border/30 text-center text-muted-foreground text-sm">
+       <MotionDiv variants={itemVariants} className="mt-24 pt-12 border-t border-border/30 text-center text-muted-foreground text-sm">
           <p>{t('admin_page.footer_copy', { year: new Date().getFullYear() })}</p>
        </MotionDiv>
     </MotionDiv>

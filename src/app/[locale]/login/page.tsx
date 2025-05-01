@@ -62,7 +62,7 @@ export default function LoginPage() {
 
    // Animation variants
   const cardVariants = {
-      hidden: { opacity: 0, y: 50 }, // Removed scale from initial
+      hidden: { opacity: 0, y: 50 },
       visible: {
           opacity: 1,
           y: 0,
@@ -76,7 +76,7 @@ export default function LoginPage() {
    };
 
    const buttonVariants = {
-       hover: { scale: 1.03, boxShadow: "0px 5px 15px hsla(var(--accent)/0.35)" }, // Keep button hover, reduced scale
+       hover: { scale: 1.03, boxShadow: "0px 5px 15px hsla(var(--accent)/0.35)" },
        tap: { scale: 0.98 }
    }
 
@@ -86,18 +86,18 @@ export default function LoginPage() {
       <MotionDiv
         initial="hidden"
         animate="visible"
-        variants={cardVariants} // Apply card animation (without scale)
+        variants={cardVariants}
       >
         {/* Enhanced Card Styling */}
         <Card className="w-full max-w-md shadow-xl bg-card/90 backdrop-blur-lg border border-border/60 overflow-hidden rounded-xl"> {/* Rounded-xl */}
-          <CardHeader className="text-center border-b border-border/30 pb-6 bg-gradient-to-b from-muted/20 to-transparent p-6"> {/* Adjusted background, padding */}
+          <CardHeader className="text-center border-b border-border/30 bg-gradient-to-b from-muted/20 to-transparent"> {/* Use default padding */}
             <MotionDiv initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2, duration: 0.5 }}>
               <CardTitle className="text-3xl font-bold text-primary">{t('login_page.title')}</CardTitle>
-              <CardDescription className="text-muted-foreground mt-1 text-base">{t('login_page.description')}</CardDescription> {/* Larger description */}
+              <CardDescription className="mt-1">{t('login_page.description')}</CardDescription> {/* Use CardDescription */}
             </MotionDiv>
           </CardHeader>
-          <CardContent className="p-6 sm:p-8"> {/* Consistent padding */}
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <CardContent> {/* Use default padding */}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pt-6"> {/* Added padding-top */}
                <MotionDiv variants={inputVariants} custom={0} initial="hidden" animate="visible" transition={{delay: 0.3}}>
                   <div className="space-y-2">
                     <Label htmlFor="email" className="flex items-center text-foreground font-medium">
@@ -110,7 +110,7 @@ export default function LoginPage() {
                       placeholder={t('login_page.email_placeholder')}
                       {...register('email')}
                       aria-invalid={errors.email ? "true" : "false"}
-                      className="bg-input/60 border-border/70 focus:border-accent focus:ring-accent/50 focus:ring-2 transition-all duration-200" // Subtle focus ring, background
+                      className="bg-input/60 border-border/70 focus:border-accent focus:ring-accent/50 focus-visible:ring-2 transition-all duration-200" // Adjusted focus style
                     />
                     {errors.email && <p className="text-sm text-destructive pt-1">{t(errors.email.message as any)}</p>}
                   </div>
@@ -127,12 +127,12 @@ export default function LoginPage() {
                       placeholder={t('login_page.password_placeholder')}
                       {...register('password')}
                       aria-invalid={errors.password ? "true" : "false"}
-                      className="bg-input/60 border-border/70 focus:border-accent focus:ring-accent/50 focus:ring-2 transition-all duration-200" // Subtle focus ring, background
+                      className="bg-input/60 border-border/70 focus:border-accent focus:ring-accent/50 focus-visible:ring-2 transition-all duration-200" // Adjusted focus style
                     />
                     {errors.password && <p className="text-sm text-destructive pt-1">{t(errors.password.message as any)}</p>}
                   </div>
                </MotionDiv>
-              <MotionDiv initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.5 }}>
+              <MotionDiv initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.5 }} className="pt-2"> {/* Added padding-top */}
                   {/* Enhanced Button Styling */}
                   <MotionButton
                      type="submit"

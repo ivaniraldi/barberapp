@@ -1,6 +1,6 @@
 // src/app/[locale]/cuts/page.tsx
 import { GalleryGrid } from '@/components/gallery-grid';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'; // Keep Card imports if needed elsewhere, but not used directly here
 import { Separator } from '@/components/ui/separator';
 import { getServices, type Service } from '@/lib/services'; // Re-use services for categories maybe
 import { getI18n } from '@/locales/server'; // Import server-side i18n
@@ -64,7 +64,6 @@ const categoryTranslationKeys: Record<string, string> = {
 };
 
 export default async function CutsPage({ params }: { params: { locale: string } }) {
-  // Set locale for static generation (important for build)
   setStaticParamsLocale(params.locale);
 
   const t = await getI18n();
@@ -72,27 +71,27 @@ export default async function CutsPage({ params }: { params: { locale: string } 
 
   return (
     <MotionDiv
-      className="container mx-auto px-4 py-12 sm:py-16"
+      className="container mx-auto px-4 py-16 sm:py-24" // Increased padding
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
-      <MotionDiv variants={itemVariants} className="text-center mb-12 sm:mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2 flex items-center justify-center gap-3">
+      <MotionDiv variants={itemVariants} className="text-center mb-16 sm:mb-20"> {/* Increased margin */}
+        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-3 flex items-center justify-center gap-3"> {/* Increased margin bottom */}
            <Images className="h-8 w-8 text-accent" /> {t('cuts_page.title')}
         </h1>
         <p className="text-lg text-muted-foreground">{t('cuts_page.subtitle')}</p>
       </MotionDiv>
 
       <MotionDiv variants={itemVariants}>
-        <Tabs defaultValue="All Cuts" className="w-full mb-12">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:flex lg:flex-wrap lg:justify-center lg:w-auto mx-auto gap-2 bg-transparent p-0">
-             {/* Use flex-wrap for smaller screens if needed */}
+        <Tabs defaultValue="All Cuts" className="w-full mb-16"> {/* Increased margin bottom */}
+          {/* Enhanced TabsList Styling */}
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:flex lg:flex-wrap lg:justify-center lg:w-auto mx-auto gap-2 bg-muted/60 p-1.5 h-auto rounded-lg shadow-inner mb-12"> {/* Added padding, rounded-lg, inner shadow, margin bottom */}
             {categories.map((category) => (
               <TabsTrigger
                 key={category}
                 value={category}
-                className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:bg-muted/50 data-[state=inactive]:hover:bg-muted data-[state=inactive]:text-muted-foreground transition-colors duration-200 flex-1 lg:flex-none"
+                className="data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md data-[state=inactive]:bg-transparent data-[state=inactive]:hover:bg-muted/80 data-[state=inactive]:text-muted-foreground transition-all duration-200 flex-1 lg:flex-none px-4 py-2 text-sm font-medium rounded-md" // Enhanced styling
               >
                  {t(categoryTranslationKeys[category] || category)} {/* Translate category name */}
               </TabsTrigger>

@@ -6,6 +6,7 @@ import { Clock } from 'lucide-react'; // Removed Scissors, DollarSign, Euro - ha
 import { Separator } from '@/components/ui/separator';
 import { useI18n, useCurrentLocale } from '@/locales/client'; // Import i18n hook for client component
 import { MotionDiv } from './motion-provider'; // Import MotionDiv
+import { CardTitle, CardDescription } from '@/components/ui/card'; // Import CardTitle and CardDescription
 
 interface Service {
   id: string;
@@ -56,40 +57,42 @@ export const ServiceList: FC<ServiceListProps> = ({ services }) => {
   const isSingleService = services.length === 1; // Check if only one service is being displayed
 
   return (
-    <div className={isSingleService ? '' : 'space-y-4'}>
+    // Remove the outer div, as the parent (ServicesPage) now provides the Card structure
+    // Apply spacing directly to the elements if needed (e.g., using mb- on elements)
+    <>
       {services.map((service, index) => (
         <MotionDiv
             key={service.id}
             variants={listItemVariants}
-            // Apply variants only if part of a list (not single display)
             initial={isSingleService ? undefined : "hidden"}
             animate={isSingleService ? undefined : "visible"}
-            // Pass index for stagger delay
             custom={index}
+            // Add padding directly here if the parent CardContent doesn't provide enough
+            className="py-4" // Added padding for separation within the card
         >
-          {/* Use Card styling implicitly via parent or keep transparent */}
-          <div className="p-0"> {/* Adjusted padding */}
-              <div className="flex items-start sm:items-center justify-between mb-2 flex-col sm:flex-row gap-2 sm:gap-0">
-                {/* Always display the service name as the primary heading within the list item */}
-                <h3 className="text-lg font-semibold text-primary">
-                   {service.name}
-                </h3>
+           {/* Service details are now rendered directly inside the parent CardContent */}
+           <div className="flex items-start sm:items-center justify-between mb-2 flex-col sm:flex-row gap-2 sm:gap-0">
+               {/* Use CardTitle for the service name */}
+               <CardTitle className="text-lg"> {/* Adjust size as needed */}
+                 {service.name}
+               </CardTitle>
                 <span className="text-lg font-semibold text-primary flex items-center shrink-0">
                    {/* Use formatted currency */}
                    {formatCurrency(service.price, currentLocale)}
                 </span>
               </div>
-              <p className="text-sm text-muted-foreground mb-2">{service.description}</p>
+              {/* Use CardDescription for the description */}
+              <CardDescription className="mb-3">{service.description}</CardDescription>
               <div className="text-sm text-muted-foreground flex items-center">
-                <Clock className="mr-1 h-4 w-4" />
+                <Clock className="mr-1.5 h-4 w-4" /> {/* Slightly more margin */}
                 {/* Use translation for duration */}
                 <span>{t('booking_form.duration_minutes', { duration: service.duration })}</span>
               </div>
-          </div>
-          {/* Add separator only if there are multiple services and it's not the last one */}
-          {!isSingleService && index < services.length - 1 && <Separator className="my-4 border-border/50" />}
+
+          {/* Add separator only if rendered as part of a list (e.g., popular services) and not the last one */}
+          {!isSingleService && index < services.length - 1 && <Separator className="mt-4 mb-0 border-border/50" />}
         </MotionDiv>
       ))}
-    </div>
+    </>
   );
 };

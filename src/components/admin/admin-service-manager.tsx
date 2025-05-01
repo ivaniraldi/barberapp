@@ -38,7 +38,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  // Removed AlertDialogTrigger import as it's not used directly inside the loop anymore
 } from "@/components/ui/alert-dialog"; // Import AlertDialog components
 import { PlusCircle, Edit, Power, PowerOff, DollarSign, Clock, Tag, Trash2, Euro, PoundSterling, Loader2, AlertTriangle } from 'lucide-react'; // Added more icons
 import { useToast } from '@/hooks/use-toast';
@@ -119,7 +118,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
     loadServices();
     // Only run on mount, dependencies are correct as they don't change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [t, toast]);
+  }, []); // Removed t and toast from dependencies as they shouldn't trigger refetch
 
 
   const openModalForEdit = (service: Service) => {
@@ -142,7 +141,6 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
 
   const handleDeleteConfirmation = (service: Service) => {
       setServiceToDelete(service);
-      // The AlertDialog will open because its `open` prop is bound to `!!serviceToDelete`
   };
 
   const handleDeleteService = async () => {
@@ -152,12 +150,13 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
           await apiDeleteService(serviceToDelete.id); // Call the actual API delete function
           setServices(prev => prev.filter(s => s.id !== serviceToDelete!.id));
           toast({ title: t('admin_service.delete_success_title'), description: t('admin_service.delete_success_desc', { serviceName: serviceToDelete.name }) });
-          setServiceToDelete(null); // Close confirmation dialog implicitly via state update
+          setServiceToDelete(null); // Close confirmation dialog
       } catch (error) {
           console.error("Failed to delete service:", error);
           toast({ title: t('admin_service.delete_error_title'), description: t('admin_service.error_generic_desc'), variant: 'destructive' });
       } finally {
           setIsLoading(false); // Reset loading state
+          setServiceToDelete(null); // Ensure dialog is closed even on error
       }
   };
 
@@ -165,14 +164,12 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
     setIsSubmittingForm(true); // Use form submission state
     try {
       if (editingService) {
-        // Update existing service
-        const updatedService = await apiUpdateService(editingService.id, data); // Use API update function
+        const updatedService = await apiUpdateService(editingService.id, data);
         setServices(services.map(s => s.id === editingService.id ? updatedService : s));
         toast({ title: t('admin_service.update_success_title'), description: t('admin_service.update_success_desc', { serviceName: data.name }) });
       } else {
-        // Add new service
-        const newService = await apiAddService(data); // Use API add function
-        setServices(prev => [newService, ...prev]); // Add new service to the top
+        const newService = await apiAddService(data);
+        setServices(prev => [newService, ...prev]);
         toast({ title: t('admin_service.add_success_title'), description: t('admin_service.add_success_desc', { serviceName: data.name }) });
       }
       closeModal();
@@ -230,13 +227,13 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
 
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8"> {/* Increased spacing */}
       <div className="flex justify-end">
-         <Dialog open={isModalOpen} onOpenChange={(isOpen) => { if (!isOpen) closeModal(); setIsModalOpen(isOpen); }}>
+         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
            <DialogTrigger asChild>
             <MotionButton
                 onClick={openModalForNew}
-                className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                variant="accent" // Use accent variant
                 whileHover={{ y: -2 }} // Subtle hover lift
                 whileTap={{ scale: 0.97 }} // Subtle tap
              >
@@ -246,52 +243,52 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
            <AnimatePresence>
             {isModalOpen && (
               <DialogContent
-                className="sm:max-w-[525px] bg-card border-border/70"
+                className="sm:max-w-[550px] bg-card border-border/70" // Slightly wider modal
                 onEscapeKeyDown={closeModal}
-                onPointerDownOutside={closeModal}
+                // onPointerDownOutside={closeModal} // Allow interaction outside while modal is open if needed, otherwise keep this
               >
                  <MotionDiv
                     variants={modalVariants}
                     initial="hidden"
                     animate="visible"
                     exit="exit"
-                    className="flex flex-col"
+                    className="flex flex-col" // Ensure flex direction
                  >
-                      <DialogHeader>
-                        <DialogTitle className="text-primary">{editingService ? t('admin_service.edit_service') : t('admin_service.add_service')}</DialogTitle>
+                      <DialogHeader className="mb-4"> {/* Added margin bottom */}
+                        <DialogTitle className="text-primary text-xl">{editingService ? t('admin_service.edit_service') : t('admin_service.add_service')}</DialogTitle>
                         <DialogDescription>
                           {editingService ? t('admin_service.edit_service_desc') : t('admin_service.add_service_desc')}
                         </DialogDescription>
                       </DialogHeader>
-                      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-3"> {/* Scrollable form */}
-                        <div className="space-y-1">
+                      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 py-2 max-h-[70vh] overflow-y-auto pr-3"> {/* Increased space-y, reduced py */}
+                        <div className="space-y-1.5"> {/* Consistent spacing */}
                             <Label htmlFor="name" className="text-muted-foreground">{t('admin_service.service_name')}</Label>
                             <Input id="name" {...register('name')} aria-invalid={errors.name ? "true" : "false"} className="bg-input/50 border-border/70"/>
-                            {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+                            {errors.name && <p className="text-sm text-destructive pt-1">{errors.name.message}</p>}
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1.5">
                             <Label htmlFor="category" className="text-muted-foreground">{t('admin_service.category')}</Label>
                             <Input id="category" {...register('category')} aria-invalid={errors.category ? "true" : "false"} placeholder={t('admin_service.category_placeholder')} className="bg-input/50 border-border/70"/>
-                            {errors.category && <p className="text-sm text-destructive">{errors.category.message}</p>}
+                            {errors.category && <p className="text-sm text-destructive pt-1">{errors.category.message}</p>}
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1.5">
                             <Label htmlFor="description" className="text-muted-foreground">{t('admin_service.description')}</Label>
-                            <Textarea id="description" {...register('description')} aria-invalid={errors.description ? "true" : "false"} className="bg-input/50 border-border/70"/>
-                            {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
+                            <Textarea id="description" {...register('description')} aria-invalid={errors.description ? "true" : "false"} className="bg-input/50 border-border/70 min-h-[100px]"/> {/* Increased min height */}
+                            {errors.description && <p className="text-sm text-destructive pt-1">{errors.description.message}</p>}
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-1">
+                        <div className="grid grid-cols-2 gap-5"> {/* Increased gap */}
+                          <div className="space-y-1.5">
                               <Label htmlFor="duration" className="text-muted-foreground">{t('admin_service.duration')}</Label>
                               <Input id="duration" type="number" {...register('duration')} aria-invalid={errors.duration ? "true" : "false"} className="bg-input/50 border-border/70"/>
-                              {errors.duration && <p className="text-sm text-destructive">{errors.duration.message}</p>}
+                              {errors.duration && <p className="text-sm text-destructive pt-1">{errors.duration.message}</p>}
                           </div>
-                            <div className="space-y-1">
+                            <div className="space-y-1.5">
                                <Label htmlFor="price" className="text-muted-foreground">{t('admin_service.price', { symbol: currentLocale === 'pt' ? 'R$' : currentLocale === 'es' ? '€' : '$' })}</Label>
                               <Input id="price" type="number" step="0.01" {...register('price')} aria-invalid={errors.price ? "true" : "false"} className="bg-input/50 border-border/70"/>
-                              {errors.price && <p className="text-sm text-destructive">{errors.price.message}</p>}
+                              {errors.price && <p className="text-sm text-destructive pt-1">{errors.price.message}</p>}
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2 pt-2">
+                        <div className="flex items-center space-x-3 pt-3"> {/* Increased spacing and padding top */}
                             <Controller
                                 name="active"
                                 control={control}
@@ -301,19 +298,20 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                                         checked={field.value}
                                         onCheckedChange={field.onChange}
                                         aria-label={t('admin_service.active_status')}
-                                        className="data-[state=checked]:bg-accent focus-visible:ring-accent"
+                                        className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-muted focus-visible:ring-ring" // Use green for active
                                     />
                                 )}
                             />
-                            <Label htmlFor="active" className="text-muted-foreground">{t('admin_service.active_status')}</Label>
+                            <Label htmlFor="active" className="text-muted-foreground font-normal cursor-pointer">{t('admin_service.active_status')}</Label> {/* Lighter font, cursor pointer */}
                         </div>
-                        <DialogFooter className="pt-4">
+                        <DialogFooter className="pt-6"> {/* Increased padding top */}
                             <DialogClose asChild>
                                 <Button type="button" variant="outline">{t('admin_service.cancel')}</Button>
                             </DialogClose>
                             <MotionButton
                                type="submit"
-                               className="bg-accent hover:bg-accent/90 text-accent-foreground min-w-[110px]" // Min width to prevent resizing
+                               variant="accent" // Use accent variant
+                               className="min-w-[120px]" // Min width to prevent resizing
                                disabled={isSubmittingForm || isLoading} // Disable during form submit or API call
                                 whileHover={{ y: -2 }} // Subtle hover lift
                                 whileTap={{ scale: 0.97 }} // Subtle tap
@@ -358,21 +356,21 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
        </AlertDialog>
 
 
-      <div className="overflow-x-auto"> {/* Responsive table */}
+      <div className="overflow-x-auto rounded-lg border border-border/50 shadow-sm"> {/* Add border and shadow */}
           <Table className="min-w-full">
-            <TableHeader>
+            <TableHeader className="bg-muted/30"> {/* Subtle header background */}
               <TableRow>
-                <TableHead>{t('admin_service.th_name')}</TableHead>
-                <TableHead><Tag className="inline mr-1 h-4 w-4" />{t('admin_service.th_category')}</TableHead>
-                <TableHead><Clock className="inline mr-1 h-4 w-4" />{t('admin_service.th_duration')}</TableHead>
-                <TableHead>
+                <TableHead className="w-[30%]">{t('admin_service.th_name')}</TableHead> {/* Adjusted width */}
+                <TableHead className="w-[15%]"><Tag className="inline mr-1 h-4 w-4" />{t('admin_service.th_category')}</TableHead> {/* Adjusted width */}
+                <TableHead className="w-[10%]"><Clock className="inline mr-1 h-4 w-4" />{t('admin_service.th_duration')}</TableHead> {/* Adjusted width */}
+                <TableHead className="w-[10%]"> {/* Adjusted width */}
                   {currentLocale === 'pt' && <span className="inline mr-1">R$</span>}
                   {currentLocale === 'es' && <Euro className="inline mr-1 h-4 w-4" />}
                   {currentLocale === 'en' && <DollarSign className="inline mr-1 h-4 w-4" />}
                   {t('admin_service.th_price')}
                 </TableHead>
-                <TableHead>{t('admin_service.th_status')}</TableHead>
-                <TableHead className="text-right">{t('admin_service.th_actions')}</TableHead>
+                <TableHead className="w-[10%]">{t('admin_service.th_status')}</TableHead> {/* Adjusted width */}
+                <TableHead className="text-right w-[15%]">{t('admin_service.th_actions')}</TableHead> {/* Adjusted width */}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -385,7 +383,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                                <TableCell><Skeleton className="h-5 w-1/4" /></TableCell>
                                <TableCell><Skeleton className="h-5 w-1/4" /></TableCell>
                                <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-                               <TableCell className="text-right space-x-0.5">
+                               <TableCell className="text-right space-x-1"> {/* Adjusted space */}
                                    <Skeleton className="h-8 w-8 inline-block" />
                                    <Skeleton className="h-8 w-8 inline-block" />
                                    <Skeleton className="h-8 w-8 inline-block" />
@@ -395,7 +393,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                    )}
                   {!isLoading && services.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground py-10">{t('admin_service.no_services')}</TableCell>
+                      <TableCell colSpan={6} className="text-center text-muted-foreground py-12">{t('admin_service.no_services')}</TableCell> {/* Increased padding */}
                     </TableRow>
                   )}
                   {services.map((service, index) => (
@@ -417,17 +415,17 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                          {formatCurrency(service.price, currentLocale)}
                        </TableCell>
                       <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs font-normal border ${service.active ? 'bg-green-500/10 border-green-500/50 text-green-400' : 'bg-gray-500/10 border-gray-500/50 text-gray-400'}`}> {/* Adjusted inactive color */}
+                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${service.active ? 'bg-green-500/10 border-green-500/50 text-green-400' : 'bg-gray-500/10 border-gray-500/50 text-gray-400'}`}> {/* Use medium font weight */}
                             {service.active ? t('admin_service.status_active') : t('admin_service.status_inactive')}
                         </span>
                       </TableCell>
-                      <TableCell className="text-right space-x-0.5"> {/* Reduced space */}
+                      <TableCell className="text-right space-x-1"> {/* Adjusted space */}
                         <MotionButton
                            variant="ghost"
                            size="icon"
                            onClick={() => toggleServiceStatus(service)}
                            title={service.active ? t('admin_service.deactivate_tooltip') : t('admin_service.activate_tooltip')}
-                           className="hover:bg-muted/50"
+                           className="hover:bg-muted/50 rounded-md" // Added rounded-md
                            whileHover={{ scale: 1.1, y: -1 }} whileTap={{ scale: 0.9 }}
                          >
                           {service.active ? <PowerOff className="h-4 w-4 text-red-500" /> : <Power className="h-4 w-4 text-green-500" />}
@@ -437,22 +435,26 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                            size="icon"
                            onClick={() => openModalForEdit(service)}
                            title={t('admin_service.edit_tooltip')}
-                           className="hover:bg-muted/50"
+                           className="hover:bg-muted/50 rounded-md" // Added rounded-md
                            whileHover={{ scale: 1.1, y: -1 }} whileTap={{ scale: 0.9 }}
                          >
                           <Edit className="h-4 w-4 text-blue-400" />
                         </MotionButton>
-                         {/* This button now just sets the state to open the single AlertDialog */}
-                             <MotionButton
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleDeleteConfirmation(service)} // Set service to delete, opening the AlertDialog
-                                title={t('admin_service.delete_tooltip')}
-                                className="text-destructive hover:bg-destructive/10"
-                                whileHover={{ scale: 1.1, y: -1 }} whileTap={{ scale: 0.9 }}
-                              >
-                               <Trash2 className="h-4 w-4" />
-                             </MotionButton>
+                         <AlertDialog> {/* Wrap Trigger and Content */}
+                             <AlertDialogTrigger asChild>
+                                 <MotionButton
+                                     variant="ghost"
+                                     size="icon"
+                                     onClick={() => handleDeleteConfirmation(service)} // Still needed to set state
+                                     title={t('admin_service.delete_tooltip')}
+                                     className="text-destructive hover:bg-destructive/10 rounded-md" // Added rounded-md
+                                     whileHover={{ scale: 1.1, y: -1 }} whileTap={{ scale: 0.9 }}
+                                   >
+                                    <Trash2 className="h-4 w-4" />
+                                  </MotionButton>
+                              </AlertDialogTrigger>
+                              {/* AlertDialogContent is now outside the map, controlled by `serviceToDelete` state */}
+                         </AlertDialog>
                       </TableCell>
                     </MotionDiv>
                   ))}

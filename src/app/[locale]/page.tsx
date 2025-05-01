@@ -35,7 +35,7 @@ const itemVariants = {
   },
 };
 
-// Updated hover effect (removed scale)
+// Hover effect for cards
 const cardHoverEffect = {
   boxShadow: "0px 10px 25px hsla(var(--primary) / 0.1), 0px 5px 10px hsla(var(--primary) / 0.05)", // Keep shadow effect
   transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1.0] } // Custom ease for smooth transition
@@ -81,9 +81,6 @@ function useFetchServices() {
 
 
 export default function Home() {
-  // Removed params prop as it's no longer needed for locale setting here
-  // Removed setStaticParamsLocale call
-
   const t = useI18n(); // Get translation function
   const { services: allServices, isLoading: isLoadingServices, error: servicesError } = useFetchServices();
 
@@ -95,13 +92,13 @@ export default function Home() {
 
   return (
     <MotionDiv
-      className="container mx-auto px-4 py-12 sm:py-16" // Increased padding
+      className="container mx-auto px-4 py-16 sm:py-24" // Increased padding further
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
       {/* Hero Section */}
-      <MotionDiv variants={itemVariants} className="text-center mb-20 sm:mb-32"> {/* Increased margin */}
+      <MotionDiv variants={itemVariants} className="text-center mb-24 sm:mb-32"> {/* Increased margin */}
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/80 to-accent mb-4 tracking-tighter drop-shadow-lg"> {/* Tighter tracking, larger size */}
           {t('home.title')}
         </h1>
@@ -111,19 +108,19 @@ export default function Home() {
       </MotionDiv>
 
       <MotionDiv
-        className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 mb-20 sm:mb-32" // Increased gap and margin
+        className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-20 mb-24 sm:mb-32" // Increased gap and margin
         variants={containerVariants} // Stagger children within this grid too
       >
         {/* Services Section */}
         <MotionDiv variants={itemVariants} whileHover={cardHoverEffect}>
-          <Card className="shadow-xl bg-card/80 backdrop-blur-md border-border/50 overflow-hidden h-full flex flex-col rounded-lg"> {/* Explicit rounded-lg */}
+          <Card className="shadow-lg bg-card/90 backdrop-blur-md border-border/50 overflow-hidden h-full flex flex-col rounded-xl"> {/* Explicit rounded-xl */}
             <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 pb-4 border-b border-border/30"> {/* Subtle header gradient and border */}
               <CardTitle className="text-2xl sm:text-3xl flex items-center gap-2 text-primary"> {/* Responsive title size */}
                 <ShoppingCart className="w-7 h-7 text-accent"/> {t('home.popular_services')}
               </CardTitle>
-              <CardDescription className="text-base">{t('home.popular_services_desc')}</CardDescription> {/* Slightly larger desc */}
+              <CardDescription>{t('home.popular_services_desc')}</CardDescription> {/* Use default description styling */}
             </CardHeader>
-            <CardContent className="pt-6 flex-grow flex flex-col justify-between p-6"> {/* Standard padding */}
+            <CardContent className="pt-6 flex-grow flex flex-col justify-between"> {/* Use default CardContent padding */}
                {isLoadingServices && (
                  <div className="flex justify-center items-center h-full py-10">
                    <Loader2 className="h-8 w-8 animate-spin text-accent"/>
@@ -138,8 +135,8 @@ export default function Home() {
                  !isLoadingServices && !servicesError && <p className="text-muted-foreground text-center py-4">{t('services_page.no_services_available')}</p>
                )}
                {/* CTA Button */}
-                <MotionDiv whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}> {/* Slightly reduced hover scale */}
-                   <Button asChild variant="link" className="mt-6 text-accent px-0 self-start group hover:text-accent/80 transition-colors font-semibold">
+                <MotionDiv whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="mt-6 self-start">
+                   <Button asChild variant="link" className="text-accent px-0 group hover:text-accent/80 transition-colors font-semibold">
                     <Link href="/services">
                       {t('home.view_all_services')} <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" /> {/* Icon animation on hover */}
                     </Link>
@@ -151,14 +148,14 @@ export default function Home() {
 
         {/* Booking Section */}
         <MotionDiv variants={itemVariants}> {/* Removed scaling hover effect */}
-          <Card className="shadow-xl bg-card/80 backdrop-blur-md border-border/50 overflow-hidden h-full flex flex-col rounded-lg"> {/* Explicit rounded-lg */}
+          <Card className="shadow-lg bg-card/90 backdrop-blur-md border-border/50 overflow-hidden h-full flex flex-col rounded-xl"> {/* Explicit rounded-xl */}
             <CardHeader className="bg-gradient-to-l from-primary/5 to-accent/5 pb-4 border-b border-border/30"> {/* Subtle header gradient and border */}
               <CardTitle className="text-2xl sm:text-3xl flex items-center gap-2 text-primary"> {/* Responsive title size */}
                  <CalendarCheck className="w-7 h-7 text-accent"/> {t('home.book_appointment')}
               </CardTitle>
-              <CardDescription className="text-base">{t('home.book_appointment_desc')}</CardDescription> {/* Slightly larger desc */}
+              <CardDescription>{t('home.book_appointment_desc')}</CardDescription> {/* Use default description styling */}
             </CardHeader>
-            <CardContent className="pt-6 flex-grow p-6"> {/* Standard padding */}
+            <CardContent className="pt-6 flex-grow"> {/* Use default CardContent padding */}
                {isLoadingServices && (
                  <div className="flex justify-center items-center h-full py-10">
                     <Loader2 className="h-8 w-8 animate-spin text-accent"/>
@@ -175,12 +172,12 @@ export default function Home() {
       </MotionDiv>
 
       <MotionDiv variants={itemVariants}>
-        <Separator className="my-20 sm:my-32 bg-gradient-to-r from-transparent via-border/50 to-transparent h-[1px]" /> {/* Faded separator */}
+        <Separator className="my-24 sm:my-32 bg-gradient-to-r from-transparent via-border/50 to-transparent h-[1px]" /> {/* Faded separator */}
       </MotionDiv>
 
       {/* Our Work Gallery Section */}
-      <MotionDiv variants={itemVariants} className="mb-20 sm:mb-32"> {/* Increased margin */}
-        <header className="text-center mb-12 sm:mb-16"> {/* Increased margin */}
+      <MotionDiv variants={itemVariants} className="mb-24 sm:mb-32"> {/* Increased margin */}
+        <header className="text-center mb-16 sm:mb-20"> {/* Increased margin */}
           <h2 className="text-4xl md:text-5xl font-bold text-primary mb-3 flex items-center justify-center gap-3">
             <Images className="h-8 w-8 text-accent animate-subtle-pulse" /> {/* Added subtle infinite animation */}
             {t('home.our_work')}
@@ -190,9 +187,9 @@ export default function Home() {
         {/* Pass images with category */}
         <GalleryGrid images={galleryImages} />
          {/* CTA to view full gallery */}
-         <div className="text-center mt-12">
+         <div className="text-center mt-16"> {/* Increased margin */}
              <MotionDiv whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}> {/* Slightly reduced hover scale */}
-                 <Button asChild variant="outline" size="lg" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-colors shadow-sm hover:shadow-md">
+                 <Button asChild variant="outline" size="lg" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-colors shadow-md hover:shadow-lg">
                     <Link href="/cuts">
                         {t('cuts_page.title')} <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>

@@ -13,53 +13,53 @@
 @layer base {
   /* Dark Theme Variables (Primary Theme - Enhanced Elegance - Darker BG) */
   .dark {
-    --background: 220 20% 3%; /* Darker Black */
-    --foreground: 215 25% 93%; /* Slightly brighter off-white for contrast */
+    --background: 220 25% 4%; /* Slightly darker, more saturated */
+    --foreground: 215 25% 95%; /* Brighter off-white */
 
-    --card: 220 15% 10%; /* Slightly lighter than background, subtle blue tint */
-    --card-foreground: 215 25% 91%; /* Adjusted foreground */
+    --card: 220 20% 8%; /* Darker card, subtle blue */
+    --card-foreground: 215 25% 93%; /* Adjusted card text */
 
-    --popover: 220 20% 5%; /* Darker Popover */
-    --popover-foreground: 215 25% 93%;
+    --popover: 220 22% 6%; /* Darker Popover, slightly blue */
+    --popover-foreground: 215 25% 95%; /* Brighter popover text */
 
     /* Primary adjusted for better contrast on dark bg */
-    --primary: 215 35% 90%; /* Slightly brighter gray-blue */
-    --primary-foreground: 220 20% 8%; /* Darker foreground */
+    --primary: 215 40% 92%; /* Slightly brighter, stronger gray-blue */
+    --primary-foreground: 220 25% 10%; /* Darker foreground for contrast */
 
-    --secondary: 220 10% 18%; /* Muted dark slate - slightly lighter */
-    --secondary-foreground: 215 20% 70%; /* Muted light gray */
+    --secondary: 220 15% 15%; /* Muted dark slate */
+    --secondary-foreground: 215 20% 75%; /* Muted light gray */
 
-    --muted: 220 10% 15%; /* Darker muted slate */
-    --muted-foreground: 215 15% 50%; /* Medium gray */
+    --muted: 220 12% 12%; /* Darker muted slate */
+    --muted-foreground: 215 15% 55%; /* Medium-dark gray */
 
-    --accent: 43 95% 55%; /* Refined Gold - slightly less bright, richer */
-    --accent-foreground: 30 50% 12%; /* Dark Brown/Black for accent text */
+    --accent: 45 90% 60%; /* Richer Gold - slightly deeper */
+    --accent-foreground: 30 60% 10%; /* Darker Brown/Black for accent text */
 
-    --destructive: 0 65% 50%; /* Slightly desaturated Red */
+    --destructive: 0 70% 55%; /* Slightly more saturated Red */
     --destructive-foreground: 0 0% 98%; /* White */
 
-    --border: 220 12% 17%; /* Subtle Border, slightly lighter */
-    --input: 220 12% 14%; /* Input Background */
-    --ring: 43 90% 60%; /* Gold for Rings */
+    --border: 220 15% 15%; /* Slightly darker border, matches secondary */
+    --input: 220 15% 10%; /* Input Background, slightly darker */
+    --ring: 45 85% 65%; /* Slightly brighter Gold for Rings */
 
-    --radius: 0.8rem; /* Slightly larger radius */
+    --radius: 0.75rem; /* Standard radius */
 
     /* Chart colors (adjust as needed) */
-    --chart-1: 210 70% 60%; /* Brighter Blue */
-    --chart-2: 160 60% 55%; /* Teal */
-    --chart-3: 45 90% 60%;  /* Gold */
-    --chart-4: 280 65% 70%; /* Purple */
-    --chart-5: 340 75% 65%; /* Pink */
+    --chart-1: 210 75% 65%; /* Brighter Blue */
+    --chart-2: 160 65% 60%; /* Teal */
+    --chart-3: 45 85% 65%;  /* Gold */
+    --chart-4: 280 70% 75%; /* Purple */
+    --chart-5: 340 80% 70%; /* Pink */
 
     /* Sidebar specific colors (if using sidebar component) */
-     --sidebar-background: 220 18% 4%; /* Even Darker */
-     --sidebar-foreground: 215 25% 90%;
-     --sidebar-primary: 43 95% 58%; /* Sidebar Gold */
-     --sidebar-primary-foreground: 30 50% 8%;
-     --sidebar-accent: 220 12% 13%;
-     --sidebar-accent-foreground: 215 25% 92%;
-     --sidebar-border: 220 10% 13%;
-     --sidebar-ring: 43 90% 60%;
+     --sidebar-background: 220 22% 5%; /* Slightly darker sidebar */
+     --sidebar-foreground: 215 25% 92%;
+     --sidebar-primary: 45 90% 60%; /* Sidebar Gold */
+     --sidebar-primary-foreground: 30 50% 10%;
+     --sidebar-accent: 220 15% 13%; /* Sidebar accent slightly lighter */
+     --sidebar-accent-foreground: 215 25% 94%;
+     --sidebar-border: 220 12% 15%; /* Sidebar border slightly lighter */
+     --sidebar-ring: 45 85% 65%; /* Sidebar ring gold */
   }
 
   /* Light Theme Variables (Kept for reference or future use) */
@@ -93,7 +93,7 @@
      --input: 40 20% 92%; /* Light input, cream-ish */
      --ring: 45 95% 55%; /* Gold ring */
 
-     --radius: 0.8rem; /* Slightly larger radius */
+     --radius: 0.75rem; /* Standard radius */
 
      /* Chart colors for light theme */
      --chart-1: 12 76% 61%;
@@ -133,11 +133,11 @@
      content: '';
      position: fixed;
      top: 0; left: 0; right: 0; bottom: 0;
-     background: radial-gradient(ellipse at top left, hsla(var(--primary) / 0.01), transparent 70%), /* Even softer primary gradient */
-                 radial-gradient(ellipse at bottom right, hsla(var(--accent) / 0.015), transparent 80%); /* Even softer accent gradient */
+     background: radial-gradient(ellipse at top left, hsla(var(--primary) / 0.008), transparent 80%), /* Even softer primary gradient */
+                 radial-gradient(ellipse at bottom right, hsla(var(--accent) / 0.012), transparent 85%); /* Even softer accent gradient */
      z-index: -1; /* Place behind content */
      pointer-events: none;
-     opacity: 0.5; /* Further reduced opacity */
+     opacity: 0.6; /* Reduced opacity */
    }
 
 
@@ -147,23 +147,23 @@
 
   /* Style scrollbars for a cleaner look */
     ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+      width: 6px; /* Slightly thinner */
+      height: 6px; /* Slightly thinner */
     }
     ::-webkit-scrollbar-track {
-      background: hsl(var(--background) / 0.5);
+      background: hsla(var(--background) / 0.3); /* More transparent track */
       border-radius: 10px;
     }
     ::-webkit-scrollbar-thumb {
-      background: hsl(var(--border));
+      background: hsl(var(--border) / 0.8); /* Use border color, more opaque */
       border-radius: 10px;
-      border: 2px solid transparent;
+      border: 1px solid transparent; /* Reduced border */
       background-clip: content-box;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: hsl(var(--muted-foreground));
+      background: hsl(var(--muted-foreground) / 0.9); /* Slightly darker hover */
        background-clip: content-box;
-        border: 2px solid transparent;
+        border: 1px solid transparent; /* Reduced border */
     }
 }
 
@@ -175,21 +175,21 @@
 
    /* Example subtle infinite animation class */
    .animate-subtle-pulse {
-      animation: subtle-pulse 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite; /* Slower pulse */
+      animation: subtle-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; /* Slower pulse */
    }
 
    @keyframes subtle-pulse {
      0%, 100% { opacity: 1; transform: scale(1); }
-     50% { opacity: 0.75; transform: scale(1.02); } /* Slightly more noticeable */
+     50% { opacity: 0.8; transform: scale(1.015); } /* Slightly less scale */
    }
 
    .animate-subtle-glow {
-     animation: subtle-glow 3.5s ease-in-out infinite alternate; /* Slower glow */
+     animation: subtle-glow 4s ease-in-out infinite alternate; /* Slower glow */
    }
 
     @keyframes subtle-glow {
-      from { box-shadow: 0 0 4px 0px hsla(var(--accent) / 0.1); } /* More subtle start */
-      to { box-shadow: 0 0 12px 2px hsla(var(--accent) / 0.2); } /* More subtle end */
+      from { box-shadow: 0 0 3px 0px hsla(var(--accent) / 0.08); } /* More subtle start */
+      to { box-shadow: 0 0 10px 1px hsla(var(--accent) / 0.15); } /* More subtle end */
     }
 
 }
