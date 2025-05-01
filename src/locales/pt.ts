@@ -12,7 +12,7 @@ export default {
   },
   // Homepage
   home: {
-    title: 'BarberApp',
+    title: 'WebRush',
     subtitle: 'A sua barbearia de bairro para um cuidado premium.',
     popular_services: 'Serviços Populares',
     popular_services_desc: 'Confira os favoritos dos nossos clientes.',
