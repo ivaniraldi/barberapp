@@ -49,6 +49,7 @@ export default {
   },
   // Calendar Page
   calendar_page: {
+      loading: 'Cargando Calendario...',
       title: 'Calendario de Citas',
       subtitle: 'Ver citas programadas por fecha.',
       previous_month: 'Mes Anterior',
@@ -148,7 +149,7 @@ export default {
       description_error: 'La descripción debe tener al menos 5 caracteres.',
       duration: 'Duración (min)',
       duration_error: 'La duración debe ser un número positivo (minutos).',
-      price: 'Precio ({symbol})', // Updated price label
+      price: 'Precio', // Removed symbol placeholder
       price_error: 'El precio debe ser un número positivo.',
       active_status: 'Estado Activo',
       // Table Headers

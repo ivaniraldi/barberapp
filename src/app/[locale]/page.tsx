@@ -9,10 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ArrowRight, Images, CalendarCheck, ShoppingCart, Loader2 } from 'lucide-react'; // Added Loader2
-import { getServices, type Service } from '@/lib/services'; // Import service type and fetch function
 import { useI18n } from '@/locales/client'; // Use client-side i18n hook
 import { MotionDiv } from '@/components/motion-provider'; // Import MotionDiv
-import { useEffect, useState } from 'react'; // Import React hooks
+import { useFetchServices } from '@/hooks/use-fetch-services'; // Import the hook from its new location
+import { type Service } from '@/lib/services'; // Import service type directly if needed
 
 // Animation variants
 const containerVariants = {
@@ -50,34 +50,6 @@ const galleryImages = [
   { id: 'g5', src: 'https://picsum.photos/seed/long5/350/550', alt: 'Long hair style 5', category: 'Styling' },
   { id: 'g6', src: 'https://picsum.photos/seed/shave6/600/400', alt: 'Hot towel shave 6', category: 'Shaves' },
 ];
-
-
-// Custom hook to fetch services client-side
-function useFetchServices() {
-    const [services, setServices] = useState<Service[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        const loadServices = async () => {
-            try {
-                setIsLoading(true);
-                const fetchedServices = await getServices(); // Call the API function
-                setServices(fetchedServices);
-                setError(null);
-            } catch (err) {
-                console.error("Failed to fetch services:", err);
-                setError("Failed to load services. Please try again later.");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        loadServices();
-    }, []); // Empty dependency array ensures this runs once on mount
-
-    return { services, isLoading, error };
-}
 
 
 export default function Home() {

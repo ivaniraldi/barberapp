@@ -2,11 +2,12 @@
 'use client'; // Add this directive
 
 import type { FC } from 'react';
-import { Clock } from 'lucide-react'; // Removed Scissors, DollarSign, Euro - handled by formatCurrency
+import { Clock } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { useI18n, useCurrentLocale } from '@/locales/client'; // Import i18n hook for client component
+import { useI18n } from '@/locales/client'; // Import i18n hook for client component
 import { MotionDiv } from './motion-provider'; // Import MotionDiv
 import { CardTitle, CardDescription } from '@/components/ui/card'; // Import CardTitle and CardDescription
+import { formatCurrency } from '@/lib/utils'; // Import centralized currency formatter
 
 interface Service {
   id: string;
@@ -20,28 +21,6 @@ interface ServiceListProps {
   services: Service[];
 }
 
-// Helper to format currency based on locale
-const formatCurrency = (price: number, locale: string): string => {
-    const options: Intl.NumberFormatOptions = { style: 'currency', minimumFractionDigits: 2, maximumFractionDigits: 2 };
-    let currencyCode = 'BRL'; // Default to BRL for Portuguese
-    if (locale === 'en') currencyCode = 'USD';
-    else if (locale === 'es') currencyCode = 'EUR';
-    // Add more locales/currencies as needed
-
-    options.currency = currencyCode;
-
-    // Handle potential errors during formatting
-    try {
-        return new Intl.NumberFormat(locale, options).format(price);
-    } catch (error) {
-        console.error("Currency formatting error:", error);
-        // Fallback to simple formatting
-        const symbol = locale === 'pt' ? 'R$' : locale === 'es' ? '€' : '$';
-        return `${symbol}${price.toFixed(2)}`;
-    }
-};
-
-
 const listItemVariants = {
     hidden: { opacity: 0, x: -10 },
     visible: (i: number) => ({ // Accept custom index for staggering
@@ -53,12 +32,9 @@ const listItemVariants = {
 
 export const ServiceList: FC<ServiceListProps> = ({ services }) => {
   const t = useI18n(); // Get translation function
-  const currentLocale = useCurrentLocale() as 'en' | 'es' | 'pt'; // Get current locale
   const isSingleService = services.length === 1; // Check if only one service is being displayed
 
   return (
-    // Remove the outer div, as the parent (ServicesPage) now provides the Card structure
-    // Apply spacing directly to the elements if needed (e.g., using mb- on elements)
     <>
       {services.map((service, index) => (
         <MotionDiv
@@ -77,8 +53,8 @@ export const ServiceList: FC<ServiceListProps> = ({ services }) => {
                  {service.name}
                </CardTitle>
                 <span className="text-lg font-semibold text-primary flex items-center shrink-0">
-                   {/* Use formatted currency */}
-                   {formatCurrency(service.price, currentLocale)}
+                   {/* Use centralized formatted currency (always BRL) */}
+                   {formatCurrency(service.price)}
                 </span>
               </div>
               {/* Use CardDescription for the description */}

@@ -1,27 +1,28 @@
 // src/app/[locale]/admin/page.tsx
 'use client'; // This component interacts with state and API, so it needs to be client-side
 
-import { useState, useEffect, Suspense } from 'react'; // Added Suspense
+import { Suspense } from 'react'; // Added Suspense
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminServiceManager } from "@/components/admin/admin-service-manager";
 import { AdminAppointmentManager } from "@/components/admin/admin-appointment-manager";
 import { Separator } from "@/components/ui/separator";
 import { Lock, LogOut, Settings, CalendarDays, Loader2 } from "lucide-react"; // Added Loader2
-import { getServices, type Service } from "@/lib/services";
+import { getServices, type Service } from "@/lib/services"; // Import server-side fetch for initial data
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useI18n } from '@/locales/client'; // Use client-side hook
 import { MotionDiv } from '@/components/motion-provider'; // Import MotionDiv
 import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
+import { useEffect, useState } from 'react'; // Import hooks needed for client-side interaction
 
 // Mock Appointments Data - Use ISO strings for consistency across server/client
 // In a real app, fetch this data from your backend/database
 const mockAppointments = [
-    { id: 'a1', clientName: 'John Doe', clientPhone: '+15551234', clientEmail: 'john@example.com', serviceName: 'Corte de Cabelo Clássico', date: '2024-09-15T10:00:00Z', status: 'Confirmed' }, // Updated name
-    { id: 'a2', clientName: 'Jane Smith', clientPhone: '+15555678', clientEmail: 'jane@example.com', serviceName: 'Aparar e Modelar Barba', date: '2024-09-15T11:30:00Z', status: 'Pending' }, // Updated name
-    { id: 'a3', clientName: 'Bob Johnson', clientPhone: '+15559012', clientEmail: 'bob@example.com', serviceName: 'Barbear com Toalha Quente', date: '2024-09-16T14:00:00Z', status: 'Completed' }, // Updated name
-    { id: 'a4', clientName: 'Carlos Rey', clientPhone: '+346661122', clientEmail: 'carlos@email.es', serviceName: 'Corte Degradê (Skin Fade)', date: '2024-09-17T09:00:00Z', status: 'Confirmed' }, // Updated name
+    { id: 'a1', clientName: 'John Doe', clientPhone: '+15551234', clientEmail: 'john@example.com', serviceName: 'Corte de Cabelo Clássico', date: '2024-09-15T10:00:00Z', status: 'Confirmed' },
+    { id: 'a2', clientName: 'Jane Smith', clientPhone: '+15555678', clientEmail: 'jane@example.com', serviceName: 'Aparar e Modelar Barba', date: '2024-09-15T11:30:00Z', status: 'Pending' },
+    { id: 'a3', clientName: 'Bob Johnson', clientPhone: '+15559012', clientEmail: 'bob@example.com', serviceName: 'Barbear com Toalha Quente', date: '2024-09-16T14:00:00Z', status: 'Completed' },
+    { id: 'a4', clientName: 'Carlos Rey', clientPhone: '+346661122', clientEmail: 'carlos@email.es', serviceName: 'Corte Degradê (Skin Fade)', date: '2024-09-17T09:00:00Z', status: 'Confirmed' },
 ];
 
 // Animation variants
@@ -47,39 +48,14 @@ const cardHoverEffect = {
 };
 
 
-// Custom hook to fetch services client-side
-function useFetchServices() {
-    const [services, setServices] = useState<Service[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const t = useI18n();
-
-    useEffect(() => {
-        const loadServices = async () => {
-            try {
-                setIsLoading(true);
-                const fetchedServices = await getServices(); // Call the API function
-                setServices(fetchedServices);
-                setError(null);
-            } catch (err) {
-                console.error("Failed to fetch services:", err);
-                setError(t('admin_service.fetch_error_desc'));
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        loadServices();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Dependencies are intentionally empty to run once on mount
-
-    return { services, isLoading, error };
-}
-
 // Component content extracted for Suspense
-function AdminPageContent() {
+function AdminPageContent({ initialServices }: { initialServices: Service[] }) {
   const t = useI18n(); // Get translation function (client-side)
-  const { services: initialServices, isLoading: isLoadingServices, error: servicesError } = useFetchServices();
+
+  // State for managing services within the component (used by AdminServiceManager)
+  // This can be passed down or AdminServiceManager can fetch its own data if needed
+  // For simplicity, we pass the initialServices fetched on the server
+  const [services, setServices] = useState<Service[]>(initialServices);
 
   return (
       <MotionDiv
@@ -163,22 +139,8 @@ function AdminPageContent() {
                     <CardDescription>{t('admin_page.services_desc')}</CardDescription> {/* Use CardDescription component */}
                   </CardHeader>
                   <CardContent className="p-5 sm:p-6"> {/* Consistent padding */}
-                      {/* Show loading state or error for services */}
-                      {isLoadingServices && (
-                          <div className="space-y-4">
-                             <Skeleton className="h-10 w-1/3" />
-                             <Skeleton className="h-8 w-full" />
-                             <Skeleton className="h-8 w-full" />
-                             <Skeleton className="h-8 w-full" />
-                           </div>
-                       )}
-                       {servicesError && (
-                           <p className="text-destructive text-center py-4">{servicesError}</p>
-                       )}
-                      {/* Pass fetched services only when loaded and no error */}
-                      {!isLoadingServices && !servicesError && (
-                         <AdminServiceManager initialServices={initialServices} />
-                      )}
+                      {/* Pass initial services fetched on server */}
+                       <AdminServiceManager initialServices={services} />
                   </CardContent>
                 </Card>
              </MotionDiv>
@@ -193,17 +155,44 @@ function AdminPageContent() {
   );
 }
 
-export default function AdminPage() {
+export default function AdminPageWrapper({ params }: { params: { locale: string } }) {
+  // This wrapper will fetch initial data and pass it to the client component
+  // NOTE: This pattern (fetching in Server Component and passing down)
+  // is generally preferred over fetching directly in the Client Component
+  // unless client-side fetching is strictly necessary for interactivity.
+
+  const fetchInitialServices = async () => {
+      try {
+          const services = await getServices();
+          return services;
+      } catch (error) {
+          console.error("Failed to fetch initial services for admin page:", error);
+          return []; // Return empty array on error
+      }
+  };
+
   // Wrap the main content with Suspense
   return (
     <Suspense fallback={<AdminPageFallback />} >
-      <AdminPageContent />
+       {/* Await data fetching and pass to client component */}
+       <AdminPageDataLoader fetcher={fetchInitialServices} />
     </Suspense>
   );
 }
 
+// Separate component to handle data loading to keep the Suspense boundary clean
+async function AdminPageDataLoader({ fetcher }: { fetcher: () => Promise<Service[]> }) {
+    const initialServices = await fetcher();
+    return <AdminPageContent initialServices={initialServices} />;
+}
+
+
 // Fallback component for Suspense
 function AdminPageFallback() {
+    // Assuming 'useI18n' is available client-side for translations in fallback
+    // const t = useI18n();
+    // If not, use static text or pass translations if necessary
+
     return (
         <div className="container mx-auto px-4 py-12 sm:py-16 space-y-12">
             <div className="flex flex-col sm:flex-row items-center justify-between">

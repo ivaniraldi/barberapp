@@ -2,13 +2,14 @@
 'use client'; // Make this a client component to use hooks
 
 import { ServiceList } from '@/components/service-list';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // Use Card components
-import { getServices, type Service } from '@/lib/services'; // Import function and type
+import { Card, CardContent } from '@/components/ui/card'; // Removed CardHeader, Title, Desc
+import { type Service } from '@/lib/services'; // Import type
 import { useI18n } from '@/locales/client'; // Use client-side i18n hook
 import { MotionDiv } from '@/components/motion-provider'; // Import MotionDiv
 import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton for loading states
-import { useEffect, useState, useMemo } from 'react'; // Import React hooks
+import { useMemo } from 'react'; // Import React hooks
 import { Loader2 } from 'lucide-react'; // Import Loader2
+import { useFetchServices } from '@/hooks/use-fetch-services'; // Import the hook from its new location
 
 // Helper function to group services by category key
 const groupServicesByCategoryKey = (services: Service[], t: ReturnType<typeof useI18n>) => {
@@ -58,35 +59,6 @@ const cardHoverEffect = {
   boxShadow: "0px 10px 25px hsla(var(--primary) / 0.1), 0px 5px 10px hsla(var(--primary) / 0.05)", // Refined shadow using theme colors
   transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1.0] } // Custom ease
 };
-
-// Custom hook to fetch services client-side (can be moved to a separate hooks file)
-function useFetchServices() {
-    const [services, setServices] = useState<Service[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const t = useI18n(); // Get translation hook here for error messages
-
-    useEffect(() => {
-        const loadServices = async () => {
-            try {
-                setIsLoading(true);
-                const fetchedServices = await getServices(); // Call the API function
-                setServices(fetchedServices);
-                setError(null);
-            } catch (err) {
-                console.error("Failed to fetch services:", err);
-                setError(t('admin_service.fetch_error_desc')); // Use translated error message
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        loadServices();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [t]); // Add t to dependency array
-
-    return { services, isLoading, error };
-}
 
 
 export default function ServicesPage() {
@@ -149,8 +121,7 @@ export default function ServicesPage() {
                   <MotionDiv key={service.id} variants={itemVariants} whileHover={cardHoverEffect}>
                     {/* Use Card component for each service */}
                     <Card className="shadow-md hover:shadow-xl transition-shadow duration-300 bg-card/90 backdrop-blur-sm border-border/50 overflow-hidden h-full flex flex-col rounded-xl">
-                       {/* CardContent now wraps the ServiceList which handles the inner details */}
-                      <CardContent className="flex-grow flex flex-col justify-between"> {/* Use default padding */}
+                      <CardContent className="flex-grow flex flex-col justify-between p-5 sm:p-6"> {/* Ensure padding here */}
                          {/* Pass the single service to ServiceList */}
                          <ServiceList services={[service]} />
                       </CardContent>

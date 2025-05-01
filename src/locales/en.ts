@@ -50,6 +50,7 @@ export default {
   },
   // Calendar Page
   calendar_page: {
+      loading: 'Loading Calendar...',
       title: 'Appointment Calendar',
       subtitle: 'View scheduled appointments by date.',
       previous_month: 'Previous Month',
@@ -150,7 +151,7 @@ export default {
       description_error: 'Description must be at least 5 characters.',
       duration: 'Duration (min)',
       duration_error: 'Duration must be a positive number (minutes).',
-      price: 'Price ({symbol})', // Updated price label
+      price: 'Price', // Removed symbol placeholder
       price_error: 'Price must be a positive number.',
       active_status: 'Active Status',
       // Table Headers

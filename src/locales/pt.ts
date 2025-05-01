@@ -49,6 +49,7 @@ export default {
   },
   // Calendar Page
   calendar_page: {
+      loading: 'Carregando Calendário...',
       title: 'Calendário de Agendamentos',
       subtitle: 'Veja os agendamentos programados por data.',
       previous_month: 'Mês Anterior',
@@ -148,7 +149,7 @@ export default {
       description_error: 'A descrição deve ter pelo menos 5 caracteres.',
       duration: 'Duração (min)',
       duration_error: 'A duração deve ser um número positivo (minutos).',
-      price: 'Preço ({symbol})', // Updated price label
+      price: 'Preço', // Removed symbol placeholder
       price_error: 'O preço deve ser um número positivo.',
       active_status: 'Status Ativo',
       // Table Headers

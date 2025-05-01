@@ -38,15 +38,17 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger, // Import trigger for AlertDialog
 } from "@/components/ui/alert-dialog"; // Import AlertDialog components
-import { PlusCircle, Edit, Power, PowerOff, DollarSign, Clock, Tag, Trash2, Euro, PoundSterling, Loader2, AlertTriangle } from 'lucide-react'; // Added more icons
+import { PlusCircle, Edit, Power, PowerOff, DollarSign, Clock, Tag, Trash2, AlertTriangle, Loader2 } from 'lucide-react'; // Removed currency icons, added Loader2
 import { useToast } from '@/hooks/use-toast';
 import type { Service } from '@/lib/services';
 import { getServices as fetchServices, addService as apiAddService, updateService as apiUpdateService, deleteService as apiDeleteService } from '@/lib/services'; // Import API functions
-import { useI18n, useCurrentLocale } from '@/locales/client';
+import { useI18n } from '@/locales/client'; // Removed useCurrentLocale as it's not needed here anymore
 import { MotionDiv, MotionButton } from '@/components/motion-provider';
 import { AnimatePresence } from 'framer-motion';
 import { Skeleton } from '../ui/skeleton';
+import { formatCurrency } from '@/lib/utils'; // Import centralized currency formatter
 
 
 interface AdminServiceManagerProps {
@@ -66,34 +68,16 @@ const getServiceSchema = (t: ReturnType<typeof useI18n>) => z.object({
 // Infer the type from the Zod schema
 type ServiceFormData = z.infer<ReturnType<typeof getServiceSchema>>;
 
-// Helper to format currency based on locale
-const formatCurrency = (price: number, locale: string): string => {
-    const options: Intl.NumberFormatOptions = { style: 'currency', minimumFractionDigits: 2, maximumFractionDigits: 2 };
-    let currencyCode = 'BRL'; // Default to BRL for Portuguese
-    if (locale === 'en') currencyCode = 'USD';
-    else if (locale === 'es') currencyCode = 'EUR';
-
-    options.currency = currencyCode;
-
-    try {
-        return new Intl.NumberFormat(locale, options).format(price);
-    } catch (error) {
-        console.error("Currency formatting error:", error);
-        const symbol = locale === 'pt' ? 'R$' : locale === 'es' ? '€' : '$';
-        return `${symbol}${price.toFixed(2)}`;
-    }
-};
 
 export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServices }) => {
   const [services, setServices] = useState<Service[]>(initialServices);
-  const [isLoading, setIsLoading] = useState(true); // Start as true to show loading initially
+  const [isLoading, setIsLoading] = useState(false); // Start as false if initialServices are provided
   const [isSubmittingForm, setIsSubmittingForm] = useState(false); // Separate state for form submission
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [serviceToDelete, setServiceToDelete] = useState<Service | null>(null); // For delete confirmation
   const { toast } = useToast();
   const t = useI18n();
-  const currentLocale = useCurrentLocale() as 'en' | 'es' | 'pt';
   const serviceSchema = getServiceSchema(t);
 
   const { register, handleSubmit, control, reset, formState: { errors } } = useForm<ServiceFormData>({
@@ -101,24 +85,11 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
     defaultValues: { name: '', description: '', duration: 0, price: 0, category: '', active: true }
   });
 
-  // Fetch services on mount
+  // Sync state with potentially updated initialServices prop (e.g., after parent re-fetches)
   useEffect(() => {
-    const loadServices = async () => {
-      setIsLoading(true); // Ensure loading state is true when fetching
-      try {
-        const freshServices = await fetchServices(); // Use your actual fetch function
-        setServices(freshServices);
-      } catch (error) {
-        console.error("Failed to fetch services:", error);
-        toast({ title: t('admin_service.fetch_error_title'), description: t('admin_service.fetch_error_desc'), variant: 'destructive' });
-      } finally {
-        setIsLoading(false); // Set loading to false after fetching (or error)
-      }
-    };
-    loadServices();
-    // Only run on mount, dependencies are correct as they don't change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Removed t and toast from dependencies as they shouldn't trigger refetch
+    setServices(initialServices);
+    setIsLoading(false); // Assume loading is finished when initialServices are available
+  }, [initialServices]);
 
 
   const openModalForEdit = (service: Service) => {
@@ -283,7 +254,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                               {errors.duration && <p className="text-sm text-destructive pt-1">{errors.duration.message}</p>}
                           </div>
                             <div className="space-y-1.5">
-                               <Label htmlFor="price" className="text-muted-foreground">{t('admin_service.price', { symbol: currentLocale === 'pt' ? 'R$' : currentLocale === 'es' ? '€' : '$' })}</Label>
+                               <Label htmlFor="price" className="text-muted-foreground">{t('admin_service.price', { symbol: 'R$' })}</Label> {/* Pass R$ directly */}
                               <Input id="price" type="number" step="0.01" {...register('price')} aria-invalid={errors.price ? "true" : "false"} className="bg-input/50 border-border/70"/>
                               {errors.price && <p className="text-sm text-destructive pt-1">{errors.price.message}</p>}
                           </div>
@@ -364,10 +335,8 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                 <TableHead className="w-[15%]"><Tag className="inline mr-1 h-4 w-4" />{t('admin_service.th_category')}</TableHead> {/* Adjusted width */}
                 <TableHead className="w-[10%]"><Clock className="inline mr-1 h-4 w-4" />{t('admin_service.th_duration')}</TableHead> {/* Adjusted width */}
                 <TableHead className="w-[10%]"> {/* Adjusted width */}
-                  {currentLocale === 'pt' && <span className="inline mr-1">R$</span>}
-                  {currentLocale === 'es' && <Euro className="inline mr-1 h-4 w-4" />}
-                  {currentLocale === 'en' && <DollarSign className="inline mr-1 h-4 w-4" />}
-                  {t('admin_service.th_price')}
+                   <span className="inline mr-1">R$</span> {/* Display R$ directly */}
+                   {t('admin_service.th_price')}
                 </TableHead>
                 <TableHead className="w-[10%]">{t('admin_service.th_status')}</TableHead> {/* Adjusted width */}
                 <TableHead className="text-right w-[15%]">{t('admin_service.th_actions')}</TableHead> {/* Adjusted width */}
@@ -412,7 +381,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                       <TableCell className="text-muted-foreground">{service.category}</TableCell>
                       <TableCell className="text-muted-foreground">{service.duration} min</TableCell>
                        <TableCell className="text-muted-foreground">
-                         {formatCurrency(service.price, currentLocale)}
+                         {formatCurrency(service.price)} {/* Use centralized formatter */}
                        </TableCell>
                       <TableCell>
                         <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${service.active ? 'bg-green-500/10 border-green-500/50 text-green-400' : 'bg-gray-500/10 border-gray-500/50 text-gray-400'}`}> {/* Use medium font weight */}
@@ -440,7 +409,8 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                          >
                           <Edit className="h-4 w-4 text-blue-400" />
                         </MotionButton>
-                         <AlertDialog> {/* Wrap Trigger and Content */}
+                         {/* Wrap Trigger in AlertDialog */}
+                         <AlertDialog>
                              <AlertDialogTrigger asChild>
                                  <MotionButton
                                      variant="ghost"
@@ -453,7 +423,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                                     <Trash2 className="h-4 w-4" />
                                   </MotionButton>
                               </AlertDialogTrigger>
-                              {/* AlertDialogContent is now outside the map, controlled by `serviceToDelete` state */}
+                              {/* The AlertDialogContent is outside the map, rendered once */}
                          </AlertDialog>
                       </TableCell>
                     </MotionDiv>
