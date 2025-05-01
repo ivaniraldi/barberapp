@@ -1,4 +1,4 @@
-// src/app/[locale]/admin/page.tsx
+// src/components/admin/admin-page.tsx
 'use client'; // This component interacts with state and API, so it needs to be client-side
 
 import { useState, useEffect } from 'react';

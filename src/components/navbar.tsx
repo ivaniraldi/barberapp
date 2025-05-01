@@ -98,6 +98,7 @@ export function Navbar() {
                const isActive = isClient && (pathname === baseHref || (item.href === '/' && pathname === `/${currentLocale}`)); // Check isClient
 
                return (
+                 // Apply MotionDiv wrapper here for hover/tap effects on the whole item
                  <MotionDiv
                    key={item.href}
                    initial="hidden"
@@ -108,7 +109,7 @@ export function Navbar() {
                    whileTap={{ scale: 0.97 }}
                  >
                    <Button
-                     asChild
+                     asChild // Keep asChild for Button to render Link
                      variant="ghost"
                      className={cn(
                        'transition-colors text-sm font-medium relative group px-3 py-2 rounded-md', // Standard padding and rounded
@@ -149,22 +150,22 @@ export function Navbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Admin Login CTA Button */}
+           {/* Admin Login CTA Button - Wrap Link in MotionDiv */}
            <MotionDiv
              variants={accentButtonVariants}
              whileHover="hover"
              whileTap="tap"
              className="ml-3" // Apply margin to the wrapper div
            >
-            <Button
-               asChild
+             <Button
+               asChild // Keep asChild for Button to render Link
                variant="accent" // Use the accent variant for primary CTA
                size="sm"
              >
-              <Link href="/login">
-                  <LogIn className="mr-1.5 h-4 w-4"/> {t('nav.admin_login')}
-              </Link>
-            </Button>
+               <Link href="/login">
+                 <LogIn className="mr-1.5 h-4 w-4" /> {t('nav.admin_login')}
+               </Link>
+             </Button>
            </MotionDiv>
         </div>
 
@@ -233,26 +234,26 @@ export function Navbar() {
                    })}
 
               </nav>
-               {/* Mobile Admin Login CTA */}
+               {/* Mobile Admin Login CTA - Wrap Link in MotionDiv */}
                <div className="mt-auto p-4 border-t border-border/50">
                  <MotionDiv
-                     variants={accentButtonVariants}
-                     whileHover="hover"
-                     whileTap="tap"
+                   variants={accentButtonVariants}
+                   whileHover="hover"
+                   whileTap="tap"
                  >
-                    <SheetClose asChild>
-                       <Button
-                         asChild
-                         variant="accent" // Use accent variant for consistency
-                         className="w-full"
-                         onClick={closeMobileMenu}
-                        >
-                          <Link href="/login">
-                              <LogIn className="mr-2 h-4 w-4"/> {t('nav.admin_login')}
-                          </Link>
-                       </Button>
-                    </SheetClose>
-                  </MotionDiv>
+                   <SheetClose asChild>
+                     <Button
+                       asChild // Keep asChild for Button to render Link
+                       variant="accent" // Use accent variant for consistency
+                       className="w-full"
+                       onClick={closeMobileMenu}
+                     >
+                       <Link href="/login">
+                         <LogIn className="mr-2 h-4 w-4" /> {t('nav.admin_login')}
+                       </Link>
+                     </Button>
+                   </SheetClose>
+                 </MotionDiv>
                </div>
             </SheetContent>
           </Sheet>
