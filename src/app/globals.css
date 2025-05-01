@@ -11,26 +11,26 @@
 } */
 
 @layer base {
-  /* Dark Theme Variables (Primary Theme - Enhanced Elegance) */
+  /* Dark Theme Variables (Primary Theme - Enhanced Elegance - Darker BG) */
   .dark {
-    --background: 220 20% 5%; /* Even Darker Black */
-    --foreground: 215 25% 92%; /* Slightly softer off-white */
+    --background: 220 20% 3%; /* Darker Black */
+    --foreground: 215 25% 93%; /* Slightly brighter off-white for contrast */
 
-    --card: 220 15% 12%; /* Slightly lighter than background, subtle blue tint */
-    --card-foreground: 215 25% 90%; /* Matching foreground */
+    --card: 220 15% 10%; /* Slightly lighter than background, subtle blue tint */
+    --card-foreground: 215 25% 91%; /* Adjusted foreground */
 
-    --popover: 220 20% 7%; /* Darker Popover */
-    --popover-foreground: 215 25% 92%;
+    --popover: 220 20% 5%; /* Darker Popover */
+    --popover-foreground: 215 25% 93%;
 
     /* Primary adjusted for better contrast on dark bg */
-    --primary: 215 30% 88%; /* Lighter gray-blue for main text/elements */
-    --primary-foreground: 220 20% 10%; /* Dark foreground for primary buttons/elements */
+    --primary: 215 35% 90%; /* Slightly brighter gray-blue */
+    --primary-foreground: 220 20% 8%; /* Darker foreground */
 
-    --secondary: 220 10% 22%; /* Muted dark slate */
-    --secondary-foreground: 215 20% 75%; /* Muted light gray */
+    --secondary: 220 10% 18%; /* Muted dark slate - slightly lighter */
+    --secondary-foreground: 215 20% 70%; /* Muted light gray */
 
-    --muted: 220 10% 18%; /* Darker muted slate */
-    --muted-foreground: 215 15% 55%; /* Medium gray */
+    --muted: 220 10% 15%; /* Darker muted slate */
+    --muted-foreground: 215 15% 50%; /* Medium gray */
 
     --accent: 43 95% 55%; /* Refined Gold - slightly less bright, richer */
     --accent-foreground: 30 50% 12%; /* Dark Brown/Black for accent text */
@@ -38,8 +38,8 @@
     --destructive: 0 65% 50%; /* Slightly desaturated Red */
     --destructive-foreground: 0 0% 98%; /* White */
 
-    --border: 220 12% 20%; /* Subtle Border, slightly lighter */
-    --input: 220 12% 16%; /* Input Background */
+    --border: 220 12% 17%; /* Subtle Border, slightly lighter */
+    --input: 220 12% 14%; /* Input Background */
     --ring: 43 90% 60%; /* Gold for Rings */
 
     --radius: 0.8rem; /* Slightly larger radius */
@@ -52,13 +52,13 @@
     --chart-5: 340 75% 65%; /* Pink */
 
     /* Sidebar specific colors (if using sidebar component) */
-     --sidebar-background: 220 18% 6%; /* Even Darker */
-     --sidebar-foreground: 215 25% 88%;
+     --sidebar-background: 220 18% 4%; /* Even Darker */
+     --sidebar-foreground: 215 25% 90%;
      --sidebar-primary: 43 95% 58%; /* Sidebar Gold */
-     --sidebar-primary-foreground: 30 50% 10%;
-     --sidebar-accent: 220 12% 15%;
-     --sidebar-accent-foreground: 215 25% 90%;
-     --sidebar-border: 220 10% 15%;
+     --sidebar-primary-foreground: 30 50% 8%;
+     --sidebar-accent: 220 12% 13%;
+     --sidebar-accent-foreground: 215 25% 92%;
+     --sidebar-border: 220 10% 13%;
      --sidebar-ring: 43 90% 60%;
   }
 
@@ -134,10 +134,10 @@
      position: fixed;
      top: 0; left: 0; right: 0; bottom: 0;
      background: radial-gradient(ellipse at top left, hsla(var(--primary) / 0.01), transparent 70%), /* Even softer primary gradient */
-                 radial-gradient(ellipse at bottom right, hsla(var(--accent) / 0.02), transparent 80%); /* Even softer accent gradient */
+                 radial-gradient(ellipse at bottom right, hsla(var(--accent) / 0.015), transparent 80%); /* Even softer accent gradient */
      z-index: -1; /* Place behind content */
      pointer-events: none;
-     opacity: 0.6; /* Further reduced opacity */
+     opacity: 0.5; /* Further reduced opacity */
    }
 
 
@@ -175,21 +175,21 @@
 
    /* Example subtle infinite animation class */
    .animate-subtle-pulse {
-      animation: subtle-pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      animation: subtle-pulse 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite; /* Slower pulse */
    }
 
    @keyframes subtle-pulse {
-     0%, 100% { opacity: 1; }
-     50% { opacity: 0.7; }
+     0%, 100% { opacity: 1; transform: scale(1); }
+     50% { opacity: 0.75; transform: scale(1.02); } /* Slightly more noticeable */
    }
 
    .animate-subtle-glow {
-     animation: subtle-glow 3s ease-in-out infinite alternate;
+     animation: subtle-glow 3.5s ease-in-out infinite alternate; /* Slower glow */
    }
 
     @keyframes subtle-glow {
-      from { box-shadow: 0 0 5px 0px hsla(var(--accent) / 0.15); } /* Reduced glow intensity */
-      to { box-shadow: 0 0 15px 3px hsla(var(--accent) / 0.25); } /* Reduced glow intensity */
+      from { box-shadow: 0 0 4px 0px hsla(var(--accent) / 0.1); } /* More subtle start */
+      to { box-shadow: 0 0 12px 2px hsla(var(--accent) / 0.2); } /* More subtle end */
     }
 
 }

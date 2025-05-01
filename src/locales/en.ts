@@ -137,6 +137,8 @@ export default {
       add_new: 'Add New Service',
       edit_service: 'Edit Service', // Modal title
       add_service: 'Add New Service', // Modal title & button
+      add_service_desc: 'Fill in the details for the new service.', // Modal description
+      edit_service_desc: 'Update the details for this service.', // Modal description
       save_changes: 'Save Changes', // Modal button
       cancel: 'Cancel', // Modal button
       service_name: 'Service Name',
@@ -165,6 +167,7 @@ export default {
       activate_tooltip: 'Activate Service',
       deactivate_tooltip: 'Deactivate Service',
       edit_tooltip: 'Edit Service',
+      delete_tooltip: 'Delete Service',
       // Toasts
       update_success_title: 'Service Updated',
       update_success_desc: '"{serviceName}" has been updated.',
@@ -173,6 +176,20 @@ export default {
       toggle_success_title_activated: 'Service Activated',
       toggle_success_title_deactivated: 'Service Deactivated',
       toggle_success_desc: '"{serviceName}" is now {status}.', // status will be 'active' or 'inactive'
+      delete_success_title: 'Service Deleted',
+      delete_success_desc: '"{serviceName}" has been deleted.',
+      update_error_title: 'Update Failed',
+      add_error_title: 'Add Failed',
+      toggle_error_title: 'Status Change Failed',
+      delete_error_title: 'Delete Failed',
+      fetch_error_title: 'Fetch Failed',
+      fetch_error_desc: 'Could not load services. Please try again.',
+      error_generic_desc: 'An unexpected error occurred. Please try again.',
       no_services: 'No services found.', // Message in table body
+      // Delete Confirmation
+      delete_confirm_title: 'Are you sure?',
+      delete_confirm_desc: 'This action cannot be undone. This will permanently delete the service "{serviceName}".',
+      delete_confirm_button: 'Delete',
   },
 } as const;
+

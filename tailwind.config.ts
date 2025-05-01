@@ -19,39 +19,39 @@ export default {
             // secondary: ['var(--font-secondary)', ...fontFamily.sans],
         },
         colors: {
-            background: 'hsl(var(--background))',
-            foreground: 'hsl(var(--foreground))',
+            background: 'hsl(var(--background))', // Updated reference
+            foreground: 'hsl(var(--foreground))', // Updated reference
             card: {
-                DEFAULT: 'hsl(var(--card))',
-                foreground: 'hsl(var(--card-foreground))'
+                DEFAULT: 'hsl(var(--card))', // Updated reference
+                foreground: 'hsl(var(--card-foreground))' // Updated reference
             },
             popover: {
-                DEFAULT: 'hsl(var(--popover))',
-                foreground: 'hsl(var(--popover-foreground))'
+                DEFAULT: 'hsl(var(--popover))', // Updated reference
+                foreground: 'hsl(var(--popover-foreground))' // Updated reference
             },
             primary: {
-                DEFAULT: 'hsl(var(--primary))',
-                foreground: 'hsl(var(--primary-foreground))'
+                DEFAULT: 'hsl(var(--primary))', // Updated reference
+                foreground: 'hsl(var(--primary-foreground))' // Updated reference
             },
             secondary: {
-                DEFAULT: 'hsl(var(--secondary))',
-                foreground: 'hsl(var(--secondary-foreground))'
+                DEFAULT: 'hsl(var(--secondary))', // Updated reference
+                foreground: 'hsl(var(--secondary-foreground))' // Updated reference
             },
             muted: {
-                DEFAULT: 'hsl(var(--muted))',
-                foreground: 'hsl(var(--muted-foreground))'
+                DEFAULT: 'hsl(var(--muted))', // Updated reference
+                foreground: 'hsl(var(--muted-foreground))' // Updated reference
             },
             accent: {
-                DEFAULT: 'hsl(var(--accent))',
-                foreground: 'hsl(var(--accent-foreground))'
+                DEFAULT: 'hsl(var(--accent))', // Updated reference
+                foreground: 'hsl(var(--accent-foreground))' // Updated reference
             },
             destructive: {
-                DEFAULT: 'hsl(var(--destructive))',
-                foreground: 'hsl(var(--destructive-foreground))'
+                DEFAULT: 'hsl(var(--destructive))', // Updated reference
+                foreground: 'hsl(var(--destructive-foreground))' // Updated reference
             },
-            border: 'hsl(var(--border))',
-            input: 'hsl(var(--input))',
-            ring: 'hsl(var(--ring))',
+            border: 'hsl(var(--border))', // Updated reference
+            input: 'hsl(var(--input))', // Updated reference
+            ring: 'hsl(var(--ring))', // Updated reference
             chart: {
                 '1': 'hsl(var(--chart-1))',
                 '2': 'hsl(var(--chart-2))',
@@ -59,7 +59,7 @@ export default {
                 '4': 'hsl(var(--chart-4))',
                 '5': 'hsl(var(--chart-5))'
             },
-            sidebar: {
+            sidebar: { // Updated sidebar colors
                 DEFAULT: 'hsl(var(--sidebar-background))',
                 foreground: 'hsl(var(--sidebar-foreground))',
                 primary: 'hsl(var(--sidebar-primary))',
@@ -85,24 +85,24 @@ export default {
                 to: { height: '0' }
             },
             // Custom animations defined in globals.css can be referenced here if needed
-            // Example: If you defined @keyframes subtle-pulse
-            'subtle-pulse': {
-                '0%, 100%': { opacity: '1' },
-                '50%': { opacity: '0.7' },
+            'subtle-pulse': { // Updated pulse keyframe
+                '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+                '50%': { opacity: '0.75', transform: 'scale(1.02)' },
             },
-             'subtle-glow': { // Match keyframe name in globals.css
-               'from': { 'box-shadow': '0 0 5px 0px hsla(var(--accent) / 0.2)' },
-               'to': { 'box-shadow': '0 0 15px 3px hsla(var(--accent) / 0.3)' },
+             'subtle-glow': { // Updated glow keyframe
+               'from': { 'box-shadow': '0 0 4px 0px hsla(var(--accent) / 0.1)' },
+               'to': { 'box-shadow': '0 0 12px 2px hsla(var(--accent) / 0.2)' },
              }
         },
         animation: {
             'accordion-down': 'accordion-down 0.2s ease-out',
             'accordion-up': 'accordion-up 0.2s ease-out',
             // Make custom animations available as utilities
-            'subtle-pulse': 'subtle-pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'subtle-glow': 'subtle-glow 3s ease-in-out infinite alternate',
+            'subtle-pulse': 'subtle-pulse 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite', // Updated animation duration
+            'subtle-glow': 'subtle-glow 3.5s ease-in-out infinite alternate', // Updated animation duration
         }
     }
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+

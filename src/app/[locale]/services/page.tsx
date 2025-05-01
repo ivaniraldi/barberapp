@@ -1,24 +1,24 @@
 // src/app/[locale]/services/page.tsx
 import { ServiceList } from '@/components/service-list';
-import { Card, CardContent } from '@/components/ui/card'; // Removed CardHeader, Title, Desc as they weren't used directly here
-import { getServices, type Service } from '@/lib/services'; // Import function and type
-import { getI18n } from '@/locales/server'; // Import server-side i18n
-import { setStaticParamsLocale } from 'next-international/server'; // Correct import for setStaticParamsLocale
-import { MotionDiv } from '@/components/motion-provider'; // Import MotionDiv
-import { Badge } from '@/components/ui/badge'; // Import Badge for category display
-import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton for potential loading states
+import { Card, CardContent } from '@/components/ui/card';
+import { getServices, type Service } from '@/lib/services';
+import { getI18n } from '@/locales/server';
+import { setStaticParamsLocale } from 'next-international/server';
+import { MotionDiv } from '@/components/motion-provider';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Helper function to group services by category key
 const groupServicesByCategoryKey = (services: Service[]) => {
   return services.reduce((acc, service) => {
     // Generate a consistent key from the category name (lowercase, underscores, default to 'other')
-    const categoryKey = (service.category || 'other').toLowerCase().replace(/\s+/g, '_');
+    const categoryKey = (service.category || 'other').toLowerCase().replace(/\s+/g, '_').replace(/[^\w-]+/g, ''); // Sanitize key further
     if (!acc[categoryKey]) {
-      acc[categoryKey] = [];
+      acc[categoryKey] = { originalName: service.category || 'Other Services', services: [] }; // Store original name
     }
-    acc[categoryKey].push(service);
+    acc[categoryKey].services.push(service);
     return acc;
-  }, {} as Record<string, Service[]>);
+  }, {} as Record<string, { originalName: string, services: Service[] }>); // Adjusted type
 };
 
 // Animation variants
@@ -38,13 +38,12 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: "easeOut" },
+    transition: { duration: 0.4, ease: "easeOut" }, // Adjusted duration
   },
 };
 
-// Enhanced hover effect for service cards
+// Enhanced hover effect for service cards (removed scale)
 const cardHoverEffect = {
-  scale: 1.03,
   boxShadow: "0px 10px 25px hsla(var(--primary) / 0.1), 0px 5px 10px hsla(var(--primary) / 0.05)", // Refined shadow using theme colors
   transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1.0] } // Custom ease
 };
@@ -58,8 +57,8 @@ export default async function ServicesPage({ params }: { params: { locale: strin
   const allServices = getServices();
   const activeServices = allServices.filter(service => service.active); // Only show active services
 
-  const categorizedServicesByKey = groupServicesByCategoryKey(activeServices);
-  const categoryKeys = Object.keys(categorizedServicesByKey).sort(); // Sort category keys alphabetically
+  const categorizedServicesData = groupServicesByCategoryKey(activeServices);
+  const categoryKeys = Object.keys(categorizedServicesData).sort(); // Sort category keys alphabetically
 
   return (
     <MotionDiv
@@ -81,13 +80,11 @@ export default async function ServicesPage({ params }: { params: { locale: strin
         )}
 
         {categoryKeys.map((categoryKey) => {
+          const categoryData = categorizedServicesData[categoryKey];
           // Construct the translation key
           const translationKey = `services_page.category_${categoryKey}` as any; // e.g., services_page.category_haircuts
-          // Determine fallback: find the original category name from the first service in the group for a sensible fallback
-          const originalCategoryNameFallback = categorizedServicesByKey[categoryKey]?.[0]?.category || t('services_page.category_other');
-          // Get the translated category name
-          const translatedCategoryName = t(translationKey, undefined, { fallback: originalCategoryNameFallback });
-
+          // Get the translated category name, using the original name as fallback
+          const translatedCategoryName = t(translationKey, {}, { fallback: categoryData.originalName });
 
           return (
             <MotionDiv key={categoryKey} variants={itemVariants}>
@@ -100,7 +97,7 @@ export default async function ServicesPage({ params }: { params: { locale: strin
                   className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
                   variants={containerVariants} // Stagger children (cards)
               >
-                {categorizedServicesByKey[categoryKey].map(service => (
+                {categoryData.services.map(service => (
                   <MotionDiv key={service.id} variants={itemVariants} whileHover={cardHoverEffect}>
                     {/* Wrap card content for better structure and apply hover effect */}
                     <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card/80 backdrop-blur-sm border-border/50 overflow-hidden h-full flex flex-col rounded-lg"> {/* Added rounded-lg */}

@@ -135,6 +135,8 @@ export default {
       add_new: 'Adicionar Novo Serviço',
       edit_service: 'Editar Serviço',
       add_service: 'Adicionar Novo Serviço',
+      add_service_desc: 'Preencha os detalhes para o novo serviço.',
+      edit_service_desc: 'Atualize os detalhes deste serviço.',
       save_changes: 'Salvar Alterações',
       cancel: 'Cancelar',
       service_name: 'Nome do Serviço',
@@ -163,6 +165,7 @@ export default {
       activate_tooltip: 'Ativar Serviço',
       deactivate_tooltip: 'Desativar Serviço',
       edit_tooltip: 'Editar Serviço',
+      delete_tooltip: 'Excluir Serviço',
       // Toasts
       update_success_title: 'Serviço Atualizado',
       update_success_desc: '"{serviceName}" foi atualizado.',
@@ -170,7 +173,21 @@ export default {
       add_success_desc: '"{serviceName}" foi adicionado.',
       toggle_success_title_activated: 'Serviço Ativado',
       toggle_success_title_deactivated: 'Serviço Desativado',
-      toggle_success_desc: '"{serviceName}" agora está {status}.', // status será 'ativo' ou 'inativo'
+      toggle_success_desc: '"{serviceName}" agora está {status}.',
+      delete_success_title: 'Serviço Excluído',
+      delete_success_desc: '"{serviceName}" foi excluído.',
+      update_error_title: 'Falha ao Atualizar',
+      add_error_title: 'Falha ao Adicionar',
+      toggle_error_title: 'Falha ao Alterar Status',
+      delete_error_title: 'Falha ao Excluir',
+      fetch_error_title: 'Falha ao Carregar',
+      fetch_error_desc: 'Não foi possível carregar os serviços. Tente novamente.',
+      error_generic_desc: 'Ocorreu um erro inesperado. Por favor, tente novamente.',
       no_services: 'Nenhum serviço encontrado.',
+       // Delete Confirmation
+      delete_confirm_title: 'Tem certeza?',
+      delete_confirm_desc: 'Esta ação não pode ser desfeita. Isto excluirá permanentemente o serviço "{serviceName}".',
+      delete_confirm_button: 'Excluir',
   },
 } as const;
+

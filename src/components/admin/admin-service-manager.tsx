@@ -2,7 +2,7 @@
 'use client';
 
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -19,13 +19,34 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { PlusCircle, Edit, Power, PowerOff, DollarSign, Clock, Tag, Trash2, Euro, PoundSterling } from 'lucide-react'; // Added currency icons
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+  DialogDescription, // Import Description for delete confirmation
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"; // Import AlertDialog components
+import { PlusCircle, Edit, Power, PowerOff, DollarSign, Clock, Tag, Trash2, Euro, PoundSterling, Loader2, AlertTriangle } from 'lucide-react'; // Added more icons
 import { useToast } from '@/hooks/use-toast';
 import type { Service } from '@/lib/services';
-import { useI18n, useCurrentLocale } from '@/locales/client'; // Import i18n hook
-import { MotionDiv, MotionButton } from '@/components/motion-provider'; // Import motion components
-import { AnimatePresence } from 'framer-motion'; // For exit animations
+import { getServices as fetchServices, addService as apiAddService, updateService as apiUpdateService, deleteService as apiDeleteService } from '@/lib/services'; // Import API functions
+import { useI18n, useCurrentLocale } from '@/locales/client';
+import { MotionDiv, MotionButton } from '@/components/motion-provider';
+import { AnimatePresence } from 'framer-motion';
 
 
 interface AdminServiceManagerProps {
@@ -48,19 +69,16 @@ type ServiceFormData = z.infer<ReturnType<typeof getServiceSchema>>;
 // Helper to format currency based on locale
 const formatCurrency = (price: number, locale: string): string => {
     const options: Intl.NumberFormatOptions = { style: 'currency', minimumFractionDigits: 2, maximumFractionDigits: 2 };
-    let currencyCode = 'USD'; // Default
-    if (locale === 'pt') currencyCode = 'BRL';
+    let currencyCode = 'BRL'; // Default to BRL for Portuguese
+    if (locale === 'en') currencyCode = 'USD';
     else if (locale === 'es') currencyCode = 'EUR';
-    // Add more locales/currencies as needed
 
     options.currency = currencyCode;
 
-    // Handle potential errors during formatting
     try {
         return new Intl.NumberFormat(locale, options).format(price);
     } catch (error) {
         console.error("Currency formatting error:", error);
-        // Fallback to simple formatting
         const symbol = locale === 'pt' ? 'R$' : locale === 'es' ? '€' : '$';
         return `${symbol}${price.toFixed(2)}`;
     }
@@ -68,85 +86,142 @@ const formatCurrency = (price: number, locale: string): string => {
 
 export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServices }) => {
   const [services, setServices] = useState<Service[]>(initialServices);
+  const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
+  const [serviceToDelete, setServiceToDelete] = useState<Service | null>(null); // For delete confirmation
   const { toast } = useToast();
-  const t = useI18n(); // Get translation function
-  const currentLocale = useCurrentLocale() as 'en' | 'es' | 'pt'; // Get current locale
-  const serviceSchema = getServiceSchema(t); // Get schema with translated messages
+  const t = useI18n();
+  const currentLocale = useCurrentLocale() as 'en' | 'es' | 'pt';
+  const serviceSchema = getServiceSchema(t);
 
   const { register, handleSubmit, control, reset, formState: { errors, isSubmitting } } = useForm<ServiceFormData>({
     resolver: zodResolver(serviceSchema),
     defaultValues: { name: '', description: '', duration: 0, price: 0, category: '', active: true }
   });
 
+  // Fetch services on mount (optional, if initialServices might be stale)
+  useEffect(() => {
+    // Example: Fetch fresh data if needed
+    // const loadServices = async () => {
+    //   setIsLoading(true);
+    //   try {
+    //     const freshServices = await fetchServices(); // Use your actual fetch function
+    //     setServices(freshServices);
+    //   } catch (error) {
+    //     toast({ title: t('admin_service.fetch_error_title'), description: t('admin_service.fetch_error_desc'), variant: 'destructive' });
+    //   } finally {
+    //     setIsLoading(false);
+    //   }
+    // };
+    // loadServices();
+  }, []); // Empty dependency array ensures it runs once on mount
+
+
   const openModalForEdit = (service: Service) => {
     setEditingService(service);
-    reset(service); // Pre-fill form
+    reset(service);
     setIsModalOpen(true);
   };
 
   const openModalForNew = () => {
     setEditingService(null);
-    reset({ name: '', description: '', duration: 0, price: 0, category: '', active: true }); // Reset form
+    reset({ name: '', description: '', duration: 0, price: 0, category: '', active: true });
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingService(null);
-    // Optionally reset form on close, or rely on openModalForNew/Edit to set defaults
-    // reset({ name: '', description: '', duration: 0, price: 0, category: '', active: true });
+    reset({ name: '', description: '', duration: 0, price: 0, category: '', active: true }); // Reset form on close
+  };
+
+  const handleDeleteConfirmation = (service: Service) => {
+      setServiceToDelete(service);
+      // AlertDialog trigger will open the confirmation dialog
+  };
+
+  const handleDeleteService = async () => {
+      if (!serviceToDelete) return;
+      setIsLoading(true);
+      try {
+          await apiDeleteService(serviceToDelete.id); // Call the actual API delete function
+          setServices(prev => prev.filter(s => s.id !== serviceToDelete!.id));
+          toast({ title: t('admin_service.delete_success_title'), description: t('admin_service.delete_success_desc', { serviceName: serviceToDelete.name }) });
+          setServiceToDelete(null); // Close confirmation dialog implicitly via state update
+      } catch (error) {
+          console.error("Failed to delete service:", error);
+          toast({ title: t('admin_service.delete_error_title'), description: t('admin_service.error_generic_desc'), variant: 'destructive' });
+      } finally {
+          setIsLoading(false);
+      }
   };
 
   const onSubmit = async (data: ServiceFormData) => {
-     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    if (editingService) {
-      // Update existing service
-      const updatedService = { ...editingService, ...data };
-      setServices(services.map(s => s.id === editingService.id ? updatedService : s));
-      toast({ title: t('admin_service.update_success_title'), description: t('admin_service.update_success_desc', { serviceName: data.name }) });
-    } else {
-      // Add new service (generate temporary ID)
-      const newService: Service = { ...data, id: `service-${Date.now()}` };
-      setServices(prev => [newService, ...prev]); // Add to the beginning for visibility
-      toast({ title: t('admin_service.add_success_title'), description: t('admin_service.add_success_desc', { serviceName: data.name }) });
+    setIsLoading(true);
+    try {
+      if (editingService) {
+        // Update existing service
+        const updatedService = await apiUpdateService(editingService.id, data); // Use API update function
+        setServices(services.map(s => s.id === editingService.id ? updatedService : s));
+        toast({ title: t('admin_service.update_success_title'), description: t('admin_service.update_success_desc', { serviceName: data.name }) });
+      } else {
+        // Add new service
+        const newService = await apiAddService(data); // Use API add function
+        setServices(prev => [newService, ...prev]);
+        toast({ title: t('admin_service.add_success_title'), description: t('admin_service.add_success_desc', { serviceName: data.name }) });
+      }
+      closeModal();
+    } catch (error) {
+      console.error("Failed to save service:", error);
+      toast({ title: editingService ? t('admin_service.update_error_title') : t('admin_service.add_error_title'), description: t('admin_service.error_generic_desc'), variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
     }
-    closeModal();
   };
 
   const toggleServiceStatus = async (service: Service) => {
-     // Simulate API call
-     await new Promise(resolve => setTimeout(resolve, 300));
-     const updatedStatus = !service.active;
-     const statusKey = updatedStatus ? 'status_active' : 'status_inactive';
-     const titleKey = updatedStatus ? 'toggle_success_title_activated' : 'toggle_success_title_deactivated';
+    const optimisticStatus = !service.active;
+    const originalServices = [...services]; // Store original state for potential rollback
 
-     setServices(services.map(s => s.id === service.id ? { ...s, active: updatedStatus } : s));
-     toast({
-       title: t(titleKey as any),
-       description: t('admin_service.toggle_success_desc', { serviceName: service.name, status: t(statusKey as any).toLowerCase() }),
-     });
-   };
+    // Optimistic update UI first
+    setServices(services.map(s => s.id === service.id ? { ...s, active: optimisticStatus } : s));
+
+    try {
+      // Call API to update status
+      await apiUpdateService(service.id, { active: optimisticStatus }); // Assuming updateService can handle partial updates
+
+      // Toast on successful API call
+      const statusKey = optimisticStatus ? 'status_active' : 'status_inactive';
+      const titleKey = optimisticStatus ? 'toggle_success_title_activated' : 'toggle_success_title_deactivated';
+      toast({
+        title: t(titleKey as any),
+        description: t('admin_service.toggle_success_desc', { serviceName: service.name, status: t(statusKey as any).toLowerCase() }),
+      });
+    } catch (error) {
+      console.error("Failed to toggle service status:", error);
+      // Rollback UI on error
+      setServices(originalServices);
+      toast({ title: t('admin_service.toggle_error_title'), description: t('admin_service.error_generic_desc'), variant: 'destructive' });
+    }
+  };
 
     // Animation variants for modal
     const modalVariants = {
-        hidden: { opacity: 0, scale: 0.9, y: 20 },
+        hidden: { opacity: 0, scale: 0.95, y: 10 }, // Smoother start
         visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
-        exit: { opacity: 0, scale: 0.9, y: 10, transition: { duration: 0.2, ease: "easeIn" } }
+        exit: { opacity: 0, scale: 0.95, y: 5, transition: { duration: 0.2, ease: "easeIn" } } // Smoother exit
     };
 
      // Animation variants for table rows
     const tableRowVariants = {
-        hidden: { opacity: 0, y: 10 },
+        hidden: { opacity: 0, y: 5 }, // Reduced initial offset
         visible: (i: number) => ({
             opacity: 1,
             y: 0,
-            transition: { delay: i * 0.05, duration: 0.3, ease: "easeOut" }
+            transition: { delay: i * 0.04, duration: 0.3, ease: "easeOut" } // Faster stagger
         }),
-        exit: { opacity: 0, x: -20, transition: { duration: 0.2 } }
+        exit: { opacity: 0, x: -10, transition: { duration: 0.2 } } // Slightly adjusted exit
     };
 
 
@@ -158,8 +233,8 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
             <MotionButton
                 onClick={openModalForNew}
                 className="bg-accent hover:bg-accent/90 text-accent-foreground"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.03 }} // Subtle hover
+                whileTap={{ scale: 0.97 }} // Subtle tap
              >
                 <PlusCircle className="mr-2 h-4 w-4" /> {t('admin_service.add_new')}
             </MotionButton>
@@ -168,20 +243,21 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
             {isModalOpen && (
               <DialogContent
                 className="sm:max-w-[525px] bg-card border-border/70"
-                // Use MotionDiv for DialogContent - Requires custom DialogContent or wrapping
-                // For simplicity, wrap the form inside with MotionDiv
-                onEscapeKeyDown={closeModal} // Ensure ESC closes
-                onPointerDownOutside={closeModal} // Ensure click outside closes
+                onEscapeKeyDown={closeModal}
+                onPointerDownOutside={closeModal}
               >
                  <MotionDiv
                     variants={modalVariants}
                     initial="hidden"
                     animate="visible"
                     exit="exit"
-                    className="flex flex-col" // Add flex container if needed
+                    className="flex flex-col"
                  >
                       <DialogHeader>
                         <DialogTitle className="text-primary">{editingService ? t('admin_service.edit_service') : t('admin_service.add_service')}</DialogTitle>
+                        <DialogDescription>
+                          {editingService ? t('admin_service.edit_service_desc') : t('admin_service.add_service_desc')}
+                        </DialogDescription>
                       </DialogHeader>
                       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-3"> {/* Scrollable form */}
                         <div className="space-y-1">
@@ -233,12 +309,16 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                             </DialogClose>
                             <MotionButton
                                type="submit"
-                               className="bg-accent hover:bg-accent/90 text-accent-foreground"
-                               disabled={isSubmitting}
-                               whileHover={{ scale: 1.05 }}
-                               whileTap={{ scale: 0.95 }}
+                               className="bg-accent hover:bg-accent/90 text-accent-foreground min-w-[110px]" // Min width to prevent resizing
+                               disabled={isSubmitting || isLoading} // Disable during form submit or API call
+                               whileHover={{ scale: 1.03 }} // Subtle hover
+                               whileTap={{ scale: 0.97 }} // Subtle tap
                              >
-                                {editingService ? t('admin_service.save_changes') : t('admin_service.add_service')}
+                                {isSubmitting || isLoading ? (
+                                   <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                    editingService ? t('admin_service.save_changes') : t('admin_service.add_service')
+                                )}
                              </MotionButton>
                         </DialogFooter>
                       </form>
@@ -249,6 +329,31 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
          </Dialog>
       </div>
 
+       {/* Delete Confirmation Dialog */}
+       <AlertDialog open={!!serviceToDelete} onOpenChange={(isOpen) => { if (!isOpen) setServiceToDelete(null); }}>
+           <AlertDialogContent>
+               <AlertDialogHeader>
+                   <AlertDialogTitle className="flex items-center gap-2">
+                      <AlertTriangle className="text-destructive h-5 w-5"/> {t('admin_service.delete_confirm_title')}
+                   </AlertDialogTitle>
+                   <AlertDialogDescription>
+                       {t('admin_service.delete_confirm_desc', { serviceName: serviceToDelete?.name || '' })}
+                   </AlertDialogDescription>
+               </AlertDialogHeader>
+               <AlertDialogFooter>
+                   <AlertDialogCancel disabled={isLoading}>{t('admin_service.cancel')}</AlertDialogCancel>
+                   <AlertDialogAction
+                       onClick={handleDeleteService}
+                       disabled={isLoading}
+                       className="bg-destructive hover:bg-destructive/90 text-destructive-foreground min-w-[90px]"
+                   >
+                       {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('admin_service.delete_confirm_button')}
+                   </AlertDialogAction>
+               </AlertDialogFooter>
+           </AlertDialogContent>
+       </AlertDialog>
+
+
       <div className="overflow-x-auto"> {/* Responsive table */}
           <Table className="min-w-full">
             <TableHeader>
@@ -257,7 +362,6 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                 <TableHead><Tag className="inline mr-1 h-4 w-4" />{t('admin_service.th_category')}</TableHead>
                 <TableHead><Clock className="inline mr-1 h-4 w-4" />{t('admin_service.th_duration')}</TableHead>
                 <TableHead>
-                   {/* Dynamically select currency icon */}
                   {currentLocale === 'pt' && <span className="inline mr-1">R$</span>}
                   {currentLocale === 'es' && <Euro className="inline mr-1 h-4 w-4" />}
                   {currentLocale === 'en' && <DollarSign className="inline mr-1 h-4 w-4" />}
@@ -269,7 +373,23 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
             </TableHeader>
             <TableBody>
               <AnimatePresence initial={false}> {/* Handle row add/remove animations */}
-                  {services.length === 0 && (
+                  {isLoading && services.length === 0 && ( // Show skeleton loader only when loading initial data
+                       [...Array(3)].map((_, i) => (
+                           <TableRow key={`skel-${i}`}>
+                               <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
+                               <TableCell><Skeleton className="h-5 w-1/2" /></TableCell>
+                               <TableCell><Skeleton className="h-5 w-1/4" /></TableCell>
+                               <TableCell><Skeleton className="h-5 w-1/4" /></TableCell>
+                               <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                               <TableCell className="text-right space-x-0.5">
+                                   <Skeleton className="h-8 w-8 inline-block" />
+                                   <Skeleton className="h-8 w-8 inline-block" />
+                                   <Skeleton className="h-8 w-8 inline-block" />
+                               </TableCell>
+                           </TableRow>
+                       ))
+                   )}
+                  {!isLoading && services.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center text-muted-foreground py-10">{t('admin_service.no_services')}</TableCell>
                     </TableRow>
@@ -293,7 +413,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                          {formatCurrency(service.price, currentLocale)}
                        </TableCell>
                       <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs font-normal border ${service.active ? 'bg-green-500/10 border-green-500/50 text-green-400' : 'bg-red-500/10 border-red-500/50 text-red-400'}`}>
+                        <span className={`px-2 py-1 rounded-full text-xs font-normal border ${service.active ? 'bg-green-500/10 border-green-500/50 text-green-400' : 'bg-gray-500/10 border-gray-500/50 text-gray-400'}`}> {/* Adjusted inactive color */}
                             {service.active ? t('admin_service.status_active') : t('admin_service.status_inactive')}
                         </span>
                       </TableCell>
@@ -318,19 +438,19 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                          >
                           <Edit className="h-4 w-4 text-blue-400" />
                         </MotionButton>
-                        {/* Add Delete button with confirmation later if needed */}
-                         {/*
-                         <MotionButton
-                           variant="ghost"
-                           size="icon"
-                           // onClick={() => handleDeleteConfirmation(service.id)} // Needs confirmation dialog
-                           title="Delete Service"
-                           className="text-destructive hover:bg-destructive/10"
-                           whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
-                          >
-                           <Trash2 className="h-4 w-4" />
-                         </MotionButton>
-                         */}
+                         {/* Use AlertDialogTrigger to open confirmation */}
+                         <AlertDialogTrigger asChild>
+                             <MotionButton
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteConfirmation(service)} // Set service to delete
+                                title={t('admin_service.delete_tooltip')}
+                                className="text-destructive hover:bg-destructive/10"
+                                whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                              >
+                               <Trash2 className="h-4 w-4" />
+                             </MotionButton>
+                         </AlertDialogTrigger>
                       </TableCell>
                     </MotionDiv>
                   ))}
@@ -341,3 +461,4 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
     </div>
   );
 };
+

@@ -62,11 +62,10 @@ export default function LoginPage() {
 
    // Animation variants
   const cardVariants = {
-      hidden: { opacity: 0, y: 50, scale: 0.9 },
+      hidden: { opacity: 0, y: 50 }, // Removed scale from initial
       visible: {
           opacity: 1,
           y: 0,
-          scale: 1,
           transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }, // Smoother ease
       },
   };
@@ -77,7 +76,7 @@ export default function LoginPage() {
    };
 
    const buttonVariants = {
-       hover: { scale: 1.05, boxShadow: "0px 5px 15px hsla(var(--accent)/0.35)" }, // Stronger shadow on hover
+       hover: { scale: 1.03, boxShadow: "0px 5px 15px hsla(var(--accent)/0.35)" }, // Keep button hover, reduced scale
        tap: { scale: 0.98 }
    }
 
@@ -87,7 +86,7 @@ export default function LoginPage() {
       <MotionDiv
         initial="hidden"
         animate="visible"
-        variants={cardVariants}
+        variants={cardVariants} // Apply card animation (without scale)
       >
         {/* Enhanced Card Styling */}
         <Card className="w-full max-w-md shadow-xl bg-card/90 backdrop-blur-lg border border-border/60 overflow-hidden rounded-xl"> {/* Rounded-xl */}

@@ -64,8 +64,8 @@ export default {
     name_placeholder: 'Tu Nombre Completo',
     name_error: 'El nombre debe tener al menos 2 caracteres.',
     phone: 'Teléfono',
-    phone_placeholder: '+1234567890',
-    phone_error: 'Formato de número de teléfono inválido (ej., +34666112233).', // Added example format
+    phone_placeholder: '+34666112233', // Example ES format
+    phone_error: 'Formato de número de teléfono inválido (ej., +34666112233).',
     email: 'Correo Electrónico',
     email_placeholder: 'tu.email@ejemplo.com',
     email_error: 'Dirección de correo electrónico inválida.',
@@ -135,6 +135,8 @@ export default {
       add_new: 'Añadir Nuevo Servicio',
       edit_service: 'Editar Servicio',
       add_service: 'Añadir Nuevo Servicio',
+      add_service_desc: 'Completa los detalles para el nuevo servicio.',
+      edit_service_desc: 'Actualiza los detalles de este servicio.',
       save_changes: 'Guardar Cambios',
       cancel: 'Cancelar',
       service_name: 'Nombre del Servicio',
@@ -163,6 +165,7 @@ export default {
       activate_tooltip: 'Activar Servicio',
       deactivate_tooltip: 'Desactivar Servicio',
       edit_tooltip: 'Editar Servicio',
+      delete_tooltip: 'Eliminar Servicio',
       // Toasts
       update_success_title: 'Servicio Actualizado',
       update_success_desc: '"{serviceName}" ha sido actualizado.',
@@ -170,7 +173,21 @@ export default {
       add_success_desc: '"{serviceName}" ha sido añadido.',
       toggle_success_title_activated: 'Servicio Activado',
       toggle_success_title_deactivated: 'Servicio Desactivado',
-      toggle_success_desc: '"{serviceName}" ahora está {status}.', // status será 'activo' o 'inactivo'
+      toggle_success_desc: '"{serviceName}" ahora está {status}.',
+      delete_success_title: 'Servicio Eliminado',
+      delete_success_desc: '"{serviceName}" ha sido eliminado.',
+      update_error_title: 'Error al Actualizar',
+      add_error_title: 'Error al Añadir',
+      toggle_error_title: 'Error al Cambiar Estado',
+      delete_error_title: 'Error al Eliminar',
+      fetch_error_title: 'Error al Cargar',
+      fetch_error_desc: 'No se pudieron cargar los servicios. Inténtalo de nuevo.',
+      error_generic_desc: 'Ocurrió un error inesperado. Por favor, inténtalo de nuevo.',
       no_services: 'No se encontraron servicios.',
+      // Delete Confirmation
+      delete_confirm_title: '¿Estás seguro?',
+      delete_confirm_desc: 'Esta acción no se puede deshacer. Esto eliminará permanentemente el servicio "{serviceName}".',
+      delete_confirm_button: 'Eliminar',
   },
 } as const;
+

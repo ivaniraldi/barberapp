@@ -18,7 +18,7 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2,
+      staggerChildren: 0.15, // Slightly adjusted stagger
       delayChildren: 0.1,
     },
   },
@@ -33,11 +33,12 @@ const itemVariants = {
   },
 };
 
+// Updated hover effect (removed scale)
 const cardHoverEffect = {
-  scale: 1.03, // Slightly subtle scale
-  boxShadow: "0px 10px 25px hsla(var(--primary) / 0.1), 0px 5px 10px hsla(var(--primary) / 0.05)", // Refined shadow using theme colors
+  boxShadow: "0px 10px 25px hsla(var(--primary) / 0.1), 0px 5px 10px hsla(var(--primary) / 0.05)", // Keep shadow effect
   transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1.0] } // Custom ease for smooth transition
 };
+
 
 export default async function Home({ params }: { params: { locale: string } }) {
    // Set locale for static generation (important for build)
@@ -99,7 +100,7 @@ export default async function Home({ params }: { params: { locale: string } }) {
                  <p className="text-muted-foreground text-center py-4">{t('services_page.no_services')}</p>
                )}
                {/* CTA Button */}
-                <MotionDiv whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                <MotionDiv whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}> {/* Slightly reduced hover scale */}
                    <Button asChild variant="link" className="mt-6 text-accent px-0 self-start group hover:text-accent/80 transition-colors font-semibold">
                     <Link href="/services">
                       {t('home.view_all_services')} <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" /> {/* Icon animation on hover */}
@@ -111,7 +112,7 @@ export default async function Home({ params }: { params: { locale: string } }) {
         </MotionDiv>
 
         {/* Booking Section */}
-        <MotionDiv variants={itemVariants} whileHover={cardHoverEffect}>
+        <MotionDiv variants={itemVariants} whileHover={cardHoverEffect}> {/* Apply non-scaling hover effect */}
           <Card className="shadow-xl bg-card/80 backdrop-blur-md border-border/50 overflow-hidden h-full flex flex-col rounded-lg"> {/* Explicit rounded-lg */}
             <CardHeader className="bg-gradient-to-l from-primary/5 to-accent/5 pb-4 border-b border-border/30"> {/* Subtle header gradient and border */}
               <CardTitle className="text-2xl sm:text-3xl flex items-center gap-2 text-primary"> {/* Responsive title size */}
@@ -144,7 +145,7 @@ export default async function Home({ params }: { params: { locale: string } }) {
         <GalleryGrid images={galleryImages} />
          {/* CTA to view full gallery */}
          <div className="text-center mt-12">
-             <MotionDiv whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+             <MotionDiv whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}> {/* Slightly reduced hover scale */}
                  <Button asChild variant="outline" size="lg" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-colors shadow-sm hover:shadow-md">
                     <Link href="/cuts">
                         {t('cuts_page.title')} <ArrowRight className="ml-2 h-4 w-4" />
