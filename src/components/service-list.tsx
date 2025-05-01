@@ -2,8 +2,7 @@
 'use client'; // Add this directive
 
 import type { FC } from 'react';
-import { Scissors, Clock, DollarSign, Euro } from 'lucide-react'; // Added Euro
-import { Card, CardContent } from '@/components/ui/card';
+import { Clock } from 'lucide-react'; // Removed Scissors, DollarSign, Euro - handled by formatCurrency
 import { Separator } from '@/components/ui/separator';
 import { useI18n, useCurrentLocale } from '@/locales/client'; // Import i18n hook for client component
 import { MotionDiv } from './motion-provider'; // Import MotionDiv
@@ -20,11 +19,11 @@ interface ServiceListProps {
   services: Service[];
 }
 
-// Helper to format currency based on locale (same as in admin manager)
+// Helper to format currency based on locale
 const formatCurrency = (price: number, locale: string): string => {
     const options: Intl.NumberFormatOptions = { style: 'currency', minimumFractionDigits: 2, maximumFractionDigits: 2 };
-    let currencyCode = 'USD'; // Default
-    if (locale === 'pt') currencyCode = 'BRL';
+    let currencyCode = 'BRL'; // Default to BRL for Portuguese
+    if (locale === 'en') currencyCode = 'USD';
     else if (locale === 'es') currencyCode = 'EUR';
     // Add more locales/currencies as needed
 
@@ -54,7 +53,7 @@ const listItemVariants = {
 export const ServiceList: FC<ServiceListProps> = ({ services }) => {
   const t = useI18n(); // Get translation function
   const currentLocale = useCurrentLocale() as 'en' | 'es' | 'pt'; // Get current locale
-  const isSingleService = services.length === 1;
+  const isSingleService = services.length === 1; // Check if only one service is being displayed
 
   return (
     <div className={isSingleService ? '' : 'space-y-4'}>
@@ -71,9 +70,8 @@ export const ServiceList: FC<ServiceListProps> = ({ services }) => {
           {/* Use Card styling implicitly via parent or keep transparent */}
           <div className="p-0"> {/* Adjusted padding */}
               <div className="flex items-start sm:items-center justify-between mb-2 flex-col sm:flex-row gap-2 sm:gap-0">
-                <h3 className="text-lg font-semibold flex items-center text-primary">
-                  {/* Icon only shown if it's part of a list, not a single display */}
-                  {!isSingleService && <Scissors className="mr-2 h-5 w-5 text-primary shrink-0" />}
+                {/* Always display the service name as the primary heading within the list item */}
+                <h3 className="text-lg font-semibold text-primary">
                    {service.name}
                 </h3>
                 <span className="text-lg font-semibold text-primary flex items-center shrink-0">

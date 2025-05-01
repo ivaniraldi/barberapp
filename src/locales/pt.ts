@@ -28,14 +28,14 @@ export default {
   services_page: {
     title: 'Nossos Serviços',
     subtitle: 'Encontre o serviço de cuidado perfeito para você.',
-    no_services: 'Nenhum serviço disponível no momento. Por favor, volte mais tarde.',
-    // Added specific category translations with 'category_' prefix
+    no_services_available: 'Nenhum serviço disponível no momento. Por favor, volte mais tarde.', // Changed key for clarity
+    // Added specific category translations with 'category_' prefix matching generated keys
     category_other: 'Outros Serviços',
-    category_haircuts: 'Cortes de Cabelo',
-    category_beard_care: 'Cuidado com a Barba',
-    category_shaves: 'Barbear',
-    category_styling: 'Estilização',
-    category_coloring: 'Coloração',
+    category_cortes_de_cabelo: 'Cortes de Cabelo', // Matches 'cortes_de_cabelo' key
+    category_cuidado_com_a_barba: 'Cuidado com a Barba', // Matches 'cuidado_com_a_barba' key
+    category_barbear: 'Barbear', // Matches 'barbear' key
+    category_estilizacao: 'Estilização', // Matches 'estilizacao' key
+    category_coloracao: 'Coloração', // Matches 'coloracao' key
   },
    // Cuts Page
   cuts_page: {
@@ -183,11 +183,10 @@ export default {
       fetch_error_title: 'Falha ao Carregar',
       fetch_error_desc: 'Não foi possível carregar os serviços. Tente novamente.',
       error_generic_desc: 'Ocorreu um erro inesperado. Por favor, tente novamente.',
-      no_services: 'Nenhum serviço encontrado.',
+      no_services: 'Nenhum serviço encontrado.', // Added this key for table body message
        // Delete Confirmation
       delete_confirm_title: 'Tem certeza?',
       delete_confirm_desc: 'Esta ação não pode ser desfeita. Isto excluirá permanentemente o serviço "{serviceName}".',
       delete_confirm_button: 'Excluir',
   },
 } as const;
-

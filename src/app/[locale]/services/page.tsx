@@ -1,9 +1,9 @@
 // src/app/[locale]/services/page.tsx
 import { ServiceList } from '@/components/service-list';
-import { Card, CardContent } from '@/components/ui/card'; // Removed CardHeader, Title, Desc as they weren't used directly here
+import { Card, CardContent } from '@/components/ui/card'; // Only Card and CardContent needed here
 import { getServices, type Service } from '@/lib/services'; // Import function and type
 import { getI18n } from '@/locales/server'; // Import server-side i18n
-import { setStaticParamsLocale } from 'next-international/server'; // Correct import for setStaticParamsLocale
+import { setStaticParamsLocale } from 'next-international/server'; // Import setStaticParamsLocale
 import { MotionDiv } from '@/components/motion-provider'; // Import MotionDiv
 import { Badge } from '@/components/ui/badge'; // Import Badge for category display
 import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton for potential loading states
@@ -12,13 +12,19 @@ import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton for pote
 const groupServicesByCategoryKey = (services: Service[]) => {
   return services.reduce((acc, service) => {
     // Generate a consistent key from the category name (lowercase, underscores, default to 'other')
-    const categoryKey = (service.category || 'other').toLowerCase().replace(/\s+/g, '_').replace(/[^\w-]+/g, ''); // Sanitize key further
+    // Ensure accents are removed for simpler key matching if desired, or handle them in locale files.
+    // Sticking to basic replacement for now.
+    const categoryKey = (service.category || 'other')
+        .toLowerCase()
+        .replace(/\s+/g, '_') // Replace spaces with underscores
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents for key generation
+        .replace(/[^\w-]+/g, ''); // Remove remaining non-alphanumeric characters except hyphen
     if (!acc[categoryKey]) {
       acc[categoryKey] = { originalName: service.category || 'Other Services', services: [] }; // Store original name
     }
     acc[categoryKey].services.push(service);
     return acc;
-  }, {} as Record<string, { originalName: string, services: Service[] }>); // Adjusted type
+  }, {} as Record<string, { originalName: string, services: Service[] }>);
 };
 
 // Animation variants
@@ -75,14 +81,15 @@ export default async function ServicesPage({ params }: { params: { locale: strin
       <MotionDiv className="space-y-12" variants={containerVariants}>
         {categoryKeys.length === 0 && (
           <MotionDiv variants={itemVariants} className="text-center text-muted-foreground text-lg py-10">
-            {t('services_page.no_services')}
+            {/* Ensure this key exists in all locale files */}
+            {t('services_page.no_services_available')}
           </MotionDiv>
         )}
 
         {categoryKeys.map((categoryKey) => {
           const categoryData = categorizedServicesData[categoryKey];
-          // Construct the translation key
-          const translationKey = `services_page.category_${categoryKey}` as any; // e.g., services_page.category_haircuts
+          // Construct the translation key (ensure this matches keys in locale files)
+          const translationKey = `services_page.category_${categoryKey}` as any;
           // Get the translated category name, using the original name as fallback
           const translatedCategoryName = t(translationKey, {}, { fallback: categoryData.originalName });
 
@@ -102,10 +109,9 @@ export default async function ServicesPage({ params }: { params: { locale: strin
                     {/* Wrap card content for better structure and apply hover effect */}
                     <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card/80 backdrop-blur-sm border-border/50 overflow-hidden h-full flex flex-col rounded-lg"> {/* Added rounded-lg */}
                       <CardContent className="p-6 flex-grow flex flex-col justify-between">
-                         {/* Service Details - Explicitly show title */}
-                          <h3 className="text-xl font-semibold text-primary mb-2">{service.name}</h3>
+                         {/* REMOVED H3 title here - ServiceList handles display */}
+                         {/* Pass only the single service to the list */}
                          <ServiceList services={[service]} />
-                        {/* Optional: Add a "Book Now" button specific to this service if desired */}
                       </CardContent>
                        {/* Footer for category badge */}
                        {service.category && (

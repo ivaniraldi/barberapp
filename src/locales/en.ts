@@ -28,14 +28,19 @@ export default {
   services_page: {
     title: 'Our Services',
     subtitle: 'Find the perfect grooming service for you.',
-    no_services: 'No services currently available. Please check back later.',
-    // Added specific category translations with 'category_' prefix
+    no_services_available: 'No services currently available. Please check back later.', // Changed key for clarity
+    // Added specific category translations with 'category_' prefix matching generated keys
     category_other: 'Other Services',
-    category_haircuts: 'Haircuts',
-    category_beard_care: 'Beard Care',
-    category_shaves: 'Shaves',
-    category_styling: 'Styling',
-    category_coloring: 'Coloring',
+    category_haircuts: 'Haircuts', // Matches 'haircuts' key
+    category_beard_care: 'Beard Care', // Matches 'beard_care' key
+    category_shaves: 'Shaves', // Matches 'shaves' key
+    category_styling: 'Styling', // Matches 'styling' key
+    category_coloring: 'Coloring', // Matches 'coloring' key
+    category_cortes_de_cabelo: 'Haircuts', // Fallback if Portuguese key is used
+    category_cuidado_com_a_barba: 'Beard Care', // Fallback if Portuguese key is used
+    category_barbear: 'Shaves', // Fallback if Portuguese key is used
+    category_estilizacao: 'Styling', // Fallback if Portuguese key is used
+    category_coloracao: 'Coloring', // Fallback if Portuguese key is used
   },
   // Cuts Page
   cuts_page: {
@@ -192,4 +197,3 @@ export default {
       delete_confirm_button: 'Delete',
   },
 } as const;
-
