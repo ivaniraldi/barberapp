@@ -1,68 +1,87 @@
 // src/components/locale-provider.tsx
 'use client';
 
-import React, { useEffect, useState, createContext, useContext, type ReactNode, Suspense } from 'react';
+import React, { useEffect, useState, type ReactNode } from 'react';
 import { I18nProviderClient, useChangeLocale, useCurrentLocale } from '@/locales/client';
+import { Skeleton } from './ui/skeleton'; // Import Skeleton for fallback
 
 interface LocaleProviderProps {
   initialLocale: 'en' | 'es' | 'pt'; // Locale from server params
   children: ReactNode;
 }
 
-const LocaleContext = createContext<{ effectiveLocale: 'en' | 'es' | 'pt' }>({ effectiveLocale: 'pt' });
-export const useEffectiveLocale = () => useContext(LocaleContext);
+// Basic fallback skeleton for Suspense during locale loading/sync
+function LocaleLoadingFallback() {
+    return (
+        <div className="flex flex-col min-h-screen">
+            {/* Simplified Navbar Skeleton */}
+            <div className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/90 h-16 flex items-center justify-between container px-4">
+                <Skeleton className="h-7 w-32" />
+                <div className="flex items-center gap-2">
+                    <Skeleton className="h-8 w-20 hidden md:block" />
+                    <Skeleton className="h-8 w-24 hidden md:block" />
+                    <Skeleton className="h-8 w-8 md:hidden" />
+                    <Skeleton className="h-8 w-8" />
+                </div>
+            </div>
+            {/* Main Content Skeleton */}
+            <main className="flex-grow container mx-auto px-4 py-16 sm:py-24">
+                <Skeleton className="h-64 w-full rounded-lg" />
+            </main>
+        </div>
+    );
+}
+
 
 export function LocaleProvider({ initialLocale, children }: LocaleProviderProps) {
   const [isClient, setIsClient] = useState(false);
+  // These hooks use useSearchParams internally, hence the need for Suspense boundary
   const changeLocale = useChangeLocale({ preserveSearchParams: true });
-  const currentLocale = useCurrentLocale(); // Locale derived from the URL by next-international
+  const currentLocale = useCurrentLocale(); // Gets locale from URL
 
-  // Effect 1: Sync URL with localStorage on initial client load
+  // Effect to sync localStorage and potentially redirect on initial client load if mismatch
   useEffect(() => {
     setIsClient(true); // Mark as client-side hydrated
 
     const savedLocale = localStorage.getItem('locale') as 'en' | 'es' | 'pt' | null;
     const validLocales: ('en' | 'es' | 'pt')[] = ['en', 'es', 'pt'];
 
-    if (savedLocale && validLocales.includes(savedLocale)) {
-      // If saved locale is valid and differs from the URL locale, update the URL
-      if (savedLocale !== currentLocale) {
-        // console.log(`LocaleProvider: Mismatch found. Saved: ${savedLocale}, Current: ${currentLocale}. Changing URL.`);
+    // Only attempt to change locale if there's a valid saved locale that differs from the current URL
+    if (savedLocale && validLocales.includes(savedLocale) && savedLocale !== currentLocale) {
+        // console.log(`LocaleProvider Initial Sync: Saved ${savedLocale}, URL ${currentLocale}. Changing URL.`);
         changeLocale(savedLocale);
-        // No need to setEffectiveLocale here, I18nProviderClient will use currentLocale
-      }
+        // The component will re-render with the new `currentLocale` from the URL after redirection
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run only once on mount
+  }, []); // Run only once on initial mount
 
-  // Effect 2: Sync localStorage with URL changes
+  // Effect to update localStorage when the URL locale changes *after* initial mount
   useEffect(() => {
-    if (isClient) { // Only run after hydration
-        const savedLocale = localStorage.getItem('locale') as 'en' | 'es' | 'pt' | null;
-        const validLocales: ('en' | 'es' | 'pt')[] = ['en', 'es', 'pt'];
+    // Only run after the initial hydration and check for changes
+    if (isClient) {
+      const savedLocale = localStorage.getItem('locale') as 'en' | 'es' | 'pt' | null;
+      const validLocales: ('en' | 'es' | 'pt')[] = ['en', 'es', 'pt'];
 
-        // If the current URL locale is valid and different from saved, update localStorage
-        if (validLocales.includes(currentLocale) && currentLocale !== savedLocale) {
-            // console.log(`LocaleProvider: URL locale changed to ${currentLocale}. Updating localStorage.`);
-            localStorage.setItem('locale', currentLocale);
-        }
+      if (validLocales.includes(currentLocale) && currentLocale !== savedLocale) {
+        // console.log(`LocaleProvider URL Update: URL is now ${currentLocale}. Updating localStorage.`);
+        localStorage.setItem('locale', currentLocale);
+      }
     }
-  }, [currentLocale, isClient]); // Rerun when URL locale changes or hydration status changes
+  }, [currentLocale, isClient]); // Re-run when URL locale changes or after client hydration
 
-  // Determine the locale to use for the provider.
-  // Before hydration, use initialLocale. After hydration, use the URL-derived currentLocale.
-  const localeForProvider = isClient ? currentLocale : initialLocale;
+  // Determine the effective locale: Use the URL locale once hydrated, otherwise initial server locale
+  const effectiveLocale = isClient ? currentLocale : initialLocale;
 
+  // Key the provider with the effectiveLocale to ensure it re-initializes correctly on locale change
+  // Render a fallback while waiting for client hydration
   return (
-    // Use the determined locale for the provider and context.
-    // Keying the provider ensures it re-renders correctly when the locale changes.
-    <I18nProviderClient locale={localeForProvider} key={localeForProvider}>
-      <LocaleContext.Provider value={{ effectiveLocale: localeForProvider }}>
-        <Suspense fallback={null}>
-          {/* Render children only after hydration to avoid mismatches */}
-          {isClient ? children : null}
-        </Suspense>
-      </LocaleContext.Provider>
-    </I18nProviderClient>
+     <>
+        {!isClient && <LocaleLoadingFallback />}
+        {isClient && (
+            <I18nProviderClient locale={effectiveLocale} key={effectiveLocale}>
+                {children}
+            </I18nProviderClient>
+        )}
+     </>
   );
 }
