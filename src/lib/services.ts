@@ -52,7 +52,7 @@ export async function addService(newServiceData: Omit<Service, 'id'>): Promise<S
   };
   allServices = [newService, ...allServices]; // Add to the beginning
   console.log("Added Service:", JSON.stringify(newService)); // Log only the added service (stringified)
-  // console.log("Current Services:", JSON.stringify(allServices)); // Removed logging the full array
+  // Removed logging the full array
   return newService;
 }
 
@@ -66,7 +66,7 @@ export async function updateService(id: string, updatedData: Partial<Omit<Servic
   const updatedService = { ...allServices[serviceIndex], ...updatedData };
   allServices[serviceIndex] = updatedService;
   console.log("Updated Service:", JSON.stringify(updatedService)); // Log only the updated service (stringified)
-  // console.log("Current Services:", JSON.stringify(allServices)); // Removed logging the full array
+  // Removed logging the full array
   return updatedService;
 }
 
@@ -81,5 +81,5 @@ export async function deleteService(id: string): Promise<void> {
       console.warn(`Service with ID ${id} not found for deletion.`);
   }
   console.log("Deleted Service ID:", id);
-  // console.log("Current Services:", JSON.stringify(allServices)); // Removed logging the full array
+  // Removed logging the full array
 }

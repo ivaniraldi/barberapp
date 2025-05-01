@@ -21,7 +21,7 @@ import { MotionDiv, MotionButton } from '@/components/motion-provider'; // Impor
 export function Navbar() {
   const pathname = usePathname();
   const t = useI18n(); // Translation hook
-  const changeLocale = useChangeLocale();
+  const changeLocale = useChangeLocale({ preserveSearchParams: true }); // Preserve search params on locale change
   const currentLocale = useCurrentLocale() as 'en' | 'es' | 'pt'; // Ensure type safety
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isClient, setIsClient] = useState(false); // State to track client-side mount
@@ -95,7 +95,8 @@ export function Navbar() {
         <div className="hidden md:flex items-center space-x-1 lg:space-x-2"> {/* Reduced spacing */}
            {navItems.map((item, index) => {
                const baseHref = `/${currentLocale}${item.href === '/' ? '' : item.href}`;
-               const isActive = isClient && (pathname === baseHref || (item.href === '/' && pathname === `/${currentLocale}`)); // Check isClient
+               // Safe check for pathname before using startsWith
+               const isActive = isClient && pathname ? (pathname === baseHref || (item.href === '/' && pathname === `/${currentLocale}`)) : false;
 
                return (
                  // Apply MotionDiv wrapper here for hover/tap effects on the whole item
@@ -151,22 +152,22 @@ export function Navbar() {
           </DropdownMenu>
 
            {/* Admin Login CTA Button - Wrap Link in MotionDiv */}
-           <MotionDiv
-             variants={accentButtonVariants}
-             whileHover="hover"
-             whileTap="tap"
-             className="ml-3" // Apply margin to the wrapper div
-           >
-             <Button
-               asChild // Keep asChild for Button to render Link
-               variant="accent" // Use the accent variant for primary CTA
-               size="sm"
-             >
-               <Link href="/login">
-                 <LogIn className="mr-1.5 h-4 w-4" /> {t('nav.admin_login')}
-               </Link>
-             </Button>
-           </MotionDiv>
+            <MotionDiv
+              className="ml-3" // Apply margin to the wrapper div
+              variants={accentButtonVariants}
+              whileHover="hover"
+              whileTap="tap"
+            >
+              <Button
+                variant="accent" // Use the accent variant for primary CTA
+                size="sm"
+                asChild // Keep asChild for the link behavior
+              >
+                <Link href="/login">
+                  <LogIn className="mr-1.5 h-4 w-4" /> {t('nav.admin_login')}
+                </Link>
+              </Button>
+            </MotionDiv>
         </div>
 
         {/* Mobile Navigation Trigger */}
@@ -204,7 +205,8 @@ export function Navbar() {
               <nav className="flex-grow flex flex-col space-y-1.5 p-4 overflow-y-auto"> {/* Use nav tag, make scrollable */}
                  {navItems.map((item, index) => {
                      const baseHref = `/${currentLocale}${item.href === '/' ? '' : item.href}`;
-                     const isActive = isClient && (pathname === baseHref || (item.href === '/' && pathname === `/${currentLocale}`)); // Check isClient
+                     // Safe check for pathname before using startsWith
+                     const isActive = isClient && pathname ? (pathname === baseHref || (item.href === '/' && pathname === `/${currentLocale}`)) : false;
 
                      return (
                        <MotionDiv
@@ -236,24 +238,23 @@ export function Navbar() {
               </nav>
                {/* Mobile Admin Login CTA - Wrap Link in MotionDiv */}
                <div className="mt-auto p-4 border-t border-border/50">
-                 <MotionDiv
-                   variants={accentButtonVariants}
-                   whileHover="hover"
-                   whileTap="tap"
-                 >
-                   <SheetClose asChild>
-                     <Button
-                       asChild // Keep asChild for Button to render Link
-                       variant="accent" // Use accent variant for consistency
-                       className="w-full"
-                       onClick={closeMobileMenu}
-                     >
-                       <Link href="/login">
-                         <LogIn className="mr-2 h-4 w-4" /> {t('nav.admin_login')}
-                       </Link>
-                     </Button>
-                   </SheetClose>
-                 </MotionDiv>
+                  <MotionDiv
+                    variants={accentButtonVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                  >
+                    <SheetClose asChild>
+                       <Button
+                         variant="accent" // Use accent variant for consistency
+                         className="w-full"
+                         asChild // Keep asChild for the link behavior
+                       >
+                         <Link href="/login">
+                           <LogIn className="mr-2 h-4 w-4" /> {t('nav.admin_login')}
+                         </Link>
+                       </Button>
+                     </SheetClose>
+                  </MotionDiv>
                </div>
             </SheetContent>
           </Sheet>
