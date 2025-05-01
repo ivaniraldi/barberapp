@@ -136,8 +136,6 @@ export default function LoginPage() {
                   {/* Enhanced Button Styling */}
                   <MotionButton
                      type="submit"
-                     variant="accent" // Use accent variant
-                     size="lg" // Make button larger
                      className="w-full font-semibold text-base transition-all duration-300 transform hover:shadow-xl" // Larger text, stronger hover shadow
                      disabled={isLoading}
                      variants={buttonVariants} // Apply motion variants
