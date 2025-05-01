@@ -38,7 +38,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  // Removed AlertDialogTrigger import as it's not used directly inside the loop anymore
 } from "@/components/ui/alert-dialog"; // Import AlertDialog components
 import { PlusCircle, Edit, Power, PowerOff, DollarSign, Clock, Tag, Trash2, Euro, PoundSterling, Loader2, AlertTriangle } from 'lucide-react'; // Added more icons
 import { useToast } from '@/hooks/use-toast';
@@ -87,7 +87,8 @@ const formatCurrency = (price: number, locale: string): string => {
 
 export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServices }) => {
   const [services, setServices] = useState<Service[]>(initialServices);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Start as true to show loading initially
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false); // Separate state for form submission
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [serviceToDelete, setServiceToDelete] = useState<Service | null>(null); // For delete confirmation
@@ -96,37 +97,40 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
   const currentLocale = useCurrentLocale() as 'en' | 'es' | 'pt';
   const serviceSchema = getServiceSchema(t);
 
-  const { register, handleSubmit, control, reset, formState: { errors, isSubmitting } } = useForm<ServiceFormData>({
+  const { register, handleSubmit, control, reset, formState: { errors } } = useForm<ServiceFormData>({
     resolver: zodResolver(serviceSchema),
     defaultValues: { name: '', description: '', duration: 0, price: 0, category: '', active: true }
   });
 
-  // Fetch services on mount (optional, if initialServices might be stale)
+  // Fetch services on mount
   useEffect(() => {
     const loadServices = async () => {
-      setIsLoading(true);
+      setIsLoading(true); // Ensure loading state is true when fetching
       try {
         const freshServices = await fetchServices(); // Use your actual fetch function
         setServices(freshServices);
       } catch (error) {
+        console.error("Failed to fetch services:", error);
         toast({ title: t('admin_service.fetch_error_title'), description: t('admin_service.fetch_error_desc'), variant: 'destructive' });
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); // Set loading to false after fetching (or error)
       }
     };
     loadServices();
-  }, [t, toast]); // Add dependencies for hooks used inside effect
+    // Only run on mount, dependencies are correct as they don't change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [t, toast]);
 
 
   const openModalForEdit = (service: Service) => {
     setEditingService(service);
-    reset(service);
+    reset(service); // Populate form with existing service data
     setIsModalOpen(true);
   };
 
   const openModalForNew = () => {
     setEditingService(null);
-    reset({ name: '', description: '', duration: 0, price: 0, category: '', active: true });
+    reset({ name: '', description: '', duration: 0, price: 0, category: '', active: true }); // Reset to default empty values
     setIsModalOpen(true);
   };
 
@@ -138,12 +142,12 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
 
   const handleDeleteConfirmation = (service: Service) => {
       setServiceToDelete(service);
-      // AlertDialog trigger will open the confirmation dialog
+      // The AlertDialog will open because its `open` prop is bound to `!!serviceToDelete`
   };
 
   const handleDeleteService = async () => {
       if (!serviceToDelete) return;
-      setIsLoading(true);
+      setIsLoading(true); // Use general loading state for delete action
       try {
           await apiDeleteService(serviceToDelete.id); // Call the actual API delete function
           setServices(prev => prev.filter(s => s.id !== serviceToDelete!.id));
@@ -153,12 +157,12 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
           console.error("Failed to delete service:", error);
           toast({ title: t('admin_service.delete_error_title'), description: t('admin_service.error_generic_desc'), variant: 'destructive' });
       } finally {
-          setIsLoading(false);
+          setIsLoading(false); // Reset loading state
       }
   };
 
   const onSubmit = async (data: ServiceFormData) => {
-    setIsLoading(true);
+    setIsSubmittingForm(true); // Use form submission state
     try {
       if (editingService) {
         // Update existing service
@@ -168,7 +172,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
       } else {
         // Add new service
         const newService = await apiAddService(data); // Use API add function
-        setServices(prev => [newService, ...prev]);
+        setServices(prev => [newService, ...prev]); // Add new service to the top
         toast({ title: t('admin_service.add_success_title'), description: t('admin_service.add_success_desc', { serviceName: data.name }) });
       }
       closeModal();
@@ -176,7 +180,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
       console.error("Failed to save service:", error);
       toast({ title: editingService ? t('admin_service.update_error_title') : t('admin_service.add_error_title'), description: t('admin_service.error_generic_desc'), variant: 'destructive' });
     } finally {
-      setIsLoading(false);
+      setIsSubmittingForm(false); // Reset form submission state
     }
   };
 
@@ -310,11 +314,11 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                             <MotionButton
                                type="submit"
                                className="bg-accent hover:bg-accent/90 text-accent-foreground min-w-[110px]" // Min width to prevent resizing
-                               disabled={isSubmitting || isLoading} // Disable during form submit or API call
+                               disabled={isSubmittingForm || isLoading} // Disable during form submit or API call
                                 whileHover={{ y: -2 }} // Subtle hover lift
                                 whileTap={{ scale: 0.97 }} // Subtle tap
                              >
-                                {isSubmitting || isLoading ? (
+                                {isSubmittingForm ? (
                                    <Loader2 className="h-4 w-4 animate-spin" />
                                 ) : (
                                     editingService ? t('admin_service.save_changes') : t('admin_service.add_service')
@@ -329,7 +333,7 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
          </Dialog>
       </div>
 
-       {/* Delete Confirmation Dialog */}
+       {/* Delete Confirmation Dialog - Single instance controlled by state */}
        <AlertDialog open={!!serviceToDelete} onOpenChange={(isOpen) => { if (!isOpen) setServiceToDelete(null); }}>
            <AlertDialogContent>
                <AlertDialogHeader>
@@ -438,19 +442,17 @@ export const AdminServiceManager: FC<AdminServiceManagerProps> = ({ initialServi
                          >
                           <Edit className="h-4 w-4 text-blue-400" />
                         </MotionButton>
-                         {/* Use AlertDialogTrigger to open confirmation */}
-                         <AlertDialogTrigger asChild>
+                         {/* This button now just sets the state to open the single AlertDialog */}
                              <MotionButton
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => handleDeleteConfirmation(service)} // Set service to delete
+                                onClick={() => handleDeleteConfirmation(service)} // Set service to delete, opening the AlertDialog
                                 title={t('admin_service.delete_tooltip')}
                                 className="text-destructive hover:bg-destructive/10"
                                 whileHover={{ scale: 1.1, y: -1 }} whileTap={{ scale: 0.9 }}
                               >
                                <Trash2 className="h-4 w-4" />
                              </MotionButton>
-                         </AlertDialogTrigger>
                       </TableCell>
                     </MotionDiv>
                   ))}
