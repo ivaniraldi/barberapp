@@ -29,17 +29,13 @@ export default {
     title: 'Nuestros Servicios',
     subtitle: 'Encuentra el servicio de aseo perfecto para ti.',
     no_services_available: 'No hay servicios disponibles actualmente. Por favor, vuelve más tarde.', // Changed key for clarity
-    // Added specific category translations with 'category_' prefix matching generated keys
-    category_other: 'Otros Servicios',
-    category_cortes_de_pelo: 'Cortes de Pelo', // Matches 'cortes_de_pelo' key
-    category_cuidado_con_la_barba: 'Cuidado de Barba', // Matches 'cuidado_com_a_barba' key (normalized from pt)
-    category_cuidado_de_barba: 'Cuidado de Barba', // Matches 'cuidado_de_barba' key (if generated from es)
-    category_barbear: 'Afeitados', // Matches 'barbear' key (normalized from pt)
-    category_afeitados: 'Afeitados', // Matches 'afeitados' key (if generated from es)
-    category_estilizacao: 'Estilismo', // Matches 'estilizacao' key (normalized from pt)
-    category_estilismo: 'Estilismo', // Matches 'estilismo' key (if generated from es)
-    category_coloracao: 'Coloración', // Matches 'coloracao' key (normalized from pt)
-    category_coloracion: 'Coloración', // Matches 'coloracion' key (if generated from es)
+    // Corrected keys to match generated format (lowercase, underscore, no accents)
+    category_cortes_de_cabelo: 'Cortes de Pelo', // Matches key from pt
+    category_cuidado_com_a_barba: 'Cuidado de Barba', // Matches key from pt
+    category_barbear: 'Afeitados', // Matches key from pt
+    category_estilizacao: 'Estilismo', // Matches key from pt
+    category_coloracao: 'Coloración', // Matches key from pt
+    category_other_services: 'Otros Servicios', // Key for default/uncategorized
   },
   // Cuts Page
   cuts_page: {

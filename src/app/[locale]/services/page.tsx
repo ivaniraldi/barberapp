@@ -7,7 +7,7 @@ import { getServices, type Service } from '@/lib/services'; // Import function a
 import { useI18n } from '@/locales/client'; // Use client-side i18n hook
 // Removed setStaticParamsLocale import
 import { MotionDiv } from '@/components/motion-provider'; // Import MotionDiv
-import { Badge } from '@/components/ui/badge'; // Import Badge for category display
+// Removed Badge import as it's no longer used here
 import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton for loading states
 import { useEffect, useState, useMemo } from 'react'; // Import React hooks
 import { Loader2 } from 'lucide-react'; // Import Loader2
@@ -15,18 +15,24 @@ import { Loader2 } from 'lucide-react'; // Import Loader2
 // Helper function to group services by category key
 const groupServicesByCategoryKey = (services: Service[]) => {
   return services.reduce((acc, service) => {
-    const categoryKey = (service.category || 'other')
+    // Generate a consistent key from the category name (lowercase, underscore, no accents)
+    const categoryKey = (service.category || 'other_services') // Use 'other_services' as default key
+        .trim()
         .toLowerCase()
-        .replace(/\s+/g, '_')
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^\w-]+/g, '');
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
+        .replace(/\s+/g, '_') // Replace spaces with underscores
+        .replace(/[^\w-]+/g, ''); // Remove non-alphanumeric characters except underscore/hyphen
     if (!acc[categoryKey]) {
-      acc[categoryKey] = { originalName: service.category || 'Other Services', services: [] };
+      acc[categoryKey] = { originalName: service.category || t('services_page.category_other_services'), services: [] }; // Use translation key for default category name
     }
     acc[categoryKey].services.push(service);
     return acc;
   }, {} as Record<string, { originalName: string, services: Service[] }>);
 };
+
+// Temporary t function for default category name (will be replaced by actual hook)
+const t = (key: string) => key.split('.').pop()?.replace(/_/g, ' ') || 'Other Services';
+
 
 // Animation variants
 const containerVariants = {
@@ -60,6 +66,7 @@ function useFetchServices() {
     const [services, setServices] = useState<Service[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const t = useI18n(); // Get translation hook here for error messages
 
     useEffect(() => {
         const loadServices = async () => {
@@ -70,14 +77,15 @@ function useFetchServices() {
                 setError(null);
             } catch (err) {
                 console.error("Failed to fetch services:", err);
-                setError("Failed to load services. Please try again later.");
+                setError(t('admin_service.fetch_error_desc')); // Use translated error message
             } finally {
                 setIsLoading(false);
             }
         };
 
         loadServices();
-    }, []); // Empty dependency array ensures this runs once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [t]); // Add t to dependency array
 
     return { services, isLoading, error };
 }
@@ -126,12 +134,15 @@ export default function ServicesPage() {
 
         {!isLoadingServices && !servicesError && categoryKeys.map((categoryKey) => {
           const categoryData = categorizedServicesData[categoryKey];
+          // Construct the translation key
           const translationKey = `services_page.category_${categoryKey}` as any;
+          // Attempt to translate, use original name as fallback
           const translatedCategoryName = t(translationKey, {}, { fallback: categoryData.originalName });
 
           return (
             <MotionDiv key={categoryKey} variants={itemVariants}>
               <h2 className="text-3xl font-semibold text-primary mb-6 pb-2 border-b-2 border-accent flex items-center gap-2">
+                 {/* Display the potentially translated category name */}
                  {translatedCategoryName}
               </h2>
               <MotionDiv
@@ -142,13 +153,10 @@ export default function ServicesPage() {
                   <MotionDiv key={service.id} variants={itemVariants} whileHover={cardHoverEffect}>
                     <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card/80 backdrop-blur-sm border-border/50 overflow-hidden h-full flex flex-col rounded-lg">
                       <CardContent className="p-6 flex-grow flex flex-col justify-between">
+                         {/* Pass the single service to ServiceList */}
                          <ServiceList services={[service]} />
                       </CardContent>
-                       {service.category && (
-                          <div className="p-4 pt-0 mt-auto">
-                              <Badge variant="secondary" className="text-xs">{translatedCategoryName}</Badge>
-                          </div>
-                       )}
+                       {/* Removed redundant category badge display from here */}
                     </Card>
                   </MotionDiv>
                 ))}

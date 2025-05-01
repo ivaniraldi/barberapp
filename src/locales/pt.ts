@@ -29,13 +29,13 @@ export default {
     title: 'Nossos Serviços',
     subtitle: 'Encontre o serviço de cuidado perfeito para você.',
     no_services_available: 'Nenhum serviço disponível no momento. Por favor, volte mais tarde.', // Changed key for clarity
-    // Added specific category translations with 'category_' prefix matching generated keys
-    category_other: 'Outros Serviços',
-    category_cortes_de_cabelo: 'Cortes de Cabelo', // Matches 'cortes_de_cabelo' key
-    category_cuidado_com_a_barba: 'Cuidado com a Barba', // Matches 'cuidado_com_a_barba' key
-    category_barbear: 'Barbear', // Matches 'barbear' key
-    category_estilizacao: 'Estilização', // Matches 'estilizacao' key
-    category_coloracao: 'Coloração', // Matches 'coloracao' key
+    // Corrected keys to match generated format (lowercase, underscore, no accents)
+    category_cortes_de_cabelo: 'Cortes de Cabelo',
+    category_cuidado_com_a_barba: 'Cuidado com a Barba',
+    category_barbear: 'Barbear',
+    category_estilizacao: 'Estilização',
+    category_coloracao: 'Coloração',
+    category_other_services: 'Outros Serviços', // Key for default/uncategorized
   },
    // Cuts Page
   cuts_page: {
