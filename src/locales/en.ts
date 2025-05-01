@@ -12,7 +12,7 @@ export default {
   },
   // Homepage
   home: {
-    title: 'BarberApp',
+    title: 'WebRush',
     subtitle: 'Your neighborhood barbershop for premium grooming.',
     popular_services: 'Popular Services',
     popular_services_desc: 'Check out some of our client favorites.',
