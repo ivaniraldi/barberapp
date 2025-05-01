@@ -16,10 +16,10 @@ import { getCurrentLocale } from '@/locales/server'; // Import getCurrentLocale 
 // Mock Appointments Data - Use ISO strings for consistency across server/client
 // In a real app, fetch this data from your backend/database
 const mockAppointments = [
-    { id: 'a1', clientName: 'John Doe', clientPhone: '+15551234', clientEmail: 'john@example.com', serviceName: 'Classic Haircut', date: '2024-09-15T10:00:00Z', status: 'Confirmed' },
-    { id: 'a2', clientName: 'Jane Smith', clientPhone: '+15555678', clientEmail: 'jane@example.com', serviceName: 'Beard Trim & Shape', date: '2024-09-15T11:30:00Z', status: 'Pending' },
-    { id: 'a3', clientName: 'Bob Johnson', clientPhone: '+15559012', clientEmail: 'bob@example.com', serviceName: 'Hot Towel Shave', date: '2024-09-16T14:00:00Z', status: 'Completed' },
-    { id: 'a4', clientName: 'Carlos Rey', clientPhone: '+346661122', clientEmail: 'carlos@email.es', serviceName: 'Skin Fade Haircut', date: '2024-09-17T09:00:00Z', status: 'Confirmed' },
+    { id: 'a1', clientName: 'John Doe', clientPhone: '+15551234', clientEmail: 'john@example.com', serviceName: 'Corte de Cabelo Clássico', date: '2024-09-15T10:00:00Z', status: 'Confirmed' }, // Updated name
+    { id: 'a2', clientName: 'Jane Smith', clientPhone: '+15555678', clientEmail: 'jane@example.com', serviceName: 'Aparar e Modelar Barba', date: '2024-09-15T11:30:00Z', status: 'Pending' }, // Updated name
+    { id: 'a3', clientName: 'Bob Johnson', clientPhone: '+15559012', clientEmail: 'bob@example.com', serviceName: 'Barbear com Toalha Quente', date: '2024-09-16T14:00:00Z', status: 'Completed' }, // Updated name
+    { id: 'a4', clientName: 'Carlos Rey', clientPhone: '+346661122', clientEmail: 'carlos@email.es', serviceName: 'Corte Degradê (Skin Fade)', date: '2024-09-17T09:00:00Z', status: 'Confirmed' }, // Updated name
 ];
 
 // Animation variants
@@ -40,7 +40,7 @@ const itemVariants = {
 
 // Enhanced card hover effect for admin panels
 const cardHoverEffect = {
-  scale: 1.015, // More subtle scale for admin context
+  // Removed scale effect
   boxShadow: "0px 8px 20px hsla(var(--primary) / 0.08), 0px 4px 8px hsla(var(--primary) / 0.04)", // Softer shadow
   transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1.0] }
 };
@@ -54,7 +54,7 @@ export default async function AdminPage({ params }: { params: { locale: string }
   // In a real app, you'd add authentication checks here, possibly using middleware or a HOC
   // For now, we assume access is granted if the user reaches this page (middleware handles basic check).
 
-  const services = getServices(); // Fetch actual services
+  const services = await getServices(); // Await the promise
 
   return (
     <MotionDiv

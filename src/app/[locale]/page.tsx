@@ -45,7 +45,7 @@ export default async function Home({ params }: { params: { locale: string } }) {
    setStaticParamsLocale(params.locale);
 
   const t = await getI18n(); // Get translation function
-  const allServices = getServices();
+  const allServices = await getServices(); // Await the promise
 
   // Get popular services (active only)
   const popularServices = allServices.filter(s => s.active).slice(0, 3); // Simplified logic, still takes first 3 active
@@ -112,7 +112,7 @@ export default async function Home({ params }: { params: { locale: string } }) {
         </MotionDiv>
 
         {/* Booking Section */}
-        <MotionDiv variants={itemVariants} whileHover={cardHoverEffect}> {/* Apply non-scaling hover effect */}
+        <MotionDiv variants={itemVariants}> {/* Removed scaling hover effect */}
           <Card className="shadow-xl bg-card/80 backdrop-blur-md border-border/50 overflow-hidden h-full flex flex-col rounded-lg"> {/* Explicit rounded-lg */}
             <CardHeader className="bg-gradient-to-l from-primary/5 to-accent/5 pb-4 border-b border-border/30"> {/* Subtle header gradient and border */}
               <CardTitle className="text-2xl sm:text-3xl flex items-center gap-2 text-primary"> {/* Responsive title size */}

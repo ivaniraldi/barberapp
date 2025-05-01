@@ -1,12 +1,12 @@
 // src/app/[locale]/services/page.tsx
 import { ServiceList } from '@/components/service-list';
-import { Card, CardContent } from '@/components/ui/card';
-import { getServices, type Service } from '@/lib/services';
-import { getI18n } from '@/locales/server';
-import { setStaticParamsLocale } from 'next-international/server';
-import { MotionDiv } from '@/components/motion-provider';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent } from '@/components/ui/card'; // Removed CardHeader, Title, Desc as they weren't used directly here
+import { getServices, type Service } from '@/lib/services'; // Import function and type
+import { getI18n } from '@/locales/server'; // Import server-side i18n
+import { setStaticParamsLocale } from 'next-international/server'; // Correct import for setStaticParamsLocale
+import { MotionDiv } from '@/components/motion-provider'; // Import MotionDiv
+import { Badge } from '@/components/ui/badge'; // Import Badge for category display
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton for potential loading states
 
 // Helper function to group services by category key
 const groupServicesByCategoryKey = (services: Service[]) => {
@@ -54,7 +54,7 @@ export default async function ServicesPage({ params }: { params: { locale: strin
    setStaticParamsLocale(params.locale);
 
   const t = await getI18n(); // Get translation function
-  const allServices = getServices();
+  const allServices = await getServices(); // Await the promise
   const activeServices = allServices.filter(service => service.active); // Only show active services
 
   const categorizedServicesData = groupServicesByCategoryKey(activeServices);
@@ -102,8 +102,9 @@ export default async function ServicesPage({ params }: { params: { locale: strin
                     {/* Wrap card content for better structure and apply hover effect */}
                     <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card/80 backdrop-blur-sm border-border/50 overflow-hidden h-full flex flex-col rounded-lg"> {/* Added rounded-lg */}
                       <CardContent className="p-6 flex-grow flex flex-col justify-between">
-                        {/* Pass single service as an array to ServiceList */}
-                        <ServiceList services={[service]} />
+                         {/* Service Details - Explicitly show title */}
+                          <h3 className="text-xl font-semibold text-primary mb-2">{service.name}</h3>
+                         <ServiceList services={[service]} />
                         {/* Optional: Add a "Book Now" button specific to this service if desired */}
                       </CardContent>
                        {/* Footer for category badge */}
