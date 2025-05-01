@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet'; // Added SheetHeader, SheetTitle
 import { cn } from '@/lib/utils';
 import { Menu, Scissors, LogIn, Home, Briefcase, GalleryVertical, Globe, CalendarDays } from 'lucide-react'; // Added CalendarDays
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Added useEffect
 import { useI18n, useChangeLocale, useCurrentLocale } from '@/locales/client'; // Import i18n hooks
 import {
   DropdownMenu,
@@ -24,6 +24,11 @@ export function Navbar() {
   const changeLocale = useChangeLocale();
   const currentLocale = useCurrentLocale() as 'en' | 'es' | 'pt'; // Ensure type safety
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false); // State to track client-side mount
+
+  useEffect(() => {
+    setIsClient(true); // Component is mounted on the client
+  }, []);
 
   const navItems = [
     { href: '/', labelKey: 'nav.home', icon: Home },
@@ -33,6 +38,14 @@ export function Navbar() {
   ];
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
+  const handleLocaleChange = (newLocale: 'en' | 'es' | 'pt') => {
+    changeLocale(newLocale);
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('locale', newLocale); // Save to localStorage
+    }
+    closeMobileMenu(); // Close menu if open
+  };
 
   // Animation for Nav Items
   const navItemVariants = {
@@ -63,7 +76,7 @@ export function Navbar() {
 
   return (
     <MotionDiv
-      tag="nav" // Ensure MotionDiv renders as nav semantically
+      as="nav" // Ensure MotionDiv renders as nav semantically
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
@@ -83,7 +96,7 @@ export function Navbar() {
            {navItems.map((item, index) => {
                // Determine if the link is active, handling the root path '/' correctly
                const baseHref = `/${currentLocale}${item.href === '/' ? '' : item.href}`;
-               const isActive = pathname === baseHref || (item.href === '/' && pathname === `/${currentLocale}`);
+               const isActive = isClient && (pathname === baseHref || (item.href === '/' && pathname === `/${currentLocale}`)); // Check isClient
 
                return (
                  // Wrap Link with MotionDiv instead of using MotionButton asChild
@@ -125,14 +138,15 @@ export function Navbar() {
                 size="sm"
                 className="border-border/70 hover:bg-muted/70 text-muted-foreground hover:text-foreground" // Adjusted style
                 variants={buttonVariants} whileHover="hover" whileTap="tap"
+                disabled={!isClient} // Disable during SSR/hydration
               >
                 <Globe className="mr-1.5 h-4 w-4" /> {currentLocale.toUpperCase()}
               </MotionButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => changeLocale('en')} disabled={currentLocale === 'en'}>English (EN)</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLocale('es')} disabled={currentLocale === 'es'}>Español (ES)</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLocale('pt')} disabled={currentLocale === 'pt'}>Português (PT)</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleLocaleChange('en')} disabled={currentLocale === 'en'}>English (EN)</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleLocaleChange('es')} disabled={currentLocale === 'es'}>Español (ES)</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleLocaleChange('pt')} disabled={currentLocale === 'pt'}>Português (PT)</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -160,14 +174,14 @@ export function Navbar() {
           {/* Mobile Language Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-               <MotionButton variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" variants={buttonVariants} whileHover="hover" whileTap="tap">
+               <MotionButton variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" variants={buttonVariants} whileHover="hover" whileTap="tap" disabled={!isClient}>
                 <Globe className="h-5 w-5" />
               </MotionButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => changeLocale('en')} disabled={currentLocale === 'en'}>EN</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLocale('es')} disabled={currentLocale === 'es'}>ES</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLocale('pt')} disabled={currentLocale === 'pt'}>PT</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleLocaleChange('en')} disabled={currentLocale === 'en'}>EN</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleLocaleChange('es')} disabled={currentLocale === 'es'}>ES</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleLocaleChange('pt')} disabled={currentLocale === 'pt'}>PT</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           {/* Mobile Menu Sheet */}
@@ -180,17 +194,17 @@ export function Navbar() {
             </SheetTrigger>
              <SheetContent side="right" className="w-[280px] bg-background p-0 flex flex-col border-l border-border/50"> {/* Added border */}
                <SheetHeader className="p-6 border-b border-border/50">
-                   <SheetTitle> {/* Keep title for accessibility, can be visually hidden if needed */}
-                       <Link href="/" className="flex items-center space-x-2 text-lg font-bold text-primary" onClick={closeMobileMenu}>
-                        <Scissors className="h-6 w-6 text-accent" />
-                        <span>BarberApp</span>
-                       </Link>
+                  <SheetTitle> {/* Added SheetTitle */}
+                     <Link href="/" className="flex items-center space-x-2 text-lg font-bold text-primary" onClick={closeMobileMenu}>
+                      <Scissors className="h-6 w-6 text-accent" />
+                      <span>BarberApp</span>
+                     </Link>
                    </SheetTitle>
                </SheetHeader>
               <div className="flex-grow flex flex-col space-y-1.5 p-4 overflow-y-auto"> {/* Make menu scrollable */}
                  {navItems.map((item, index) => {
                      const baseHref = `/${currentLocale}${item.href === '/' ? '' : item.href}`;
-                     const isActive = pathname === baseHref || (item.href === '/' && pathname === `/${currentLocale}`);
+                     const isActive = isClient && (pathname === baseHref || (item.href === '/' && pathname === `/${currentLocale}`)); // Check isClient
 
                      return (
                        <MotionDiv

@@ -1,4 +1,6 @@
 // src/app/[locale]/page.tsx
+'use client'; // Make this a client component to use hooks
+
 import Link from 'next/link';
 import { ServiceList } from '@/components/service-list';
 import { BookingForm } from '@/components/booking-form';
@@ -6,11 +8,11 @@ import { GalleryGrid } from '@/components/gallery-grid';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { ArrowRight, Images, CalendarCheck, ShoppingCart } from 'lucide-react'; // Added relevant icons
-import { getServices } from '@/lib/services';
-import { getI18n } from '@/locales/server'; // Import server-side i18n
-import { setStaticParamsLocale } from 'next-international/server'; // Correct import for setStaticParamsLocale
+import { ArrowRight, Images, CalendarCheck, ShoppingCart, Loader2 } from 'lucide-react'; // Added Loader2
+import { getServices, type Service } from '@/lib/services'; // Import service type and fetch function
+import { useI18n } from '@/locales/client'; // Use client-side i18n hook
 import { MotionDiv } from '@/components/motion-provider'; // Import MotionDiv
+import { useEffect, useState } from 'react'; // Import React hooks
 
 // Animation variants
 const containerVariants = {
@@ -18,7 +20,7 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15, // Slightly adjusted stagger
+      staggerChildren: 0.15,
       delayChildren: 0.1,
     },
   },
@@ -39,29 +41,57 @@ const cardHoverEffect = {
   transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1.0] } // Custom ease for smooth transition
 };
 
+// Mock images for the gallery - replace with actual image URLs from your system
+const galleryImages = [
+  { id: 'g1', src: 'https://picsum.photos/seed/hair1/400/600', alt: 'Stylish haircut 1', category: 'Haircuts' },
+  { id: 'g2', src: 'https://picsum.photos/seed/beard2/500/350', alt: 'Beard trim style 2', category: 'Beard Care' },
+  { id: 'g3', src: 'https://picsum.photos/seed/fade3/450/550', alt: 'Clean fade haircut 3', category: 'Haircuts' },
+  { id: 'g4', src: 'https://picsum.photos/seed/classic4/400/500', alt: 'Classic men\'s cut 4', category: 'Haircuts' },
+  { id: 'g5', src: 'https://picsum.photos/seed/long5/350/550', alt: 'Long hair style 5', category: 'Styling' },
+  { id: 'g6', src: 'https://picsum.photos/seed/shave6/600/400', alt: 'Hot towel shave 6', category: 'Shaves' },
+];
 
-export default async function Home({ params }: { params: { locale: string } }) {
-   // Set locale for static generation (important for build)
-   setStaticParamsLocale(params.locale);
 
-  const t = await getI18n(); // Get translation function
-  const allServices = await getServices(); // Await the promise
+// Custom hook to fetch services client-side
+function useFetchServices() {
+    const [services, setServices] = useState<Service[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-  // Get popular services (active only)
-  const popularServices = allServices.filter(s => s.active).slice(0, 3); // Simplified logic, still takes first 3 active
+    useEffect(() => {
+        const loadServices = async () => {
+            try {
+                setIsLoading(true);
+                const fetchedServices = await getServices(); // Call the API function
+                setServices(fetchedServices);
+                setError(null);
+            } catch (err) {
+                console.error("Failed to fetch services:", err);
+                setError("Failed to load services. Please try again later.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-  // Filter all active services for the booking form
+        loadServices();
+    }, []); // Empty dependency array ensures this runs once on mount
+
+    return { services, isLoading, error };
+}
+
+
+export default function Home() {
+  // Removed params prop as it's no longer needed for locale setting here
+  // Removed setStaticParamsLocale call
+
+  const t = useI18n(); // Get translation function
+  const { services: allServices, isLoading: isLoadingServices, error: servicesError } = useFetchServices();
+
+  // Get popular services (active only) - Calculate after fetching
+  const popularServices = allServices.filter(s => s.active).slice(0, 3);
+
+  // Filter all active services for the booking form - Calculate after fetching
   const bookableServices = allServices.filter(service => service.active);
-
-  // Mock images for the gallery - replace with actual image URLs from your system
-  const galleryImages = [
-    { id: 'g1', src: 'https://picsum.photos/seed/hair1/400/600', alt: 'Stylish haircut 1', category: 'Haircuts' },
-    { id: 'g2', src: 'https://picsum.photos/seed/beard2/500/350', alt: 'Beard trim style 2', category: 'Beard Care' },
-    { id: 'g3', src: 'https://picsum.photos/seed/fade3/450/550', alt: 'Clean fade haircut 3', category: 'Haircuts' },
-    { id: 'g4', src: 'https://picsum.photos/seed/classic4/400/500', alt: 'Classic men\'s cut 4', category: 'Haircuts' },
-    { id: 'g5', src: 'https://picsum.photos/seed/long5/350/550', alt: 'Long hair style 5', category: 'Styling' },
-    { id: 'g6', src: 'https://picsum.photos/seed/shave6/600/400', alt: 'Hot towel shave 6', category: 'Shaves' },
-  ];
 
   return (
     <MotionDiv
@@ -94,10 +124,18 @@ export default async function Home({ params }: { params: { locale: string } }) {
               <CardDescription className="text-base">{t('home.popular_services_desc')}</CardDescription> {/* Slightly larger desc */}
             </CardHeader>
             <CardContent className="pt-6 flex-grow flex flex-col justify-between p-6"> {/* Standard padding */}
-               {popularServices.length > 0 ? (
+               {isLoadingServices && (
+                 <div className="flex justify-center items-center h-full py-10">
+                   <Loader2 className="h-8 w-8 animate-spin text-accent"/>
+                 </div>
+               )}
+               {servicesError && (
+                  <p className="text-destructive text-center py-4">{servicesError}</p>
+               )}
+               {!isLoadingServices && !servicesError && popularServices.length > 0 ? (
                  <ServiceList services={popularServices} />
                ) : (
-                 <p className="text-muted-foreground text-center py-4">{t('services_page.no_services')}</p>
+                 !isLoadingServices && !servicesError && <p className="text-muted-foreground text-center py-4">{t('services_page.no_services_available')}</p>
                )}
                {/* CTA Button */}
                 <MotionDiv whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}> {/* Slightly reduced hover scale */}
@@ -121,8 +159,16 @@ export default async function Home({ params }: { params: { locale: string } }) {
               <CardDescription className="text-base">{t('home.book_appointment_desc')}</CardDescription> {/* Slightly larger desc */}
             </CardHeader>
             <CardContent className="pt-6 flex-grow p-6"> {/* Standard padding */}
+               {isLoadingServices && (
+                 <div className="flex justify-center items-center h-full py-10">
+                    <Loader2 className="h-8 w-8 animate-spin text-accent"/>
+                 </div>
+               )}
+               {servicesError && (
+                  <p className="text-destructive text-center py-4">Error loading services for booking.</p> // Simplified error message
+               )}
               {/* Pass only active services and translation function to booking form */}
-              <BookingForm services={bookableServices} />
+              {!isLoadingServices && !servicesError && <BookingForm services={bookableServices} />}
             </CardContent>
           </Card>
         </MotionDiv>

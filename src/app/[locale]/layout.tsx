@@ -1,16 +1,14 @@
 // src/app/[locale]/layout.tsx
 import type { Metadata } from 'next';
-// Removed Geist font imports as the dependency is not installed
-// import { GeistSans } from 'geist/font/sans';
-// import { GeistMono } from 'geist/font/mono';
 import '../globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Navbar } from '@/components/navbar';
-import { I18nProviderClient } from '@/locales/client'; // Import client provider
+// Removed I18nProviderClient import, LocaleProvider handles it
 import type { ReactNode } from 'react';
 import { MotionProvider } from '@/components/motion-provider';
 import { getStaticParams } from '@/locales/server'; // Import getStaticParams for locale generation
 import { setStaticParamsLocale } from 'next-international/server'; // Import setStaticParamsLocale
+import { LocaleProvider } from '@/components/locale-provider'; // Import the new LocaleProvider
 
 interface LocaleLayoutProps {
   children: ReactNode;
@@ -29,12 +27,11 @@ export default function LocaleLayout({ children, params: { locale } }: LocaleLay
   const validLocale = ['en', 'es', 'pt'].includes(locale) ? locale : 'pt';
 
   return (
-    // Removed Geist font variables from html tag
     // Ensure no extra whitespace or comments directly inside the html tag
     <html lang={validLocale} className={`dark`}>
        <body className="antialiased bg-gradient-to-br from-background via-background/95 to-secondary/10 text-foreground min-h-screen flex flex-col">
-        {/* Wrap content with I18nProviderClient */}
-        <I18nProviderClient locale={validLocale}> {/* Pass validated locale */}
+        {/* Wrap content with LocaleProvider */}
+        <LocaleProvider initialLocale={validLocale}>
            {/* Wrap with MotionProvider */}
            <MotionProvider>
               <Navbar />
@@ -43,19 +40,13 @@ export default function LocaleLayout({ children, params: { locale } }: LocaleLay
               </main>
               <Toaster />
            </MotionProvider>
-        </I18nProviderClient>
+        </LocaleProvider>
       </body>
     </html>
   );
 }
 
 // Function to generate static params for supported locales
-// Re-enable generateStaticParams if using full static export or SSG for locales
-// export { generateStaticParams };
-
-// If not using full static export, this function is not strictly necessary
-// unless you want to pre-render specific locale pages during build.
-// Next.js dynamic routing will handle non-pre-rendered locales.
  export function generateStaticParams() {
    const params = getStaticParams(); // Get locale objects like [{ locale: 'en' }, ...]
    // Set the locale for each param object during static generation
