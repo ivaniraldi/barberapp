@@ -28,7 +28,7 @@ let allServices: Service[] = [
 // --- API Simulation ---
 
 // Simulate API delay
-const simulateApiDelay = (delay = 500) => new Promise(resolve => setTimeout(resolve, delay));
+const simulateApiDelay = (delay = 300) => new Promise(resolve => setTimeout(resolve, delay)); // Reduced delay slightly
 
 // Function to get all services (simulates fetching data)
 export async function getServices(): Promise<Service[]> {
@@ -51,8 +51,8 @@ export async function addService(newServiceData: Omit<Service, 'id'>): Promise<S
     id: `service-${Date.now()}-${Math.random().toString(16).slice(2)}`, // More unique ID
   };
   allServices = [newService, ...allServices]; // Add to the beginning
-  console.log("Added Service:", JSON.stringify(newService));
-  console.log("Current Services:", JSON.stringify(allServices));
+  console.log("Added Service:", JSON.stringify(newService)); // Log only the added service (stringified)
+  // console.log("Current Services:", JSON.stringify(allServices)); // Removed logging the full array
   return newService;
 }
 
@@ -65,14 +65,14 @@ export async function updateService(id: string, updatedData: Partial<Omit<Servic
   }
   const updatedService = { ...allServices[serviceIndex], ...updatedData };
   allServices[serviceIndex] = updatedService;
-  console.log("Updated Service:", JSON.stringify(updatedService));
-  console.log("Current Services:", JSON.stringify(allServices));
+  console.log("Updated Service:", JSON.stringify(updatedService)); // Log only the updated service (stringified)
+  // console.log("Current Services:", JSON.stringify(allServices)); // Removed logging the full array
   return updatedService;
 }
 
 // Function to delete a service (simulates API call)
 export async function deleteService(id: string): Promise<void> {
-  await simulateApiDelay(700); // Slightly longer delay for delete
+  await simulateApiDelay(500); // Adjusted delay
   const initialLength = allServices.length;
   allServices = allServices.filter(service => service.id !== id);
   if (allServices.length === initialLength) {
@@ -81,5 +81,5 @@ export async function deleteService(id: string): Promise<void> {
       console.warn(`Service with ID ${id} not found for deletion.`);
   }
   console.log("Deleted Service ID:", id);
-  console.log("Current Services:", JSON.stringify(allServices));
+  // console.log("Current Services:", JSON.stringify(allServices)); // Removed logging the full array
 }
